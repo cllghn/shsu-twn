@@ -192,3 +192,5 @@ coverage/
 .idea/
 .vscode/
 *.iml
+# Local Netlify folder
+.netlify
