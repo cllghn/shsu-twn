@@ -1,0 +1,276 @@
+{
+    "elements": {
+        "nodes": [
+            {
+                "data": {
+                    "id": "TX1010013",
+                    "name": "CITY OF HOUSTON",
+                    "county": "HARRIS",
+                    "population": 2202531
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010554",
+                    "name": "GREENWOOD UTILITY DISTRICT",
+                    "county": "HARRIS",
+                    "population": 10536
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010750",
+                    "name": "PARKWAY UTILITY DISTRICT",
+                    "county": "HARRIS",
+                    "population": 7278
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010004",
+                    "name": "CITY OF BELLAIRE",
+                    "county": "HARRIS",
+                    "population": 18090
+                }
+            },
+            {
+                "data": {
+                    "id": "TX0840007",
+                    "name": "CITY OF LEAGUE CITY",
+                    "county": "GALVESTON",
+                    "population": 128412
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010226",
+                    "name": "CITY OF WEBSTER",
+                    "county": "HARRIS",
+                    "population": 13710
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010007",
+                    "name": "CITY OF DEER PARK",
+                    "county": "HARRIS",
+                    "population": 34495
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1012987",
+                    "name": "CITY OF HILSHIRE VILLAGE",
+                    "county": "HARRIS",
+                    "population": 945
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1010712",
+                    "name": "HARRIS COUNTY MUD 8",
+                    "county": "HARRIS",
+                    "population": 3271
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1011865",
+                    "name": "TASFIELD",
+                    "county": "HARRIS",
+                    "population": 219
+                }
+            },
+            {
+                "data": {
+                    "id": "TX1012698",
+                    "name": "BAYBROOK MUD 1",
+                    "county": "HARRIS",
+                    "population": 3087
+                }
+            }
+        ],
+        "edges": [
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 10536,
+                    "availability": "p",
+                    "id": 0
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010554",
+                    "type": "sells to",
+                    "target": "TX1010750",
+                    "population": 7278,
+                    "availability": "p",
+                    "id": 1
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010750",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 10536,
+                    "availability": "e",
+                    "id": 2
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010554",
+                    "type": "sells to",
+                    "target": "TX1010750",
+                    "population": 7278,
+                    "availability": "p",
+                    "id": 3
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010750",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 10536,
+                    "availability": "e",
+                    "id": 4
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010554",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 7278,
+                    "availability": "p",
+                    "id": 5
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010750",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 10536,
+                    "availability": "e",
+                    "id": 6
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010554",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 7278,
+                    "availability": "p",
+                    "id": 7
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010750",
+                    "type": "sells to",
+                    "target": "TX1010554",
+                    "population": 10536,
+                    "availability": "e",
+                    "id": 8
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1010004",
+                    "population": 18090,
+                    "availability": "p",
+                    "id": 9
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX0840007",
+                    "population": 128412,
+                    "availability": "p",
+                    "id": 10
+                }
+            },
+            {
+                "data": {
+                    "source": "TX0840007",
+                    "type": "sells to",
+                    "target": "TX1010226",
+                    "population": 13710,
+                    "availability": "e",
+                    "id": 11
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1010007",
+                    "population": 34495,
+                    "availability": "p",
+                    "id": 12
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1012987",
+                    "population": 945,
+                    "availability": "p",
+                    "id": 13
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1010712",
+                    "population": 3271,
+                    "availability": "p",
+                    "id": 14
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1011865",
+                    "population": 219,
+                    "availability": "p",
+                    "id": 15
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1010013",
+                    "type": "sells to",
+                    "target": "TX1012698",
+                    "population": 3087,
+                    "availability": "p",
+                    "id": 16
+                }
+            },
+            {
+                "data": {
+                    "source": "TX1012698",
+                    "type": "sells to",
+                    "target": "TX1010226",
+                    "population": 13710,
+                    "availability": "p",
+                    "id": 17
+                }
+            }
+        ]
+    }
+}
