@@ -10,12 +10,5 @@ const nextConfig: NextConfig = {
   }
 };
 
-module.exports = {
-  basePath: '/app',
-};
-
-module.exports = {
-  distDir: 'app/.next',
-};
 
 export default nextConfig;

@@ -1,5 +1,5 @@
-import Footer from "../components/footer/Footer.tsx";
-import Graph from "../components/graph/graph.tsx";
+import Footer from "@/components/footer/Footer.tsx";
+import Graph from "@/components/graph/graph.tsx";
 
 export default function Home() {
   return (
