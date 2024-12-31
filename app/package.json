@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.3.0",
     "@mui/material": "^6.3.0",
+    "@shepherdpro/react": "^0.0.3",
     "autoprefixer": "^10.4.20",
     "cytoscape": "^3.30.4",
     "cytoscape-cola": "^2.5.1",
@@ -22,6 +23,8 @@
     "react": "^19.0.0",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.0.0",
+    "react-shepherd": "^6.1.6",
+    "shepherd.js": "^14.3.0",
     "tailwind": "^4.0.0"
   },
   "devDependencies": {

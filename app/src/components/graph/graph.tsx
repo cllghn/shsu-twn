@@ -18,6 +18,9 @@ import GraphConfigModal from "../modals/GraphConfigModal";
 import GraphInfoModal from "../modals/GraphInfoModal";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
+import TableViewIcon from '@mui/icons-material/TableView';
+import ShepherdTour from '@/components/ShepherdTour';
+
 
 // import { SelectChangeEvent } from '@mui/material/Select';
 
@@ -287,7 +290,7 @@ const Graph: React.FC = () => {
     return (
         <div className="h-full w-full relative">
             {/* Graph-level metrics */}
-            <div className="absolute bottom-0 right-2 z-10 bg-white shadow-md p-2 rounded">
+            <div className="absolute bottom-0 right-2 z-10 bg-white shadow-md p-2 rounded" id="graph-info-legend">
                 <h2 className="pb-2 text-md">Icons Key</h2>
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Sale
@@ -308,23 +311,17 @@ const Graph: React.FC = () => {
                 <button
                     onClick={toggleInfoDrawer(true)}
                     className="absolute top-0 left-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id="info-btn"
                 >
                     <InfoIcon />
                 </button>
             </Tooltip>
+            {/* Tour Guide */}
+            <ShepherdTour />
             <GraphInfoModal
                 open={graphInfoModalOpen}
                 onClose={toggleInfoDrawer(false)}
             />
-            {/* Graph Config Modal */}
-            <Tooltip title="Configure Graph" arrow placement="left">
-                <button
-                    onClick={toggleDrawer(true)}
-                    className="absolute top-0 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
-                >
-                    <ConstructionIcon />
-                </button>
-            </Tooltip>
             <GraphConfigModal
                 open={graphConfigModalOpen}
                 onClose={toggleDrawer(false)}
@@ -336,20 +333,42 @@ const Graph: React.FC = () => {
                 nodeSizeOption={nodeSizeOption}
                 onNodeSizeOptionChange={(option) => setNodeSizeOption(option)}
             />
+            {/* Graph Config Modal */}
+            <Tooltip title="Configure Graph" arrow placement="left">
+                <button
+                    onClick={toggleDrawer(true)}
+                    className="absolute top-0 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id="config-btn"
+                >
+                    <ConstructionIcon />
+                </button>
+            </Tooltip>
             {/* Autozoom button */}
             <Tooltip title="Fit to Screen" arrow placement="left">
                 <button
                     onClick={handleZoomToFit}
                     className="absolute top-14 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
+                </button>
+            </Tooltip>
+            <Tooltip title="Coming soon!" arrow placement="left">
+                <button
+                    onClick={console.log('working on this...')}
+                    className="absolute top-28 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md disabled disabled:bg-white disabled:text-blue-500"
+                    id='view-table-btn'
+                    disabled
+                >
+                    <TableViewIcon />
                 </button>
             </Tooltip>
             {/* Autozoom button */}
             <Tooltip title="Take Screenshot" arrow placement="left">
                 <button
                     onClick={getScreenshot}
-                    className="absolute top-28 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    className="absolute top-[10.5rem] right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id='screenshot-btn'
                 >
                     <CameraAltIcon />
                 </button>
@@ -365,6 +384,7 @@ const Graph: React.FC = () => {
                 cy={(cy) => {
                     cyRef.current = cy;
                 }}
+                id="cy-graph"
             />
         </div >
     );

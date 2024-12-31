@@ -7,6 +7,8 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 interface GraphConfigModalProps {
@@ -63,7 +65,12 @@ const GraphConfigModal: React.FC<GraphConfigModalProps> = ({
     return (
         <Drawer open={open} onClose={handleDrawerClose} anchor="right">
             <div className="p-5 max-w-96">
-                <h1 className="text-2xl pb-5">Graph Configuration</h1>
+                <div className="absolute top-2 right-2">
+                    <IconButton aria-label="close" onClick={handleDrawerClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </div>
+                <h1 className="text-2xl py-5">Graph Configuration</h1>
                 <p>Below is a small set of options for modifying the graph's appearance, organized by the graph elements they control.</p>
                 <Divider className="py-5">
                     <Chip label="Graph Options" size="small" />
@@ -103,12 +110,13 @@ const GraphConfigModal: React.FC<GraphConfigModalProps> = ({
                 <div>
                     <Box sx={{ minWidth: 120 }}>
                         <FormControl fullWidth>
-                            <InputLabel id="node-size-select-label"> Size</InputLabel>
+                            <InputLabel id="node-size-select-label">Size</InputLabel>
                             <Select
                                 labelId="node-size-select-label"
                                 id="node-size-select"
                                 value={nodeSizeOption}
                                 onChange={(event) => onNodeSizeOptionChange(event.target.value as string)}
+                                label="Size"
                             >
                                 <MenuItem value="Constant">Constant</MenuItem>
                                 <MenuItem value="OutDegree">Out Degree</MenuItem>
