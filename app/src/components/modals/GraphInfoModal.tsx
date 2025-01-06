@@ -1,6 +1,8 @@
 
 import React from "react";
 import { Drawer } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface GraphInfoModalProps {
     open: boolean;
@@ -17,7 +19,12 @@ const GraphInfoModal: React.FC<GraphInfoModalProps> = ({
     return (
         <Drawer open={open} onClose={handleClose} anchor="left">
             <div className="p-5 max-w-96">
-                <h1 className="text-2xl pb-5">
+                <div className="absolute top-2 right-2">
+                    <IconButton aria-label="close" onClick={handleClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </div>
+                <h1 className="text-2xl py-5">
                     Texas Water Network Visualizer
                 </h1>
                 <p>

@@ -15,7 +15,9 @@ def _():
 @app.cell
 def _(pd):
     el = pd.read_csv('edgelist.csv')
+    el = el.where(pd.notnull(el), None)
     nl = pd.read_csv('nodelist.csv')
+    nl = nl.where(pd.notnull(nl), None)
     return el, nl
 
 
@@ -73,7 +75,7 @@ def _(el, nl):
 
 @app.cell
 def _(json, out):
-    with open('../app/src/app/graph/network-data.json', 'w') as f:
+    with open('../app/src/components/graph/network-data.json', 'w') as f:
         json.dump(out, f, indent=4)
     return (f,)
 

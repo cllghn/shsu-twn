@@ -18,6 +18,16 @@ import GraphConfigModal from "../modals/GraphConfigModal";
 import GraphInfoModal from "../modals/GraphInfoModal";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
+import TableViewIcon from '@mui/icons-material/TableView';
+import ShepherdTour from '@/components/ShepherdTour';
+
+import { Tabs } from '@mui/base/Tabs';
+import { TabsList } from '@mui/base/TabsList';
+import { TabPanel } from '@mui/base/TabPanel';
+import { Tab } from '@mui/base/Tab';
+
+
+
 
 // import { SelectChangeEvent } from '@mui/material/Select';
 
@@ -50,6 +60,14 @@ interface GraphData {
     };
 }
 
+const typeColorMap: Record<string, string> = {
+    AQUIFER: "#a6cee3",
+    WS: "#1f78b4",
+    INDUSTRIAL: "#b2df8a",
+    MUNICIPAL: "#33a02c",
+    default: "#fb9a99", // Default color if type is undefined or unmatched
+};
+
 // Main Graph Component
 const Graph: React.FC = () => {
     const [graphState, setGraphState] = useState<GraphData>(graphData as GraphData);
@@ -77,6 +95,27 @@ const Graph: React.FC = () => {
     const toggleInfoDrawer = (newOpen: boolean) => () => {
         setGraphInfoModalOpen(newOpen);
     };
+
+    // Hover node state
+    const [hoveredNode, setHoveredNode] = useState<NodeData | null>(null);
+    const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    useEffect(() => {
+        const cy = cyRef.current;
+
+        if (cy) {
+            // Listen for node hover events
+            cy.on("mouseover", "node", (event) => {
+                const node = event.target;
+                const { x, y } = node.renderedPosition();
+                setHoveredNode(node.data());
+                setTooltipPosition({ x, y });
+            });
+
+            cy.on("mouseout", "node", () => {
+                setHoveredNode(null);
+            });
+        }
+    }, []);
 
     // States for the graph configuration modal
     const [graphConfigModalOpen, setGraphConfigModalOpen] = React.useState(false);
@@ -246,6 +285,9 @@ const Graph: React.FC = () => {
         return elements.nodes.map((node) => {
             const metric = sizeByNodeId[node.data.id] || 0;
             const size = sizeOption === "Constant" ? 20 : 20 + (metric / maxMetric) * 10;
+            // Determine color based on type
+            const nodeColor = typeColorMap[node.data.type] || typeColorMap.default;
+
 
             return {
                 selector: `node[id="${node.data.id}"]`,
@@ -253,11 +295,13 @@ const Graph: React.FC = () => {
                     width: `${size}px`,
                     height: `${size}px`,
                     label: showLabels ? "data(name)" : "",
-                    "background-color": "#0074D9",
+                    "text-wrap": "wrap",
+                    "text-max-width": "40px",
+                    "background-color": nodeColor,
                     "text-valign": "center",
                     "text-halign": "center",
                     color: "#000",
-                    "font-size": "5px",
+                    "font-size": "4px",
                 },
             };
         });
@@ -287,44 +331,84 @@ const Graph: React.FC = () => {
     return (
         <div className="h-full w-full relative">
             {/* Graph-level metrics */}
-            <div className="absolute bottom-0 right-2 z-10 bg-white shadow-md p-2 rounded">
-                <h2 className="pb-2 text-md">Icons Key</h2>
-                <span className="text-sm">
-                    <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Sale
-                </span>
-                <br />
-                <span className="text-sm">
-                    <CircleIcon sx={{ fontSize: 'small' }} /> Water System
-                </span>
-                <h2 className="py-2 text-md">Graph Statistics</h2>
-                <span className="text-sm">Nodes: {nodesCount}</span>
-                <br />
-                <span className="text-sm">Edges: {edgesCount}</span>
-                <br />
-                <span className="text-sm">Connected Nodes: {connectedNodesCount}</span>
+            <div className="absolute bottom-0 right-2 z-10 bg-white shadow-md p-2 rounded" id="graph-info-legend">
+                <Tabs defaultValue={1}>
+                    <TabsList className="mb-4 rounded-xl bg-blue-500 flex font-sans items-center justify-center content-between min-w-tabs-list shadow-lg">
+                        <Tab
+                            slotProps={{
+                                root: ({ selected, disabled }) => ({
+                                    className: `font-sans ${selected
+                                        ? 'text-purple-500 bg-white'
+                                        : 'text-white bg-transparent focus:text-white hover:bg-purple-400'
+                                        } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                        } text-sm font-bold w-full p-2 m-1.5 border-0 rounded-lg flex justify-center focus:outline-0 focus:shadow-outline-purple-light`,
+                                }),
+                            }}
+                            value={1}
+                        >
+                            Keys
+                        </Tab>
+                        <Tab
+                            slotProps={{
+                                root: ({ selected, disabled }) => ({
+                                    className: `font-sans ${selected
+                                        ? 'text-purple-500 bg-white'
+                                        : 'text-white bg-transparent focus:text-white hover:bg-purple-400'
+                                        } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                        } text-sm font-bold w-full p-2 m-1.5 border-0 rounded-md flex justify-center focus:outline-0 focus:shadow-outline-purple-light`,
+                                }),
+                            }}
+                            value={2}
+                        >
+                            Stats
+                        </Tab>
+                    </TabsList>
+                    <TabPanel className="w-full font-sans text-sm pb-5" value={1}>
+                        <span className="text-sm">
+                            <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: '#a6cee3' }} /> Aquifer
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: '#a6cee3' }} /> Water System
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: '#b2df8a' }} /> Industrial User
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: '#33a02c' }} /> Municipal User
+                        </span>
+                    </TabPanel>
+                    <TabPanel className="w-full font-sans text-sm pb-5" value={2}>
+                        <span className="text-sm">Nodes: {nodesCount}</span>
+                        <br />
+                        <span className="text-sm">Edges: {edgesCount}</span>
+                        <br />
+                        <span className="text-sm">Connected Nodes: {connectedNodesCount}</span>
+                    </TabPanel>
+                </Tabs>
             </div>
             {/* Info Modal */}
             <Tooltip title="Project Information" arrow placement="right">
                 <button
                     onClick={toggleInfoDrawer(true)}
                     className="absolute top-0 left-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id="info-btn"
                 >
                     <InfoIcon />
                 </button>
             </Tooltip>
+            {/* Tour Guide */}
+            <ShepherdTour />
             <GraphInfoModal
                 open={graphInfoModalOpen}
                 onClose={toggleInfoDrawer(false)}
             />
-            {/* Graph Config Modal */}
-            <Tooltip title="Configure Graph" arrow placement="left">
-                <button
-                    onClick={toggleDrawer(true)}
-                    className="absolute top-0 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
-                >
-                    <ConstructionIcon />
-                </button>
-            </Tooltip>
             <GraphConfigModal
                 open={graphConfigModalOpen}
                 onClose={toggleDrawer(false)}
@@ -336,20 +420,42 @@ const Graph: React.FC = () => {
                 nodeSizeOption={nodeSizeOption}
                 onNodeSizeOptionChange={(option) => setNodeSizeOption(option)}
             />
+            {/* Graph Config Modal */}
+            <Tooltip title="Configure Graph" arrow placement="left">
+                <button
+                    onClick={toggleDrawer(true)}
+                    className="absolute top-0 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id="config-btn"
+                >
+                    <ConstructionIcon />
+                </button>
+            </Tooltip>
             {/* Autozoom button */}
             <Tooltip title="Fit to Screen" arrow placement="left">
                 <button
                     onClick={handleZoomToFit}
                     className="absolute top-14 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
+                </button>
+            </Tooltip>
+            <Tooltip title="Coming soon!" arrow placement="left">
+                <button
+                    onClick={console.log('working on this...')}
+                    className="absolute top-28 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md disabled disabled:bg-white disabled:text-blue-500"
+                    id='view-table-btn'
+                    disabled
+                >
+                    <TableViewIcon />
                 </button>
             </Tooltip>
             {/* Autozoom button */}
             <Tooltip title="Take Screenshot" arrow placement="left">
                 <button
                     onClick={getScreenshot}
-                    className="absolute top-28 right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    className="absolute top-[10.5rem] right-2 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    id='screenshot-btn'
                 >
                     <CameraAltIcon />
                 </button>
@@ -365,7 +471,38 @@ const Graph: React.FC = () => {
                 cy={(cy) => {
                     cyRef.current = cy;
                 }}
+                id="cy-graph"
             />
+            {/* Tooltip */}
+            {hoveredNode && (
+                <Tooltip
+                    title={
+                        <div>
+                            <div className="text-left pb-2 font-bold">{hoveredNode.name}</div>
+                            <div>For more information, click and hold.</div>
+                        </div>
+                    }
+                    open={!!hoveredNode}
+                    arrow
+                    placement="top"
+                    slotProps={{
+                        modifiers: [
+                            {
+                                name: "preventOverflow",
+                                options: {
+                                    boundary: "window",
+                                },
+                            },
+                        ],
+                    }}
+                    style={{
+                        position: "absolute",
+                        left: tooltipPosition.x,
+                        top: tooltipPosition.y,
+                        transform: "translate(-50%, -50%)",
+                    }}
+                />
+            )}
         </div >
     );
 };

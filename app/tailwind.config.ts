@@ -12,6 +12,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      animation: {
+        customPulse: 'customPulse 2s ease-in-out 10',
+      },
+      keyframes: {
+        customPulse: {
+          '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+          '50%': { opacity: 0.5, transform: 'scale(0.95)' },
+        },
+      },
     },
   },
   plugins: [],
