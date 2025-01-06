@@ -27,6 +27,7 @@ const NodeInfoModal: React.FC<NodeInfoModalProps> = ({ open, nodeData, onClose }
                     border: "2px solid #000",
                     boxShadow: 24,
                     p: 4,
+                    zIndex: 100,
                 }}
             >
                 {nodeData ? (
