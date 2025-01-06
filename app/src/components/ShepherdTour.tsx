@@ -61,22 +61,6 @@ const ShepherdTour: React.FC = () => {
         })
 
         tour.addStep({
-            id: 'cy-graph',
-            text: 'Explore the relationships between water systems in Texas.',
-            attachTo: { element: '#cy-graph', on: 'top' },
-            buttons: [
-                {
-                    text: 'Back',
-                    action: tour.back,
-                },
-                {
-                    text: 'Next',
-                    action: tour.next,
-                },
-            ],
-        })
-
-        tour.addStep({
             id: 'configure',
             text: 'Configure the graph as you see fit.',
             attachTo: { element: '#config-btn', on: 'left' },

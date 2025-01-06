@@ -32,18 +32,22 @@ const NodeInfoModal: React.FC<NodeInfoModalProps> = ({ open, nodeData, onClose }
                 {nodeData ? (
                     <>
                         <h2 className="text-xl pb-5">Node Information</h2>
-                        <p>
-                            <strong>ID:</strong> {nodeData.id}
-                        </p>
+                        {nodeData.id !== nodeData.name && (
+                            <p>
+                                <strong>ID:</strong> {nodeData.id}
+                            </p>
+                        )}
                         <p>
                             <strong>Name:</strong> {nodeData.name}
                         </p>
-                        <p>
-                            <strong>County:</strong> {nodeData.county}
-                        </p>
-                        <p>
+                        {nodeData.county && (
+                            <p>
+                                <strong>County:</strong> {nodeData.county}
+                            </p>
+                        )}
+                        {/* <p>
                             <strong>Population:</strong> {nodeData.population.toLocaleString()}
-                        </p>
+                        </p> */}
                     </>
                 ) : (
                     <p>No node data available.</p>
