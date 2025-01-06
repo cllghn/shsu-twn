@@ -83,6 +83,7 @@ const Graph: React.FC = () => {
     const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
     const openNodeModal = (nodeData: NodeData) => {
         setSelectedNode(nodeData);
+        setHoveredNode(null); // Hide the tooltip
         setModalOpen(true);
     };
     const closeModal = () => {
