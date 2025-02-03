@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/Footer/Footer";
-import FadeMenu from "@/components/Menu/Menu";
+import Footer from "../components/Footer/Footer";
+import FadeMenu from "../components/Menu/Menu";
 import 'shepherd.js/dist/css/shepherd.css';
 
 const geistSans = Geist({

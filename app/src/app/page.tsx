@@ -1,12 +1,8 @@
-"use client"
-
+"use client";
 import { useState } from "react";
 import { Menu, MenuItem, Button } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-// import { PiShareNetworkFill } from "react-icons/pi";
-// import Graph from "@/components/graph/graph";
-
 
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -96,13 +92,13 @@ export default function Home() {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={() => handleClose()}
-                  slotProps={{
-                    paper: {
-                      sx: {
-                        width: document.getElementById("dropdown-button")?.offsetWidth, // Set menu width to match button
-                      },
-                    },
-                  }}
+                // slotProps={{
+                //   paper: {
+                //     sx: {
+                //       width: document.getElementById("dropdown-button")?.offsetWidth, // Set menu width to match button
+                //     },
+                //   },
+                // }}
                 >
                   {menuItems.map((item) => (
                     <MenuItem key={item.name} onClick={() => handleClose(item)}>
