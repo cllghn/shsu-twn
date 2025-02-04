@@ -6,8 +6,6 @@ import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 
-
-
 // Define the types for the props
 interface DynamicGraphProps {
     data: {
