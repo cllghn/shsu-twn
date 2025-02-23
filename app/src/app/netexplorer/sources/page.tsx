@@ -1,13 +1,11 @@
 "use client"
-
 import { useState } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
-import { Menu, MenuItem, Button } from "@mui/material";
+import { Menu, MenuItem, Button, Paper, Typography } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import DynamicGraph from "@/components/Graph/DynamicGraph";
-
 
 const SourcesPage: React.FC = () => {
     const nodeKeys = Object.keys(metadata.sources.kvs);
@@ -52,62 +50,69 @@ const SourcesPage: React.FC = () => {
         };
 
         const data = filterDataBySource(selected);
-        console.log(data);
         setFilteredData(data);
         setFilteredNode(selected);
     };
 
     return (
         <>
-            <main className='container flex flex-col w-full mt-16 mb-28 mx-auto px-24 '>
-                <h1 className='text-4xl font-bold text-left pb-10'>Explore Water Sources</h1>
-                <div className="container mx-auto flex items-center space-x-2">
-                    <div>Explore how water flows from</div>
-                    {/* Dropdown Button */}
-                    <Button
-                        variant="text"
-                        onClick={handleClick}
-                        className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
-                        id="dropdown-button"
-                    >
-                        {selectedItem} <ChevronDown size={18} className="ml-1" />
-                    </Button>
+            <main className='container flex flex-col md:flex-row w-full mt-16 mb-28 mx-auto px-18 space-x-4 '>
+                <div className="md:w-1/4">
+                    <Paper elevation={2} className="p-6">
+                        <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
+                        <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
+                        <br />
+                        <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
+                        <Button
+                            variant="text"
+                            onClick={handleClick}
+                            className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
+                            id="dropdown-button"
+                        >
+                            {selectedItem} <ChevronDown size={18} className="ml-1" />
+                        </Button>
 
-                    {/* Go Button */}
-                    <Button
-                        variant="contained"
-                        onClick={handleGo}
-                        disabled={selectedItem === "different sources"} // Disable if default is selected
-                        className="bg-blue-600 text-white normal-case shadow-none hover:bg-blue-700"
-                    >
-                        Go &rarr;
-                    </Button>
+                        {/* Go Button */}
+                        <div className="flex justify-center pt-4">
+                            <Button
+                                variant="contained"
+                                onClick={handleGo}
+                                disabled={selectedItem === "select a source"} // Disable if default is selected
+                                className="bg-blue-600 text-white normal-case shadow-none hover:bg-blue-700"
+                            >
+                                Go &rarr;
+                            </Button>
+                        </div>
 
-                    {/* Dropdown Menu */}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={() => handleClose()}
-                    >
-                        {menuItems.map((item) => (
-                            <MenuItem key={item} onClick={() => handleClose(item)}>
-                                {item}
-                            </MenuItem>
-                        ))}
-                    </Menu>
+
+                        {/* Dropdown Menu */}
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={() => handleClose()}
+                        >
+                            {menuItems.map((item) => (
+                                <MenuItem key={item} onClick={() => handleClose(item)}>
+                                    {item}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Paper>
                 </div>
-                <div className='mt-10'>
-                    {filteredData ? (
-                        <DynamicGraph data={filteredData} selected={filteredNode} />
-                    ) : (
-                        <p>Select a source and click "Go" to explore data.</p>
-                    )}
-                </div>
 
-            </ main>
+                <div className="md:w-3/4">
+                    <Paper className="min-h-screen" elevation={2}>
+                        {filteredData ? (
+                            <DynamicGraph data={filteredData} selected={filteredNode} />
+                        ) : (
+                            <p className="p-4">Select a source and click "Go" to explore data.</p>
+                        )}
+                    </Paper>
+
+                </div>
+            </main>
         </>
     );
-
 }
 
 export default SourcesPage;
