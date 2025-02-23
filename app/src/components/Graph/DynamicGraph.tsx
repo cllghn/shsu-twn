@@ -11,8 +11,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import { Box } from '@mui/material';
 
-
-
 // Define the types for the props
 interface DynamicGraphProps {
     data: {

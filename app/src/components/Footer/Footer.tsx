@@ -1,6 +1,7 @@
 import React from 'react';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
+
 const Footer = () => {
     return (
         <div className='fixed bottom-0 max-w-full min-w-full bg-white pt-2 border-t-[1px] border-black'>
