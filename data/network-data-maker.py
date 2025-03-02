@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.7"
+__generated_with = "0.11.8"
 app = marimo.App(width="medium")
 
 
@@ -327,7 +327,7 @@ def _(intake_el, pd, sales_el):
     el = pd.concat([intake_el, sales_el])
     el['source'] = el['source'].astype(str)
     el['target'] = el['target'].astype(str)
-    el
+    el.head()
     return (el,)
 
 
@@ -670,13 +670,7 @@ def _(json, out):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""
-        ## Graph Meta Data
-
-
-        """
-    )
+    mo.md(r"""## Graph Meta Data""")
     return
 
 
@@ -721,6 +715,161 @@ def _(mo):
         4. Why do some numeric identifiers appear on the intake form but not on other files? How do we get around these? Could we pass a list to TWDB for them to check?
         """
     )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""## Wholesale Data""")
+    return
+
+
+@app.cell
+def _(pd):
+    swp_trans = pd.read_excel('pws/2022StateWaterPlan_ExistingWUGSupplyTransaction+Coordinate+PWSBridge.xlsx', 
+                       engine="openpyxl", 
+                       sheet_name = "2022SWPExistingWaterSupplyTrans",
+                             skiprows=1)
+
+    return (swp_trans,)
+
+
+@app.cell
+def _(swp_trans):
+    swp_trans.head()
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        - Direct source entity: This SWP entity field represents the wholesale water provider (WWP) or water user group (WUG) that has the legal rights to the water supply. For example, this entity holds the water right permit for a reservoir or run-of-river or the permit to pump groundwater from the source associated with it. If the seller name field is blank, that means the WUG is getting self-supplied water.
+        - Seller entity: Could be the same as the direct source entity if the entity who has initial legal access to the supply is the only seller. In that case, the direct source entity and seller entity names will be the same. However, if the source entity and seller entity names are different, it means the direct source entity sold the supply wholesale to another entity who then sells it to WUGs.
+        - WUG entity is the end user of the supply. This category represents the six water use categories municipal, manufacturing, mining, irrigation, livestock, or steam electric power. When it is municipal (non-county-other) the WUG listed will correspond to the PWS you have been working with in the water use survey (WUS) data. I included a bridge table for SWP WUGs and their related PWS in the fourth tab to help you connect the data for review. (that means that we can only use the municipal records)
+
+ 
+
+        Example of how to use the tab called ‘2022SWPExistingWaterSupplyTrans’
+
+            Filter the Direct Source Entity Name column on ‘Abilene.’ It has legal rights to the sources listed in Column Q. Abilene uses some of the supply for its own retail sales and sells some to other WUG customers wholesale. The buyers are listed in column I. (does that mean that it points column q ot dse name?)
+            Clear filters and then filter the Seller Entity Name field on ‘Abilene.’ In column B you will see that in addition to their own supply they also purchase some water wholesale from other providers like West Central Texas MWD and Brazos River Authority and they sell it to other WUGs.
+            Clear filters and then filter the Self-Supplied or Buyer WUG Name field on ‘Abilene.’ This is the supply they use for their own retail customers. Some of it is self-supplied and some of it comes from other wholesale water providers. Column Q includes the source descriptions.
+            The 2022 SWP centroid point we used for the Abilene polygon is included in the workbook tab named ‘2022SWPWUGCentroids.’
+            In the tab named ‘2022SWP+SurveyPWSBridge’ if you filter the column named ‘2027 SWP Water User Group Entity Name’ by ‘Abilene’ you will see that Abilene as a WUG includes both the City of Abilene and Dyess Air Force Base PWS codes.
+
+
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        Source Description -> Direct Source Entity Name: 
+            - Correct? 
+            - In this case the source description column (Q) does not have a unique identifier, which means that I cannot link it back to other datasets, correct?
+        Direct Source Entity Name -> Self-supplied or Buyer WUG
+            - Unique ids in columns A and H
+            - If Direct Source Entity Name == Self-supplied or Buyer WUG; then, self supply, else sale.
+
+        Is the water volume for each relationship recorded anywhere?
+        Are all these relationships for 2022?
+
+        WUG is the end-user of the supply. 
+        """
+    )
+    return
+
+
+@app.cell
+def _(swp_trans):
+    swp_trans.columns
+    return
+
+
+@app.cell
+def _(Optional, pd):
+    def create_wugs_el(df_path: str, sheet: str, rskip: Optional[int] = 1, el: bool = True, 
+                       year: int = None) -> pd.DataFrame:
+        """
+        Create edge list from ...
+
+        Parameters
+        ----------
+        df_path : str
+            Path to sales data.
+        sheet: str
+            Sheet name in the excel file.
+        rskip : Optional[int], optional
+            Number of rows to skip, by default 1.
+        el : bool, optional
+            If True, returns edge list, by default True.
+        year : Optional[int], optional
+            Year of data to filter, by default None.
+
+        Returns
+        -------
+        pd.DataFrame
+            Edge list as defined above.
+        """
+        try:
+            res = pd.read_excel(
+                df_path,
+                engine="openpyxl",
+                sheet_name = sheet,
+                skiprows=rskip)
+        except FileNotFoundError:
+            print(f"Error: The file '{df_path}' was not found.")
+        except ValueError as e:
+            print(f"Error: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+        res['id'] = 'wug_' + res.index.astype(str)
+    
+        # will need to add custom type as 'intake' or 'sale', yearly_volume (asking Sabrina), year (from argument), add purchase_self as 'self-supplied' (in this case, we have to clean up the definition)
+        supplies = (res[['Source Description', 'Direct Source Entity Name', 'id', 'Source Type']]
+                    .rename(columns = {'Source Description': 'source', 'Direct Source Entity Name': 'target',
+                                       'Source Type': 'water_type'}))
+        supplies['type'] = 'intake'
+        supplies['purchased_self'] = 'Self-Supplied'
+
+        wholesale = (res[['Direct Source Entity Name', 
+                          "Self-Supplied or Buyer WUG Name\n(Self-Supplied if seller entity name is blank.)", 
+                          'id', 'Source Description']]
+                     .rename(columns={'Direct Source Entity Name': 'source', "Self-Supplied or Buyer WUG Name\n(Self-Supplied if seller entity name is blank.)": 'target', 'Source Description': 'water_type'}))
+        wholesale['type'] = 'sale'
+        wholesale['purchased_self'] = 'Purchased'
+
+        out = pd.concat([supplies, wholesale], ignore_index=True)
+        out['year'] = year if year is not None else 'Unknown'
+        out['yearly_volume'] = 0  # Placeholder for actual volume data
+        return out
+
+    wug_path = 'pws/2022StateWaterPlan_ExistingWUGSupplyTransaction+Coordinate+PWSBridge.xlsx'
+    wugs_el = create_wugs_el(wug_path, '2022SWPExistingWaterSupplyTrans', rskip=1, year=2022)
+
+    return create_wugs_el, wug_path, wugs_el
+
+
+@app.cell
+def _(pd, wug_path, wugs_el):
+    test = pd.DataFrame({
+        'wugs_nodes': pd.concat([wugs_el['source'], wugs_el['target']]).unique()
+    })
+
+    #try to match them against the nodes in the bridge table provided
+    bridge = pd.read_excel(wug_path, '2022SWP+SurveyPWSBridge', skiprows=1, engine='openpyxl')
+    bridge
+    return bridge, test
+
+
+@app.cell
+def _(nl_pos):
+    nl_pos
     return
 
 
