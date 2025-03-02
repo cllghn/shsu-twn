@@ -730,7 +730,6 @@ def _(pd):
                        engine="openpyxl", 
                        sheet_name = "2022SWPExistingWaterSupplyTrans",
                              skiprows=1)
-
     return (swp_trans,)
 
 
@@ -748,7 +747,7 @@ def _(mo):
         - Seller entity: Could be the same as the direct source entity if the entity who has initial legal access to the supply is the only seller. In that case, the direct source entity and seller entity names will be the same. However, if the source entity and seller entity names are different, it means the direct source entity sold the supply wholesale to another entity who then sells it to WUGs.
         - WUG entity is the end user of the supply. This category represents the six water use categories municipal, manufacturing, mining, irrigation, livestock, or steam electric power. When it is municipal (non-county-other) the WUG listed will correspond to the PWS you have been working with in the water use survey (WUS) data. I included a bridge table for SWP WUGs and their related PWS in the fourth tab to help you connect the data for review. (that means that we can only use the municipal records)
 
- 
+
 
         Example of how to use the tab called ‘2022SWPExistingWaterSupplyTrans’
 
@@ -757,8 +756,6 @@ def _(mo):
             Clear filters and then filter the Self-Supplied or Buyer WUG Name field on ‘Abilene.’ This is the supply they use for their own retail customers. Some of it is self-supplied and some of it comes from other wholesale water providers. Column Q includes the source descriptions.
             The 2022 SWP centroid point we used for the Abilene polygon is included in the workbook tab named ‘2022SWPWUGCentroids.’
             In the tab named ‘2022SWP+SurveyPWSBridge’ if you filter the column named ‘2027 SWP Water User Group Entity Name’ by ‘Abilene’ you will see that Abilene as a WUG includes both the City of Abilene and Dyess Air Force Base PWS codes.
-
-
         """
     )
     return
@@ -778,7 +775,7 @@ def _(mo):
         Is the water volume for each relationship recorded anywhere?
         Are all these relationships for 2022?
 
-        WUG is the end-user of the supply. 
+        WUG is the end-user of the supply.
         """
     )
     return
@@ -829,7 +826,7 @@ def _(Optional, pd):
             print(f"An unexpected error occurred: {e}")
 
         res['id'] = 'wug_' + res.index.astype(str)
-    
+
         # will need to add custom type as 'intake' or 'sale', yearly_volume (asking Sabrina), year (from argument), add purchase_self as 'self-supplied' (in this case, we have to clean up the definition)
         supplies = (res[['Source Description', 'Direct Source Entity Name', 'id', 'Source Type']]
                     .rename(columns = {'Source Description': 'source', 'Direct Source Entity Name': 'target',
@@ -851,7 +848,6 @@ def _(Optional, pd):
 
     wug_path = 'pws/2022StateWaterPlan_ExistingWUGSupplyTransaction+Coordinate+PWSBridge.xlsx'
     wugs_el = create_wugs_el(wug_path, '2022SWPExistingWaterSupplyTrans', rskip=1, year=2022)
-
     return create_wugs_el, wug_path, wugs_el
 
 
