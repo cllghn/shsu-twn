@@ -16,11 +16,11 @@ def _():
     import json
     import marimo as mo
     import numpy as np
-    import networkx as nx
     import matplotlib.pyplot as plt
     from typing import List, Optional
     import os
-    return List, Optional, json, mo, np, nx, os, pd, plt
+    import re
+    return List, Optional, json, mo, np, os, pd, plt, re
 
 
 @app.cell(hide_code=True)
@@ -46,7 +46,7 @@ def _(mo):
         - A pair of node identifiers (source and target).
         - Optional attributes, such as the type, weight, or strength of the relationship.
 
-        With the list of requirements in hand, we can begin transforming our raw data.
+        With a list of data requirements in hand, we can begin transforming our raw data.
         """
     )
     return
@@ -66,7 +66,7 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    pd.read_csv('pws/PWS Intake_2022-2023.csv').head(10)
+    pd.read_csv('inputs/PWS Intake_2022-2023.csv').head(10)
     return
 
 
@@ -78,7 +78,7 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    pd.read_csv('pws/PWS Sales_2022-2023.csv').head(1)
+    pd.read_csv('inputs/PWS Sales_2022-2023.csv').head(1)
     return
 
 
@@ -90,7 +90,7 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    pd.read_csv('pws/PWS Retail_2022-2023.csv').head(1)
+    pd.read_csv('inputs/PWS Retail_2022-2023.csv').head(1)
     return
 
 
@@ -102,7 +102,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(pd):
-    pd.read_csv('pws/PWS BridgeTable_2022-2023.csv').head(1)
+    pd.read_csv('inputs/PWS BridgeTable_2022-2023.csv').head(1)
     return
 
 
@@ -112,7 +112,9 @@ def _(mo):
         r"""
         ## Generating an Edge List
 
-        We need to extact data from two files, intake and sales, in a standard format that can be used as an edge list and in turn converted into a JSON, which is required by the front-end application. As a table, the edge list must include the following fields:
+        We need to extact data from two files, intake and sales, in a standard format that can be used as an edge list and in turn converted into a JSON. Why this conversion? Simply, the front-end app uses the [Cystoscape.js library](https://js.cytoscape.org/#introduction) for graph analysis and visualization. The library has a very limited data model that must be [met](https://js.cytoscape.org/#notation/elements-json) to return a network graph. 
+
+        The edge list table **must** include the following fields:
 
         - Source: The starting point or origin of a connection. It represents the node initiating or "sending" the relationship.
         - Target: The endpoint or recipient of the connection. It represents the node "receiving" the relationship.
@@ -143,22 +145,42 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-        First, let's extract the relevant data from the `PWS Intake_2022-2023.csv` file. The following is a list of steps taken in Python to read, clean, and reshape the data into an edge list in the format noted above:
+        ### Intake Edge List
 
-        1. Read the CSV as is.
-        2. Assign the `TWDB Survey No` column as the `target` field.
-        3. Determine the `source` based on the following logic:
+        First, let's extract the relevant data from the intake file (here `PWS Intake_2022-2023.csv`). The following is a list of steps taken in Python to read, clean, and reshape the data into an edge list in the format noted above:
 
-               - If the water type is reuse and the water is self-supplied, the source is the TWDB Survey Number. A self-loop in the network.
-               - If the water is purchased, the source is the Seller Survey Number.
-               - If the water type is groundwater and the water is self-supplied, the source is the Aquifer Source. If the Aquifer Source is "OTHER AQUIFER", the source is the Source Basin.
-               - If the water type is surface water and the water is self-supplied, the source is the Surface Water Source. If the Surface Water Source is "UNKNOWN", the source is the Source Basin.
+        1. Load the data from a file:
+               - Read the spreadsheet in CSCV format that contains the water intake water.
 
-        6. Add an `id` field with the `'intake'` string.
-        7. Assigning new variable names to existing ones for consistency later on.
-        8. Creating a `source_file` variable with the file name to ensure that data provenance can be tracked.
-        9. Optionally, filter for year.
-        10. Select only relevant columns (`source`, `target`, `id`, `volume`, `type`, `year`, `water_type`, `purchased_self`, `source_file`).
+        2. Clean up the headers in the table by stripping them of leading and lagging empty spaces.
+
+
+        3. Determine the source of water for each record.
+
+
+               - For each row in the dataset, the function looks at specific columns to determine where whater comes from:
+
+                   - If the water is reused and self-supplied, the source is a TWDB Survey Number (self-supplied).
+
+                   - If the water is purchased, the source is the Seller’s Survey Number (who sold the water).
+
+                   - If the water is groundwater and self-supplied, the source is an Aquifer (or, if the aquifer is labeled as "OTHER AQUIFER," the source is a basin).
+
+                   - If the water is surface water and self-supplied, the source is a Surface Water Source (or, if labeled "UNKNOWN," the source is a basin).
+
+        4. Create key values required in the edge list:
+
+            - Each record gets a unique ID which serves as the edge identifier.
+            - Each record is assigned a target of the water (where it's used) from the TWDB Survey Number.
+            - Each record is labeled as `"intake"`.
+            - The total volume of water is recorded from the `"Total Intake (Gallons)"` column.
+            - The year of intake, water type, and whether it was purchased or self-supplied are also saved for each record.
+            - The source file name is added to keep track of where the data came from.
+
+        5. Filter the data by year when relevant.
+
+        6. Return the data as a formated edge list.
+
 
         The resulting table head is presented below.
         """
@@ -169,7 +191,10 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(List, Optional, os, pd):
     # Intake
-    def create_intake_el(df_path: str, columns: Optional[List[str]] = None, el: bool = True, year: Optional[int] = None) -> pd.DataFrame:
+    def create_intake_el(df_path: str,
+                         columns: Optional[List[str]] = None,
+                         el: bool = True,
+                         year: Optional[int] = None) -> pd.DataFrame:
         """
         Create edge list from intake data.
 
@@ -189,7 +214,9 @@ def _(List, Optional, os, pd):
         pd.DataFrame
             Edge list as defined above.
         """
+        # Load teh CSG and strip column names from extra spaces
         intake = pd.read_csv(df_path)
+        intake.columns = intake.columns.str.strip()
 
         # The source of the water is dependent on a variety of configurations:
         # - If the water type is reuse and the water is self-supplied, the source is the TWDB Survey Number. A self-loop in the network.
@@ -197,46 +224,66 @@ def _(List, Optional, os, pd):
         # - If the water type is groundwater and the water is self-supplied, the source is the Aquifer Source. If the Aquifer Source is "OTHER AQUIFER", the source is the Source Basin.
         # - If the water type is surface water and the water is self-supplied, the source is the Surface Water Source. If the Surface Water Source is "UNKNOWN", the source is the Source Basin.
         def process_source(row):
-            if row['Water Type'] == "Reuse" and row['Purchased / Self-Supplied'] == "Self-Supplied" :
-                 return row["TWDB Survey No"]
-            elif row['Purchased / Self-Supplied'] == "Purchased" :
-                return row["Seller Survey Number"]
-            elif row['Water Type'] == "Ground Water" and row['Purchased / Self-Supplied'] == "Self-Supplied":
+            if row.get('Water Type') == "Reuse" and row.get('Purchased / Self-Supplied') == "Self-Supplied" :
+                 return row.get("TWDB Survey No", None)
+            elif row.get('Purchased / Self-Supplied') == "Purchased" :
+                return row.get("Seller Survey Number", None)
+            elif row.get('Water Type') == "Ground Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
                 # There are no unknowns in the Aquifer Source
-                if row['Aquifer Source'] == "OTHER AQUIFER":
-                    return row['Source Basin'] + ' BASIN'
+                if row.get('Aquifer Source') == "OTHER AQUIFER":
+                    return row.get('Source Basin') + ' BASIN'
                 else:
-                    return row['Aquifer Source']
-            elif row['Water Type'] == "Surface Water" and row['Purchased / Self-Supplied'] == "Self-Supplied":
-                if row['Surface Water Source'] == "UNKNOWN":
-                    return row['Source Basin'] + ' BASIN'
+                    return row.get('Aquifer Source')
+            elif row.get('Water Type') == "Surface Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
+                if row.get('Surface Water Source') == "UNKNOWN":
+                    return row.get('Source Basin') + ' BASIN' 
                 else:
-                    return row['Surface Water Source']
+                    return row.get('Surface Water Source')
 
-        intake['target'] = intake['TWDB Survey No']
+        # Apply source processing
         intake['source'] = intake.apply(process_source, axis=1)
+
+        # Create other columns safely(ish)
+        intake['target'] = intake.get('TWDB Survey No', None)
         intake['id'] = 'intake_' + intake.index.astype(str)
         intake['type'] = 'intake'
-        intake['yearly_volume'] = intake[' Total Intake (Gallons) ']
-        intake['year'] = intake['Year']
-        intake['water_type'] = intake['Water Type']
-        intake['purchased_self'] = intake['Purchased / Self-Supplied']
+        intake['yearly_volume'] = intake.get('Total Intake (Gallons)', None) # This defaults to None if the column is not found
+        intake['year'] = intake.get('Year', None)
+        intake['water_type'] = intake.get('Water Type', None)
+        intake['purchased_self'] = intake.get('Purchased / Self-Supplied', None)
         intake['source_file'] = os.path.basename(df_path)
 
         if year is not None:
-            intake = intake[intake['year'] == year]
+            intake = intake.query("year == @year")
 
         if el:
+            default_columns = ['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 'purchased_self', 'source_file']
+
+            # Cleaning rules:
+            intake.loc[:, 'source'] = intake['source'].astype(str)
+            intake.loc[:, 'target'] = intake['target'].astype(str)
+            def clean_entity(entity: str) -> str:
+                if isinstance(entity, str):
+                    entity = entity.strip()
+                    entity = entity.title()
+                return entity
+            
+            intake.loc[:, 'source'] = intake['source'].apply(clean_entity)
+            intake.loc[:, 'target'] = intake['target'].apply(clean_entity)
+
             if columns:
-                intake_el = intake[columns]
+                available_columns = [col for col in columns if col in intake.columns]
+                return intake[available_columns]
             else:
-                intake_el = intake[['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 
-                                    'purchased_self', 'source_file']]
-            return intake_el
+                return intake[default_columns]
+            
         else:
             return intake
 
-    intake_el = create_intake_el('pws/PWS Intake_2022-2023.csv', el=True, year=2022)
+    # Run the function and return an edge list
+    intake_el = create_intake_el('inputs/PWS Intake_2022-2023.csv', el=True, year=2022)
+
+    # Look at the top 10 rows in that edge list
     intake_el.head(10)
     return create_intake_el, intake_el
 
@@ -245,17 +292,28 @@ def _(List, Optional, os, pd):
 def _(mo):
     mo.md(
         r"""
-        Next, let's apply a similar threatment to the `PWS Sales_2022-2023.csv` file. Like before, the following is a list of the steps applied in Python to read, clean, and transform the data into an edge list:
+        ### Sales Edge List
 
-        1. Read in the file as is.
-        2. Assign the `TWDV Seller Survey No` as the `source`.
-        3. Assign the `Buyer Survey No` as the `target`.
-        4. Assign preset columns.
-        5. Generate `id`.
-        6. Creating a `source_file` variable with the file name to ensure that data provenance can be tracked.
-        7. Optionally, filter for year.
-        8. Select only relevant columns (`source`, `target`, `id`, `volume`, `type`, `year`, `water_type`, `purchased_self`, `source_file`).
+        Next, let's apply a similar threatment to the sales data, here stored in the `PWS Sales_2022-2023.csv` file. Like before, the following is a list of the steps applied in Python to munge the data into an edge list:
 
+        1. Load the data file from a single CSC that contains information about water sales.
+        2. Clean up spreadsheet headers to remove trailing and leading blank spaces.
+        3. Identify key information for each sale:
+
+               - Assing the water seller as the edge source. Here we used the `"TWDB Seller Survey No"` as the source node.
+               - Next, we assing a target node that represents the water buyer. We take this value from the `"Buyer Survey No"` column.
+               - We generate a transaction identifier that will serve as the edge id.
+               - Categorize every transaction as `"sale"`.
+
+        4. Add additional sale details: 
+            - The yearly volume is pulled from the `"Buyer Volume Reported"` variable.
+            - The year is copied from the source data.
+            - The function checks what type of water was sold (e.g., groundwater or surface water) by copying the `"Buyer Water Type"` column.
+            - Since all the data here refers to water purchases, we assign the `self_purchased` field to `"Purchased"` for every obeservation.
+            - We record the name of the file being processed as a source file to that users can track provenance.
+
+        5. (Optional) We filter data by year (e.g., 2022) to only retain transactions from that year.
+        6. Return the data as a formated edge list. 
 
         The resulting table head is presented below.
         """
@@ -266,7 +324,10 @@ def _(mo):
 @app.cell
 def _(List, Optional, os, pd):
     # Sales
-    def create_sales_el(df_path: str, columns: Optional[List[str]] = None, el: bool = True, year: Optional[int] = None) -> pd.DataFrame:
+    def create_sales_el(df_path: str,
+                        columns: Optional[List[str]] = None,
+                        el: bool = True,
+                        year: Optional[int] = None) -> pd.DataFrame:
         """
         Create edge list from sales data.
 
@@ -287,47 +348,62 @@ def _(List, Optional, os, pd):
             Edge list as defined above.
         """
         sales = pd.read_csv(df_path)
-        sales['source'] = sales['TWDB Seller Survey No']
-        sales['target'] = sales['Buyer Survey No']
+        sales.columns = sales.columns.str.strip()
+
+        # Create columns safely(ish)
+        sales['source'] = sales.get('TWDB Seller Survey No')
+        sales['target'] = sales.get('Buyer Survey No')
         sales['id'] = 'sales_' + sales.index.astype(str)
         sales['type'] = 'sale'
         # Which volume could be reported per transaction? Is this correct?
-        sales['yearly_volume'] = sales[' Buyer Volume Reported ']
-        sales['year'] = sales['Year']
-        sales['water_type'] = sales['Buyer Water Type']
+        sales['yearly_volume'] = sales.get('Buyer Volume Reported')
+        sales['year'] = sales.get('Year')
+        sales['water_type'] = sales.get('Buyer Water Type')
         sales['purchased_self'] = 'Purchased'
         sales['source_file'] = os.path.basename(df_path)
 
         if year is not None:
-            sales = sales[sales['year'] == year]
+            sales = sales.query("year == @year")
 
         if el:
+            default_columns = ['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 'purchased_self', 'source_file']
+
+            # Cleaning rules:
+            sales.loc[:, 'source'] = sales['source'].astype(str)
+            sales.loc[:, 'target'] = sales['target'].astype(str)
+        
             if columns:
-                sales_el = sales[columns]
+                available_columns = [col for col in columns if col in sales.columns]
+                return sales[available_columns]
             else:
-                sales_el = sales[['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 
-                                    'purchased_self', 'source_file']]
-            return sales_el
+                return sales[default_columns]
+            
         else:
             return sales
 
-    sales_el = create_sales_el('pws/PWS Sales_2022-2023.csv', el=True, year=2022)
+    sales_el = create_sales_el('inputs/PWS Sales_2022-2023.csv', 
+                               el=True, 
+                               year=2022)
     sales_el.head(10)
     return create_sales_el, sales_el
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""With both edge lists made, we can row bind these tables together. The following table is the resulting edge list.""")
+    mo.md(
+        r"""
+        ### Combining Edge Lists
+
+        With both (intake and sales) edge lists made, we can row bind these tables together. The following table is the resulting edge list.
+        """
+    )
     return
 
 
 @app.cell
 def _(intake_el, pd, sales_el):
     el = pd.concat([intake_el, sales_el])
-    el['source'] = el['source'].astype(str)
-    el['target'] = el['target'].astype(str)
-    el.head()
+    el.head(100)
     return (el,)
 
 
@@ -345,31 +421,50 @@ def _(mo):
 
 @app.cell
 def _(el, pd):
-    # Create an empty data frame and add an Id column based on the source and target values
-    nodes = pd.DataFrame()
-    nodes['id'] = pd.concat([el['source'].astype(str), el['target'].astype(str)]).unique()
+    def create_nodes_list(el: pd.DataFrame,
+                          intake_file: str) -> pd.DataFrame:
+        """
+        Create a DataFrame with unique node IDs and classify them as either 'water source' or 'water system'.
+    
+        Parameters:
+            el (pd.DataFrame): A DataFrame containing 'source' and 'target' columns.
+            intake_file (str): Path to the CSV file containing intake data.
+    
+        Returns:
+            pd.DataFrame: A DataFrame with 'id' and 'preliminary_type' columns.
+        """
+        # Create an empty DataFrame and add an 'id' column with unique values from 'source' and 'target'
+        nodes = pd.DataFrame()
+        nodes['id'] = pd.concat([el['source'].astype(str), el['target'].astype(str)]).unique()
+    
+        # Load intake data and extract unique water source names
+        intake = pd.read_csv(intake_file)
+        def clean_entity(entity: str) -> str:
+            return entity.strip().title() if isinstance(entity, str) else entity
 
-    # From the intake data, create a list of water sources that can be used to differentiate IDs
-    intake = pd.read_csv('pws/PWS Intake_2022-2023.csv')
-    water_sources = [
-        x + ' BASIN' if col == 'Source Basin' else x
-        for col in ['Aquifer Source', 'Surface Water Source', 'Source Basin']
-        for x in intake[col].dropna().apply(str).unique().tolist()
-    ]
+        water_sources = [
+            x + ' BASIN' if col == 'Source Basin' else x
+            for col in ['Aquifer Source', 'Surface Water Source', 'Source Basin']
+            for x in intake[col].dropna().apply(str).unique().tolist()
+        ]
+        water_sources = [clean_entity(x) for x in water_sources]
 
-    # Create a preliminary categorical variable that differentiates between water sources and water systems
-    nodes['preliminary_type'] = nodes['id'].apply(lambda x: 'water source' if x in water_sources else 'water system')
+        # Assign a preliminary type to each node
+        nodes['preliminary_type'] = nodes['id'].apply(lambda x: 'water source' if x in water_sources else 'water system')
+    
+        return nodes
 
-    # Take a look at the first 10 rows
+    nodes = create_nodes_list(el, 'inputs/PWS Intake_2022-2023.csv')
     nodes.head(10)
-    return intake, nodes, water_sources
+
+    return create_nodes_list, nodes
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
         """
-        Next, we can begin enriching the node table with attribute data extracted from the retail and bridge files. The retail file includes attributes for nodes with a survey number. This excludes water sources which do not appear to have a numeric unique identifier. Thus, the after joining the base node table with the reatil data, only nodes with survey numbers will have attributes.
+        Next, we can begin enriching the node table with attribute data extracted from the retail and bridge files. The retail file includes attributes for nodes with a survey number. This excludes water sources which do not appear to have a numeric unique identifier and some water systems. Thus, the after joining the base node table with the retail data, only nodes with survey numbers will have attributes.
 
         From the retail table we will take the following attributes:
 
@@ -385,42 +480,48 @@ def _(mo):
 
         The following is a list of steps used to read, clean, and reshape the retail data prior to left joining it to the base node table by TWBDB survey number:
 
-        1. Read data as is from `PWS Retail_2022-2023.csv`.
+        1. Read retail data as is from `PWS Retail_2022-2023.csv`.
         2. Rename `TWDB Survey No` to `id` to make the left join easier.
-        3. Filter out data to only include most recent record by `id`.
+        3. Filter out data to only include records for the year 2022.
         """
     )
     return
 
 
 @app.cell
-def _(pd):
+def _(Optional, pd):
     # Retail
-    retail = pd.read_csv('pws/PWS Retail_2022-2023.csv')
-    retail.rename(columns={'TWDB Survey No' : 'id', 'PWS Name': 'retail_name'}, inplace=True)
-    retail['id'] = retail['id'].astype(str)
-    #retail = retail.sort_values(by=['id', 'Year']).groupby('id').tail(1)
-    retail = retail[retail['Year'] == 2022]
-    retail
-    return (retail,)
+    def get_retail_nodes(retail_df_path: str,
+                        year: Optional[int] = None) -> pd.DataFrame:
+        """
+        Reads and processes the retail PWS dataset.
 
+        Parameters:
+            retail_df_path (str): Path to the CSV file.
+            year (int): Year to filter the data.
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""Now, join the `retail` table with the `nodes` table.""")
-    return
+        Returns:
+            pd.DataFrame: Processed DataFrame with retail nodes.
+        """
+        out = (pd.read_csv(retail_df_path, dtype={'TWDB Survey No': str})  
+                .rename(columns={'TWDB Survey No': 'id', 'PWS Name': 'retail_name'})
+               ) 
+    
+        if year is not None:
+            out = out.query("Year == @year")
+        
+        return out
 
-
-@app.cell
-def _(nodes, pd, retail):
-    nodes_retail = pd.merge(nodes, retail, on='id', how='left')
-    return (nodes_retail,)
+    # Load Retail Data
+    retail = get_retail_nodes('inputs/PWS Retail_2022-2023.csv')
+    retail.head()
+    return get_retail_nodes, retail
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
-        r"""
+        """
         Next, we can bring in the survey number table as additional node attributes. Like before, this survey contains data for nodes that have a survey number. By definition, this excludes water sources which are not linked to unique identifier. 
 
         The following is a list of steps used to read, clean, and reshape the survey number data prior to left joining it to the base node table by TWBDB survey number:
@@ -434,140 +535,169 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    survey_no = pd.read_csv('pws/PWS BridgeTable_2022-2023.csv')
-    survey_no.rename(columns={'TWDB Survey Number': 'id', 'PWS Name' : 'sur_name'}, inplace=True)
-    survey_no['id'] = survey_no['id'].astype(str)
-    survey_no.head(100)
-    return (survey_no,)
+    def get_survey_nodes(survey_df_path: str) -> pd.DataFrame:
+        """
+        Reads and processes the survey number dataset.
 
+        Parameters:
+            survey_df_path (str): Path to the CSV file.
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md("""Now join the `survey_no` table with the `nodes` table using a left join.""")
-    return
+        Returns:
+            pd.DataFrame: Processed DataFrame with survey nodes.
+        """
+        out = (pd.read_csv(survey_df_path, dtype={'TWDB Survey Number': str})  
+                .rename(columns={'TWDB Survey Number': 'id',
+                                 'PWS Name': 'sur_name'})
+               ) 
+    
+        return out
 
-
-@app.cell
-def _(nodes_retail, pd, survey_no):
-    nodes_retail_no = pd.merge(nodes_retail, survey_no, on='id', how='left')
-    nodes_retail_no.head(100)
-    return (nodes_retail_no,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""Lastly, clean up the joined node data, attempting to match ids to names.""")
-    return
+    survey_no = get_survey_nodes('inputs/PWS BridgeTable_2022-2023.csv')
+    survey_no.head()
+    return get_survey_nodes, survey_no
 
 
 @app.cell
-def _(nodes_retail_no, pd):
-    # Yields 2,150 nulls
-    nodes_retail_no['unified_name'] = nodes_retail_no.apply(lambda x: x['sur_name'] if x['preliminary_type'] == 'water system' else x['id'], axis=1)
-    # Yields 2,123 nulls
-    nodes_retail_no['unified_name'] = nodes_retail_no.apply(lambda x: x['retail_name'] if pd.isnull(x['unified_name']) else x['unified_name'], axis=1)
-    return
+def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
+    def enrich_nodes(nodes: pd.DataFrame,
+                     retail_df_path: str,
+                     survey_df_path: str,
+                     intake_df_path: str,
+                     sales_df_path: str,
+                     year: Optional[int] = None) -> pd.DataFrame:
+        """
+        Processes multiple PWS-related datasets and merges them into a unified node dataset.
+        """
+        # Load and clean Retail data
+        retail = get_retail_nodes(retail_df_path, year=year)
+
+        # Load and clean Survey Number data
+        survey_no = get_survey_nodes(survey_df_path)
+
+        # Merge Retail and Survey Data
+        nodes_retail = nodes.merge(retail, on='id', how='left')
+        nodes_retail_no = (nodes
+                          .merge(retail, on='id', how='left')
+                          .merge(survey_no, on='id', how='left'))
+    
+        # TODO: After joining, there are ~2k nodes that do not have a name.
+        # This suggests that they are not in the retail or survey number 
+        # files. After quickly drilling down on these, they appear to have
+        # a name on the intake sheet and other data sets.
+        nodes_retail_no['unified_name'] = nodes_retail_no.apply(
+            lambda x: x['sur_name'] if x['preliminary_type'] == 'water system' else x['id'],
+            axis=1)
+        nodes_retail_no['unified_name'] = nodes_retail_no.apply(
+            lambda x: x['retail_name'] if pd.isnull(x['unified_name']) else x['unified_name'],
+            axis=1)
+
+        # Load and clean Intake data
+        intake_missing = (pd.read_csv(intake_df_path,
+                                     dtype={'TWDB Survey No': str})
+                          .rename(columns={'TWDB Survey No': 'id', 
+                                           'PWS Name': 'intake_name'}
+                                 )[['id', 'intake_name']]
+                         )
+    
+        intake_sellers = (pd.read_csv(intake_df_path,
+                                     dtype={'Seller Survey Number': str})
+                          .rename(columns={'Seller Survey Number': 'id',
+                                           'Seller Name': 'intake_seller_name'})
+                          .dropna(subset=['intake_seller_name'])
+                          .groupby('id').first().reset_index()[['id', 'intake_seller_name']]
+                          .assign(intake_seller_name=lambda x: x['intake_seller_name'].str.replace(r'\s\d+$', '', regex=True))
+                         )
+
+        # Load and clean Buyer & Seller data
+        buyer_missing = (pd.read_csv(sales_df_path,
+                                    dtype={'Buyer Survey No': str})
+                         .rename(columns={'Buyer Survey No': 'id',
+                                          'Buyer Name': 'buyer_name'}
+                                )[['id', 'buyer_name']])
+        seller_missing = (pd.read_csv(sales_df_path, 
+                                      dtype={'TWDB Seller Survey No': str})
+                          .rename(columns={'TWDB Seller Survey No': 'id',
+                                           'PWS Name': 'seller_name'}
+                                 )[['id', 'seller_name']])
+
+        # Perform Merges
+        merged_data = (nodes_retail_no
+                       .merge(intake_missing, on='id', how='left')
+                       .merge(buyer_missing, on='id', how='left')
+                       .merge(seller_missing, on='id', how='left')
+                       .merge(intake_sellers, on='id', how='left'))
+
+        # Unified name column using fillna instead of multiple apply calls
+        merged_data['unified_name'] = merged_data[['unified_name', 'intake_name', 'buyer_name', 'seller_name', 'intake_seller_name']].bfill(axis=1).iloc[:, 0]
+    
+        # Quick round of cleaning
+        def clean_entity(entity: str) -> str:
+            return entity.strip().title() if isinstance(entity, str) else entity
+
+        merged_data['unified_name'] = merged_data['unified_name'].apply(clean_entity)
+
+        return merged_data
+
+    nl = enrich_nodes(nodes, 
+                     'inputs/PWS Retail_2022-2023.csv', 
+                     'inputs/PWS BridgeTable_2022-2023.csv', 
+                     'inputs/PWS Intake_2022-2023.csv', 
+                     'inputs/PWS Sales_2022-2023.csv', 
+                     year=2022)
+
+    return enrich_nodes, nl
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
         r"""
-        ### Future Investigations
+        Clean up the node list a bit more:
 
-        After joining, there are 2,015 nodes that do not have a name. This suggests that they are not in the retail or survey number files. After quickly drilling down on these, they appear to have a name on the intake sheet.
+        1. Select specific columns.
+        2. Remove duplicates based on the `id`.
         """
     )
     return
 
 
 @app.cell
-def _(nodes_retail_no):
-    missing_names = nodes_retail_no[nodes_retail_no['unified_name'].isnull()]
-    missing_names.head(10)
-    return (missing_names,)
+def _(nl):
+    # Define relevant columns
+    columns_to_keep = [
+        'id', 'unified_name', 'preliminary_type', 'Year', 'TWDB Estimated?', ' Population Served ',
+        ' Single Family Volumes ', ' Single Family Connections ', ' Multi-Family Volumes ',
+        ' Multi-Family Connections ', ' Commercial Volume ', ' Commercial Connections ',
+        ' Industrial Volumes ', ' Industrial Connections ', ' Institutional Volume ',
+        ' Institutional Connections ', ' Agricultural Volumes ', ' Agricultural Connections ',
+        ' Total Metered Volume ', ' Total Metered Connections ', ' Total Un-metered Volume ',
+        ' Total Un-metered Connections ', 'TCEQ PWS Code', 'Wholesale System?',
+        'Water Use Survey Form Type', 'PWS System Class'
+    ]
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md("""Perhaps if we incorporate names from the intake and sales data we can minimize missing names.""")
-    return
-
-
-@app.cell
-def _(nodes_retail_no, pd):
-    intake_missing = (pd.read_csv('pws/PWS Intake_2022-2023.csv')
-                      .rename(columns={'TWDB Survey No': 'id', 'PWS Name': 'intake_name'}, inplace=False
-                             )[['id', 'intake_name']])
-    intake_missing['id'] = intake_missing['id'].astype(str)
-
-    intake_sellers = (pd.read_csv('pws/PWS Intake_2022-2023.csv').rename(columns={'Seller Survey Number': 'id', 'Seller Name': 'intake_seller_name'}, inplace=False).dropna(subset=['intake_seller_name']).groupby('id').first().reset_index()[['id', 'intake_seller_name']])
-    intake_sellers['intake_seller_name'] = intake_sellers['intake_seller_name'].str.replace(r'\s\d+$', '', regex=True)
-    intake_sellers['id'] = intake_sellers['id'].astype(str)
-
-    buyer_missing = (pd.read_csv('pws/PWS Sales_2022-2023.csv')
-                      .rename(columns={'Buyer Survey No': 'id', 'Buyer Name': 'buyer_name'}, inplace=False
-                             )[['id', 'buyer_name']])
-    buyer_missing['id'] = buyer_missing['id'].astype(str)
-
-    seller_missing = (pd.read_csv('pws/PWS Sales_2022-2023.csv')
-                      .rename(columns={'TWDB Seller Survey No': 'id', 'PWS Name': 'seller_name'}, inplace=False
-                             )[['id', 'seller_name']])
-    seller_missing['id'] = seller_missing['id'].astype(str)
-
-    nodes_retail_no_intake = pd.merge(nodes_retail_no, intake_missing, on='id', how='left')
-    nodes_retail_no_intake_buyer = pd.merge(nodes_retail_no_intake, buyer_missing, on='id', how='left')
-    nodes_retail_no_intake_buyer_seller = pd.merge(nodes_retail_no_intake_buyer, seller_missing, on='id', how='left')
-    nodes_retail_no_intake_buyer_seller_ = pd.merge(nodes_retail_no_intake_buyer_seller, intake_sellers, on='id', how='left')
-
-    nodes_retail_no_intake_buyer_seller_['unified_name'] = nodes_retail_no_intake_buyer_seller_.apply(lambda x: x['intake_name'] if pd.isnull(x['unified_name']) else x['unified_name'], axis=1)
-    nodes_retail_no_intake_buyer_seller_['unified_name'] = nodes_retail_no_intake_buyer_seller_.apply(lambda x: x['buyer_name'] if pd.isnull(x['unified_name']) else x['unified_name'], axis=1)
-    nodes_retail_no_intake_buyer_seller_['unified_name'] = nodes_retail_no_intake_buyer_seller_.apply(lambda x: x['seller_name'] if pd.isnull(x['unified_name']) else x['unified_name'], axis=1)
-    nodes_retail_no_intake_buyer_seller_['unified_name'] = nodes_retail_no_intake_buyer_seller_.apply(lambda x: x['intake_seller_name'] if pd.isnull(x['unified_name']) else x['unified_name'], axis=1)
-
-    nodes_retail_no_intake_buyer_seller_.head()
-    return (
-        buyer_missing,
-        intake_missing,
-        intake_sellers,
-        nodes_retail_no_intake,
-        nodes_retail_no_intake_buyer,
-        nodes_retail_no_intake_buyer_seller,
-        nodes_retail_no_intake_buyer_seller_,
-        seller_missing,
-    )
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""This seems to close the gap; however, we need to figure out why so many records are missing.""")
-    return
-
-
-@app.cell
-def _(nodes_retail_no_intake_buyer_seller_):
-    nl = nodes_retail_no_intake_buyer_seller_[['id', 'unified_name', 'preliminary_type', 'Year', 'TWDB Estimated?', ' Population Served ', ' Single Family Volumes ', ' Single Family Connections ', ' Multi-Family Volumes ', ' Multi-Family Connections ', ' Commercial Volume ', ' Commercial Connections ', ' Industrial Volumes ', ' Industrial Connections ', ' Institutional Volume ', ' Institutional Connections ', ' Agricultural Volumes ', ' Agricultural Connections ', ' Total Metered Volume ', ' Total Metered Connections ', ' Total Un-metered Volume ',' Total Un-metered Connections ', 'TCEQ PWS Code','Wholesale System?', 'Water Use Survey Form Type', 'PWS System Class']]
-    nl = nl[~nl.duplicated(subset='id', keep='first')]
-    nl.head(100)
-    return (nl,)
+    # Select relevant columns and remove duplicate IDs
+    nl_tidy = nl.loc[~nl.duplicated(subset='id', keep='first'),
+    columns_to_keep]
+    nl_tidy
+    return columns_to_keep, nl_tidy
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
         r"""
-        ## From Tables to CSV
+        ## Exporting Data
 
-        Let's print them out as CSVs to allow Gephi users to work with them.
+        First, let write the data out as a comma-separated value (CSV) file to allow Gephi users to work with them.
         """
     )
     return
 
 
 @app.cell
-def _(el, nl):
-    nl.to_csv('nodes.csv', index=False)
-    el.to_csv('edges.csv', index=False)
+def _(el, nl_tidy):
+    nl_tidy.to_csv('outputs/nodes.csv', index=False)
+    el.to_csv('outputs/edges.csv', index=False)
     return
 
 
@@ -610,262 +740,85 @@ def _():
     return
 
 
-@app.cell
-def _(el):
-    el.rename(columns={'from': 'source', 'to': 'target'}, inplace=True)
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""To export the graph data, we have to shape it into a dictionary. Then, store it as a JSON. The code below tranforms our node and edge list into a single dictionary that Cytoscape.js can understand.""")
     return
 
 
 @app.cell
-def _(el, nx):
-    G = nx.from_pandas_edgelist(el, source='source', target='target', create_using=nx.DiGraph())
-    positions = nx.spring_layout(G, k=0.1, iterations=100, seed=42) #600 worked well but take 10 mins
-    return G, positions
+def _(el, nl_tidy, np, pd):
+    def create_cyto_json(nl: pd.DataFrame, el: pd.DataFrame) -> dict:
+        """
+        Create a JSON object for Cytoscape.js.
+
+        Parameters:
+            nl (pd.DataFrame): Node list.
+            el (pd.DataFrame): Edge list.
+
+        Returns:
+            dict: JSON object for Cytoscape.js.
+        """
+        out = {}
+        out["elements"] = {}
+
+        out["elements"]["nodes"] = [{"data": record} for record in nl.where(pd.notnull(nl), None).replace({np.nan: None}).to_dict(orient='records')]
+        out["elements"]["edges"] = [{"data": record} for record in el.where(pd.notnull(el), None).replace({np.nan: None}).to_dict(orient='records')]
+    
+        return out
+
+    cyto = create_cyto_json(nl_tidy,
+                            el.rename(columns={'from': 'source',
+                                               'to': 'target'})
+                           )
+    return create_cyto_json, cyto
 
 
-@app.cell
-def _(G, nx, plt, positions):
-    nx.draw(
-        G,
-        pos=positions,
-        with_labels=False,
-        node_color='skyblue',
-        node_size=10,
-        edge_color='gray'
-    )
-
-    plt.show()
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""Write it out in the app directory:""")
     return
 
 
 @app.cell
-def _(nl, pd, positions):
-    node_coordinates = {node: (node, pos[0], pos[1]) for node, pos in positions.items()}
-    node_coordinates_df = pd.DataFrame.from_dict(node_coordinates, orient='index', columns=['id', 'x', 'y'])
-    nl_pos = pd.merge(nl, node_coordinates_df, on='id', how='left')
-    nl_pos
-    return nl_pos, node_coordinates, node_coordinates_df
-
-
-@app.cell
-def _(el, nl_pos, np, pd):
-    out = {}
-    out["elements"] = {}
-
-    nodes_coords = [{"data": record} for record in nl_pos.where(pd.notnull(nl_pos), None).replace({np.nan: None}).to_dict(orient='records')]
-    for node in nodes_coords: 
-        node["position"] = {"x": node['data']["x"], "y": node['data']["y"]}
-    out["elements"]["nodes"] = nodes_coords 
-
-    out["elements"]["edges"] = [{"data": record} for record in el.where(pd.notnull(el), None).replace({np.nan: None}).to_dict(orient='records')]
-    return node, nodes_coords, out
-
-
-@app.cell
-def _(json, out):
+def _(cyto, json):
     with open('../app/src/data/network-data.json', 'w') as f:
-        json.dump(out, f, indent=4)
+        json.dump(cyto, f, indent=4)
     return (f,)
 
 
 @app.cell
 def _(mo):
-    mo.md(r"""## Graph Meta Data""")
+    mo.md(r"""## Parking Lot""")
     return
 
 
 @app.cell
-def _(G, el, nl):
-    graph_meta_data = {
-        'nodes' : {'title': 'Nodes', 
-                   'value': G.number_of_nodes(), 
-                   'description': 'These are key points where water is sourced, sold, stored, transferred, or consumed.'},
-        'edges' : {'title': 'Connections', 
-                   'value': G.number_of_edges(), 
-                   'description': 'These represent the pathways through which water moves between nodes.'},
-        'directed': G.is_directed(),
-        'year': float(el['year'].unique()[0]),
-        'sources': {'title': 'Water Source Nodes', 
-                   'value': len(nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))]['id'].unique()), 
-                   'description': 'Points in the network where water originates, such ground and surface water.',
-                    'url': '/netexplorer/sources',
-                   'kvs': {x['id']: x['unified_name'] for x in nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))].to_dict(orient='records')}},
-        'systems': {'title': 'Water System Nodes',
-                    'value': len(nl[nl['preliminary_type'] == 'water system']['id'].unique()),
-                    'description': 'Points in the networks involved in the sale and distribution of water.',
-                    'url': '/netexplorer/systems',
-                    'kvs': {x['id']: x['unified_name'] for x in nl[nl['preliminary_type'] == 'water system'].to_dict(orient='records')}}
-    }
+def _():
+    # graph_meta_data = {
+    #     'nodes' : {'title': 'Nodes', 
+    #                'value': G.number_of_nodes(), 
+    #                'description': 'These are key points where water is sourced, sold, stored, transferred, or consumed.'},
+    #     'edges' : {'title': 'Connections', 
+    #                'value': G.number_of_edges(), 
+    #                'description': 'These represent the pathways through which water moves between nodes.'},
+    #     'directed': G.is_directed(),
+    #     'year': float(el['year'].unique()[0]),
+    #     'sources': {'title': 'Water Source Nodes', 
+    #                'value': len(nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))]['id'].unique()), 
+    #                'description': 'Points in the network where water originates, such ground and surface water.',
+    #                 'url': '/netexplorer/sources',
+    #                'kvs': {x['id']: x['unified_name'] for x in nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))].to_dict(orient='records')}},
+    #     'systems': {'title': 'Water System Nodes',
+    #                 'value': len(nl[nl['preliminary_type'] == 'water system']['id'].unique()),
+    #                 'description': 'Points in the networks involved in the sale and distribution of water.',
+    #                 'url': '/netexplorer/systems',
+    #                 'kvs': {x['id']: x['unified_name'] for x in nl[nl['preliminary_type'] == 'water system'].to_dict(orient='records')}}
+    # }
 
-    graph_meta_data
+    # graph_meta_data
     # with open('../app/src/data/network-meta-data.json', 'w') as md:
     #     json.dump(graph_meta_data, md, indent=4)
-    return (graph_meta_data,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        r"""
-        ## Lingering Questions
-
-        1. For the source in intake we use either the Aquifer or the Surface Water Source. Is this correct or should we reference additional geographic features here (e.g., county or basin)? These latter values differ between the sources. For example, Ogallala Aquifer can be in Roberts or Donley County, which in turn changes the Basin Source.
-        2. Why are there unknown intake sources? What should we do in these situations?
-        3. I used 2022 retail data assuming that that year was more complete, is that correct? Or should I use the most recent year for each observation? The latter would mean that some retail numbers might come from 2022, while others might come from 2023.
-        4. Why do some numeric identifiers appear on the intake form but not on other files? How do we get around these? Could we pass a list to TWDB for them to check?
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(r"""## Wholesale Data""")
-    return
-
-
-@app.cell
-def _(pd):
-    swp_trans = pd.read_excel('pws/2022StateWaterPlan_ExistingWUGSupplyTransaction+Coordinate+PWSBridge.xlsx', 
-                       engine="openpyxl", 
-                       sheet_name = "2022SWPExistingWaterSupplyTrans",
-                             skiprows=1)
-    return (swp_trans,)
-
-
-@app.cell
-def _(swp_trans):
-    swp_trans.head()
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
-        r"""
-        - Direct source entity: This SWP entity field represents the wholesale water provider (WWP) or water user group (WUG) that has the legal rights to the water supply. For example, this entity holds the water right permit for a reservoir or run-of-river or the permit to pump groundwater from the source associated with it. If the seller name field is blank, that means the WUG is getting self-supplied water.
-        - Seller entity: Could be the same as the direct source entity if the entity who has initial legal access to the supply is the only seller. In that case, the direct source entity and seller entity names will be the same. However, if the source entity and seller entity names are different, it means the direct source entity sold the supply wholesale to another entity who then sells it to WUGs.
-        - WUG entity is the end user of the supply. This category represents the six water use categories municipal, manufacturing, mining, irrigation, livestock, or steam electric power. When it is municipal (non-county-other) the WUG listed will correspond to the PWS you have been working with in the water use survey (WUS) data. I included a bridge table for SWP WUGs and their related PWS in the fourth tab to help you connect the data for review. (that means that we can only use the municipal records)
-
-
-
-        Example of how to use the tab called ‘2022SWPExistingWaterSupplyTrans’
-
-            Filter the Direct Source Entity Name column on ‘Abilene.’ It has legal rights to the sources listed in Column Q. Abilene uses some of the supply for its own retail sales and sells some to other WUG customers wholesale. The buyers are listed in column I. (does that mean that it points column q ot dse name?)
-            Clear filters and then filter the Seller Entity Name field on ‘Abilene.’ In column B you will see that in addition to their own supply they also purchase some water wholesale from other providers like West Central Texas MWD and Brazos River Authority and they sell it to other WUGs.
-            Clear filters and then filter the Self-Supplied or Buyer WUG Name field on ‘Abilene.’ This is the supply they use for their own retail customers. Some of it is self-supplied and some of it comes from other wholesale water providers. Column Q includes the source descriptions.
-            The 2022 SWP centroid point we used for the Abilene polygon is included in the workbook tab named ‘2022SWPWUGCentroids.’
-            In the tab named ‘2022SWP+SurveyPWSBridge’ if you filter the column named ‘2027 SWP Water User Group Entity Name’ by ‘Abilene’ you will see that Abilene as a WUG includes both the City of Abilene and Dyess Air Force Base PWS codes.
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
-        r"""
-        Source Description -> Direct Source Entity Name: 
-            - Correct? 
-            - In this case the source description column (Q) does not have a unique identifier, which means that I cannot link it back to other datasets, correct?
-        Direct Source Entity Name -> Self-supplied or Buyer WUG
-            - Unique ids in columns A and H
-            - If Direct Source Entity Name == Self-supplied or Buyer WUG; then, self supply, else sale.
-
-        Is the water volume for each relationship recorded anywhere?
-        Are all these relationships for 2022?
-
-        WUG is the end-user of the supply.
-        """
-    )
-    return
-
-
-@app.cell
-def _(swp_trans):
-    swp_trans.columns
-    return
-
-
-@app.cell
-def _(Optional, pd):
-    def create_wugs_el(df_path: str, sheet: str, rskip: Optional[int] = 1, el: bool = True, 
-                       year: int = None) -> pd.DataFrame:
-        """
-        Create edge list from ...
-
-        Parameters
-        ----------
-        df_path : str
-            Path to sales data.
-        sheet: str
-            Sheet name in the excel file.
-        rskip : Optional[int], optional
-            Number of rows to skip, by default 1.
-        el : bool, optional
-            If True, returns edge list, by default True.
-        year : Optional[int], optional
-            Year of data to filter, by default None.
-
-        Returns
-        -------
-        pd.DataFrame
-            Edge list as defined above.
-        """
-        try:
-            res = pd.read_excel(
-                df_path,
-                engine="openpyxl",
-                sheet_name = sheet,
-                skiprows=rskip)
-        except FileNotFoundError:
-            print(f"Error: The file '{df_path}' was not found.")
-        except ValueError as e:
-            print(f"Error: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-
-        res['id'] = 'wug_' + res.index.astype(str)
-
-        # will need to add custom type as 'intake' or 'sale', yearly_volume (asking Sabrina), year (from argument), add purchase_self as 'self-supplied' (in this case, we have to clean up the definition)
-        supplies = (res[['Source Description', 'Direct Source Entity Name', 'id', 'Source Type']]
-                    .rename(columns = {'Source Description': 'source', 'Direct Source Entity Name': 'target',
-                                       'Source Type': 'water_type'}))
-        supplies['type'] = 'intake'
-        supplies['purchased_self'] = 'Self-Supplied'
-
-        wholesale = (res[['Direct Source Entity Name', 
-                          "Self-Supplied or Buyer WUG Name\n(Self-Supplied if seller entity name is blank.)", 
-                          'id', 'Source Description']]
-                     .rename(columns={'Direct Source Entity Name': 'source', "Self-Supplied or Buyer WUG Name\n(Self-Supplied if seller entity name is blank.)": 'target', 'Source Description': 'water_type'}))
-        wholesale['type'] = 'sale'
-        wholesale['purchased_self'] = 'Purchased'
-
-        out = pd.concat([supplies, wholesale], ignore_index=True)
-        out['year'] = year if year is not None else 'Unknown'
-        out['yearly_volume'] = 0  # Placeholder for actual volume data
-        return out
-
-    wug_path = 'pws/2022StateWaterPlan_ExistingWUGSupplyTransaction+Coordinate+PWSBridge.xlsx'
-    wugs_el = create_wugs_el(wug_path, '2022SWPExistingWaterSupplyTrans', rskip=1, year=2022)
-    return create_wugs_el, wug_path, wugs_el
-
-
-@app.cell
-def _(pd, wug_path, wugs_el):
-    test = pd.DataFrame({
-        'wugs_nodes': pd.concat([wugs_el['source'], wugs_el['target']]).unique()
-    })
-
-    #try to match them against the nodes in the bridge table provided
-    bridge = pd.read_excel(wug_path, '2022SWP+SurveyPWSBridge', skiprows=1, engine='openpyxl')
-    bridge
-    return bridge, test
-
-
-@app.cell
-def _(nl_pos):
-    nl_pos
     return
 
 

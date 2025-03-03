@@ -15,7 +15,7 @@ const SourcesPage: React.FC = () => {
     const [filteredNode, setFilteredNode] = useState(null); // New state for filtered node
     const [filteredData, setFilteredData] = useState(null); // New state for filtered data
     const open = Boolean(anchorEl);
-
+    
     const menuItems = nodeKeys
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -28,25 +28,38 @@ const SourcesPage: React.FC = () => {
     };
 
     const handleGo = () => {
+        function toTitleCase(str: string): string {
+            return str
+              .toLowerCase() // Convert to lowercase first
+              .split(" ") // Split into words
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter
+              .join(" "); // Join back to a sentence
+          }
+
         const selected = menuItems.find((item) => item === selectedItem);
 
-        const filterDataBySource = (selected) => {
+        const filterDataBySource = (selected: string) => {
             // Filter edges where the source matches the provided sourceId
-            const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === selected);
-            const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), selected]));
+            const titleSelected = toTitleCase(selected);
+            const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
+            const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
             const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
-            const uniqueNodes = Array.from(new Set([selected, uniqueTargets,
+            const uniqueNodes = Array.from(new Set([titleSelected, uniqueTargets,
                 ...filteredEdges.map(edge => edge.data.target)]));
             const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
-
+            
             const filteredElements = {
                 elements: {
                     nodes: filteredNodes,
                     edges: filteredEdges
                 }
             };
+
+            console.log(titleSelected);
+            console.log(filteredElements);
             // Return only the filtered edges (not affecting nodes)
             return filteredElements;
+
         };
 
         const data = filterDataBySource(selected);
