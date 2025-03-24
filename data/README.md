@@ -51,7 +51,7 @@ One of the advantages or using Marimo over other tools (e.g., Jupyter Notebooks)
 ```bash
 python network-data-maker.py
 ```
-##Troubleshooting 🔎
+## Troubleshooting 🔎
 
 Should you run into an issue with your Execution Policy not allowing you to activate the enviroment. You may need to temporaily change the PowerShell execution policy to allow scripts to run. In PowerShell you can change your policy by using the following command: 
 
