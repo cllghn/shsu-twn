@@ -41,17 +41,27 @@ export default function FadeMenu() {
 
     return (
         <div
-            className={`fixed top-0 w-full p-5 transition-colors duration-300 flex justify-end ${scrolled ? "bg-white bg-opacity-50 shadow-lg" : "bg-transparent"
+            className={`fixed top-0 w-full p-5 transition-colors duration-300 flex justify-end ${scrolled ? "bg-white bg-opacity-25 shadow-lg" : "bg-[#f4f4f4] shadow-lg"
                 }`}
         >
             <Button
-                className='text-bold hover:bg-gray-300 hover:bg-opacity-50'
                 variant='outlined'
                 id="fade-button"
                 aria-controls={open ? 'fade-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
+                sx={{
+                    color: '#ffffff',
+                    backgroundColor: '#124559',
+                    borderColor: '#ffffff',
+                    borderRadius: '5px',
+                    '&:hover': {
+                        backgroundColor: '#ffffff',
+                        borderColor: '#124559',
+                        color: '#124559',
+                    },
+                }}
             >
                 Menu
             </Button>

@@ -29,11 +29,13 @@ export default function RootLayout({
     <html lang="en">
       <FadeMenu />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        {children}
+        {/* {children} */}
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
-      <Footer />
+      
 
     </html>
   );

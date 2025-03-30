@@ -41,12 +41,24 @@ const ScorecardPage: React.FC<ScorecardPageProps> = ({ data }) => {
                                 {/* Conditionally render the button if the URL exists */}
                                 {item.url && (
                                     <Button
-                                        variant="contained"
+                                        variant="outlined"
                                         color="primary"
                                         className="mt-4 mx-auto"
                                         onClick={() => router.push(item.url)}
                                         // href={item.url}
                                         target="_blank"
+                                        rel="noopener noreferrer"
+                                        sx={{
+                                            color: '#ffffff',
+                                            backgroundColor: '#124559',
+                                            borderColor: '#ffffff',
+                                            borderRadius: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#ffffff',
+                                                borderColor: '#124559',
+                                                color: '#124559',
+                                            },
+                                        }}
                                     >
                                         Explore &rarr;
                                     </Button>

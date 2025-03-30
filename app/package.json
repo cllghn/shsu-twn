@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build-data": "cd ../data && call venv\\Scripts\\activate && py network-data-maker.py"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
