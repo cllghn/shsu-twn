@@ -70,6 +70,43 @@ const FAQ: React.FC = () => {
                         </AccordionDetails>
                     </Accordion>
 
+                    <Accordion className="shadow-lg">
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className="font-semibold">Why do we need to visualize water systems as a network? </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                            Network visualizations are useful in exploratory data analysis. Have you ever heard the expression “a picture tells a thousand words?”. Data visualization makes it easier to identify patterns, trends, and outliers in a dataset. For example: 
+                            <br></br><br></br>
+                            <ol>
+                                <li>&bull; A network might center around a handful of nodes. A centralized network has advantages and disadvantages. For instance, a centralized network has clear hubs that can efficiently distribute resources. However, the downside is that if a central node fails, the entire system can become vulnerable to disruptions. On the other hand, a decentralized water network distributes control and flow across multiple nodes, increasing resilience to failures and making the system more adaptable to local needs. However, this can also introduce complexities in coordination and maintenance. Visualizing the data is the first step in identifying the advantages and disadvantages of a network.</li>
+                                <li>&bull; A network visualization might highlight disconnection between components in the networks. For example, isolated nodes or clusters might indicate areas with limited access to water resources, inefficiencies in distribution, or vulnerabilities in the system. For instance, if a community’s water supply relies on a single pipeline that is not well-connected to alternative sources, a failure in that pipeline could leave residents without water.</li>
+                            </ol>
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className="shadow-lg">
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className="font-semibold">What do the lines and dots in the visualization represent? </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                                The lines are connections that represent the flow of water from one water entity to another. Those relationships connect a source-to-system (intake) or system-to-system (sales). The dots represent water entities, those can be water sources (e.g., aquifers or surface water) or water systems. 
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className="shadow-lg">
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography className="font-semibold">Where does the data come from? </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                                These data are provided by TWDB and collected through the annual Water Use Survey. 
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
 
                     {/* Complete */}
                 </div>

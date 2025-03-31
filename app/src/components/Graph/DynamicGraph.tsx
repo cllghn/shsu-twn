@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from "cytoscape";
 import fcose from 'cytoscape-fcose';
-import dagre from 'cytoscape-dagre';
+// import dagre from 'cytoscape-dagre';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
 import TextFieldsIcon from '@mui/icons-material/TextFields';
@@ -22,9 +22,9 @@ interface DynamicGraphProps {
     selected: string;
 }
 
-// cytoscape.use(fcose);
+cytoscape.use(fcose);
 
-cytoscape.use(dagre);
+// cytoscape.use(dagre);
 
 // Function to determine color based on preliminary_type
 const getNodeColor = (type: string) => {
@@ -57,8 +57,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     ];
 
     const layout = {
-        // name: "fcose",
-        name: "dagre",
+        name: "fcose",
+        // name: "dagre",
         fit: true,
         animate: false,
         padding: 20,

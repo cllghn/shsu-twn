@@ -80,7 +80,7 @@ export default function FadeMenu() {
                 <MenuItem onClick={() => { router.push("/netexplorer"); handleClose(); }}>Network Explorer</MenuItem>
                 <MenuItem onClick={() => { router.push("/data"); handleClose(); }}>Data</MenuItem>
                 <MenuItem onClick={handleClose} disabled>About</MenuItem>
-                <MenuItem onClick={handleClose} disabled>Methodology</MenuItem>
+                {/* <MenuItem onClick={handleClose} disabled>Methodology</MenuItem> */}
                 <MenuItem onClick={() => { router.push("/faq"); handleClose(); }}>FAQ</MenuItem>
 
             </Menu>
