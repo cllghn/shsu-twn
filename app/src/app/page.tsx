@@ -4,6 +4,9 @@ import { Menu, MenuItem, Button } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import SourceIcon from '@mui/icons-material/Source';
+
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedItem, setSelectedItem] = useState("different sources"); // Default text
@@ -42,7 +45,7 @@ export default function Home() {
                 Texas Water Foundation Network Explorer
               </h1>
               <p className="text-white text-left pt-4 sm:block hidden">
-                A tool designed to revolutionize the way we interact with water data in Texas.
+                A tool designed to revolutionize the way we interact with water data in Texas.<a className="hover:underline">Read more about it... &rarr;</a>
               </p>
             </div>
             {/* Right Column - Placeholder */}
@@ -59,8 +62,8 @@ export default function Home() {
               <PiShareNetworkFill size={70} className="transform rotate-45 lg:block hidden" /> */}
             </div>
             <div className="bg-white bg-opacity-10 col-span-10 lg:col-span-7 px-20 py-20 rounded-r-lg">
-              <h2 className="pb-5 text-red-700 font-bold text-lg">Water Flows</h2>
-              <h3 className="pb-5 text-2xl text-thin">Interested in learning how water flows through the system?</h3>
+              <h2 className="pb-5 text-[#53899D] font-bold text-lg">Water Flows <WaterDropIcon /></h2>
+              <h3 className="pb-5 text-2xl text-thin text-[#124559]">Interested in learning how water flows through the network?</h3>
               <div className="container mx-auto flex items-center space-x-2">
                 <div>Explore how water flows from</div>
 
@@ -127,8 +130,8 @@ export default function Home() {
 
           <div className="mt-16 grid grid-cols-10 shadow-lg rounded-lg animate-fadeIn">
             <div className="bg-white bg-opacity-10 col-span-10 lg:col-span-7 px-20 py-20 rounded-lg">
-              <h2 className="pb-5 text-red-700 font-bold text-lg">Data Sets</h2>
-              <h3 className="pb-5 text-2xl text-thin">Interested in taking a look at the data?</h3>
+              <h2 className="pb-5 text-[#53899D] font-bold text-lg">Data Sets <SourceIcon /></h2>
+              <h3 className="pb-5 text-2xl text-thin text-[#124559]">Interested in taking a look at the data?</h3>
               <div className="container mx-auto flex items-center space-x-2">
 
                 {/* Go Button */}
