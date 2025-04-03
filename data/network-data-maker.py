@@ -232,12 +232,12 @@ def _(List, Optional, os, pd):
             elif row.get('Water Type') == "Ground Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
                 # There are no unknowns in the Aquifer Source
                 if row.get('Aquifer Source') == "OTHER AQUIFER":
-                    return row.get('Source Basin') + ' BASIN'
+                    return row.get('Source Basin') + ' BASIN (Source Unknown)'
                 else:
                     return row.get('Aquifer Source')
             elif row.get('Water Type') == "Surface Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
                 if row.get('Surface Water Source') == "UNKNOWN":
-                    return row.get('Source Basin') + ' BASIN' 
+                    return row.get('Source Basin') + ' BASIN (Source Unknown)' 
                 else:
                     return row.get('Surface Water Source')
 
@@ -444,7 +444,7 @@ def _(el, pd):
             return entity.strip().title() if isinstance(entity, str) else entity
 
         water_sources = [
-            x + ' BASIN' if col == 'Source Basin' else x
+            x + ' BASIN (Source Unknown)' if col == 'Source Basin' else x
             for col in ['Aquifer Source', 'Surface Water Source', 'Source Basin']
             for x in intake[col].dropna().apply(str).unique().tolist()
         ]
