@@ -1,8 +1,11 @@
 "use client";
+
 import { useState } from "react";
 import { Menu, MenuItem, Button } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Typography from "@mui/material/Typography";
 
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import SourceIcon from '@mui/icons-material/Source';
@@ -42,10 +45,10 @@ export default function Home() {
             {/* Left Column - Title & Description */}
             <div className="col p-10 sm:bg-[#01161E] sm:bg-opacity-25 sm:rounded-lg  sm:border-2 sm:border-[#f4f4f4] animate-fadeInSlow">
               <h1 className="text-4xl text-white font-bold text-left">
-                Texas Water Foundation Network Explorer
+                Texas Water Network Explorer
               </h1>
               <p className="text-white text-left pt-4 sm:block hidden">
-                A tool designed to revolutionize the way we interact with water data in Texas.<a className="hover:underline">Read more about it... &rarr;</a>
+                A tool designed to revolutionize the way we interact with water data in Texas.<a href='/about' className='aPlus'>Read more about it... &rarr;</a>
               </p>
             </div>
             {/* Right Column - Placeholder */}
@@ -125,6 +128,11 @@ export default function Home() {
                   ))}
                 </Menu>
               </div>
+              <Typography variant="caption">
+                <Link href="/faq?expand=waterSource" className="aPlus">
+                  Find a source... &rarr;
+                </Link>
+              </Typography>
             </div>
           </div>
 
@@ -153,11 +161,16 @@ export default function Home() {
                   Go &rarr;
                 </Button>
               </div>
+              <Typography variant="caption">
+                <Link href="/faq?expand=dataSource" className="aPlus mt-3">
+                  Read FAQs about the data... &rarr;
+                </Link>
+              </Typography>
             </div>
             <div className="col-span-3 bg-cover bg-center lg:flex hidden flex-col bg-[url('/data.jpg')] rounded-r-lg">
             </div>
           </div>
-
+          
         </div>
       </main >
     </>

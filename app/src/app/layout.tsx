@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Texas Water Network Visualizer",
-  description: "A visualization tool for Texas water network data.",
+  description: "The Texas Water Network Explorer (TWNet) is a publicly accessible tool designed to enhance how policymakers, decision-makers, and the public analyze water data. It maps the interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. Using data from the Texas Water Development Board’s (TWDB) Water Use Survey, TWNet leverages network analysis methods and visualization techniques to transform a complex web of thousands of water users into clear, intuitive graphs and insights. These insights help policymakers quickly understand water distribution patterns, identify key stakeholders, and make informed decisions to improve water management.",
 };
 
 export default function RootLayout({

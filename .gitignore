@@ -198,3 +198,6 @@ coverage/
 
 # Stop tracking the output files
 data/outputs/*
+data/__marimo__/
+__marimo__/
+
