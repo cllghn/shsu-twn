@@ -12,11 +12,11 @@ const DataPage: React.FC = () => {
     return (
         <>
             <main className='container flex flex-col w-full m-28 mx-auto px-24 pt-14'>
-                <h1 className='text-4xl font-bold text-left pb-10'>Texas Water Network Data</h1>
-                <div>
+                <h1 className='text-4xl font-bold text-left pb-10 animate-fadeIn'>Texas Water Network Data</h1>
+                <div className='animate-fadeIn'>
                     <p>The Texas Water Network Explorer utilizes annual water use data and estimates. This data is collected by the <a href='https://www.twdb.texas.gov/index.asp' target='_blank'>Texas Water Development Board (TWDB)</a> and available to the public.</p>
                 </div>
-                <div className="w-full py-5 mx-auto">
+                <div className="w-full py-5 mx-auto animate-fadeInSlow">
                     {/* Accordion 1 */}
                     <Accordion className = "shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>

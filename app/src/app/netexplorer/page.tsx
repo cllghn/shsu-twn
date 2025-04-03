@@ -39,8 +39,8 @@ const Page: React.FC = () => {
     return (
         <>
             <main className='container flex flex-col w-full m-28 mx-auto px-24 pt-14'>
-                <h1 className='text-4xl font-bold text-left pb-10'>Network Explorer</h1>
-                <span className="text-black flex flex-wrap items-center pb-8">
+                <h1 className='text-4xl font-bold text-left pb-10 animate-fadeIn'>Network Explorer</h1>
+                <span className="text-black flex flex-wrap items-center pb-8 animate-fadeIn">
                     Explore the {metadata.year} water data flows originating from&nbsp;
                     <Typography
                         aria-owns={open1 ? 'mouse-over-popover-1' : undefined}
@@ -99,7 +99,7 @@ const Page: React.FC = () => {
                     </Popover> .
                 </span>
 
-                <span>
+                <span className='animate-fadeInSlow'>
                     <ScorecardPage data={filteredMetadata} />
                 </span>
             </main >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -8,7 +8,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const FAQ: React.FC = () => {
+// Create a separate component that uses useSearchParams
+const FAQContent = () => {
     const searchParams = useSearchParams();
     const expandWater = searchParams.get("expand") === "waterSource";
     const expandData = searchParams.get("expand") === "dataSource";
@@ -29,12 +30,12 @@ const FAQ: React.FC = () => {
     
     return (
         <>
-            <main className='container flex flex-col w-full m-28 mx-auto px-24 pt-14'>
-                <h1 className='text-4xl font-bold text-left pb-10'>Frequently Asked Questions</h1>
-                <div>
+            <main className='container flex flex-col w-full m-28 mx-auto px-24 pt-14 '>
+                <h1 className='text-4xl font-bold text-left pb-10 animate-fadeIn'>Frequently Asked Questions</h1>
+                <div className="animate-fadeInSlow">
                     <p>This page includes questions and answers to common questions about this website.</p>
                 </div>
-                <div className="w-full py-5 mx-auto">
+                <div className="w-full py-5 mx-auto animate-fadeInSlow">
                     <Accordion className="shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography variant="overline">What is the Texas Water Network Explorer?</Typography>
@@ -42,7 +43,7 @@ const FAQ: React.FC = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">
-                                    The Texas Water Networks Explorer (TWNet) is a publicly accessible tool designed to enhance how policymakers and decision-makers analyze water data. It maps the interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. Using data from the Texas Water Development Board’s (TWDB) Water Use Survey, TWNet leverages network analysis methods and visualization techniques to transform a complex web of thousands of water users into clear, intuitive graphs and insights. These insights help policymakers quickly understand water distribution patterns, identify key stakeholders, and make informed decisions to improve water management.
+                                    The Texas Water Networks Explorer (TWNet) is a publicly accessible tool designed to enhance how policymakers and decision-makers analyze water data. It maps the interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. Using data from the Texas Water Development Board's (TWDB) Water Use Survey, TWNet leverages network analysis methods and visualization techniques to transform a complex web of thousands of water users into clear, intuitive graphs and insights. These insights help policymakers quickly understand water distribution patterns, identify key stakeholders, and make informed decisions to improve water management.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -55,7 +56,7 @@ const FAQ: React.FC = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">    
-                                This tool distills thousands of data points into intuitive visual analytics, simplifying how policymakers conceptualize water usage across Texas. Rather than simply asking, “How much water is used?” the tool broadens the scope to: “Who uses it, and who do they rely on? What kinds of uses interlink water users? And how much water is exchanged?” By applying a network-based approach, users can visualize and interpret the intricate relationships between water entities—such as water intake from sources, sales to industries and municipalities, and retail distribution to other systems. This framing enables policymakers to quickly identify strengths, dependencies and weaknesses within the network and better understand how water moves through the system. In turn, this expanded insight supports more data-driven decision-making in key areas, including developing system resilience strategies, risk management, infrastructure planning, and the development of policies and regulations governing water use.
+                                This tool distills thousands of data points into intuitive visual analytics, simplifying how policymakers conceptualize water usage across Texas. Rather than simply asking, "How much water is used?" the tool broadens the scope to: "Who uses it, and who do they rely on? What kinds of uses interlink water users? And how much water is exchanged?" By applying a network-based approach, users can visualize and interpret the intricate relationships between water entities—such as water intake from sources, sales to industries and municipalities, and retail distribution to other systems. This framing enables policymakers to quickly identify strengths, dependencies and weaknesses within the network and better understand how water moves through the system. In turn, this expanded insight supports more data-driven decision-making in key areas, including developing system resilience strategies, risk management, infrastructure planning, and the development of policies and regulations governing water use.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -63,7 +64,7 @@ const FAQ: React.FC = () => {
 
                     <Accordion className="shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="overline">How does the tool derive relationships from TWDB’s data?</Typography>
+                            <Typography variant="overline">How does the tool derive relationships from TWDB's data?</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
@@ -79,7 +80,7 @@ const FAQ: React.FC = () => {
                                 In addition to characteristics of each relationship, like water volume and frequency, the TWDB data is also used to extract contextual characteristics about the water entities in the network, enriching our understanding of each entity in the network by adding important information beyond just relationships. For example, water sources and water systems are geographically referenced. Similarly, when applicable, data on retail water connections and populations served are included to provide users with relevant data about public water systems in the network.
                                 </p>
                                 <p className="pt-2 pb-4">
-                                In all, the tool leverages relational data to depict interdependencies and flows, while pairing this with contextual data. What emerges is a clear picture of Texas’s water system, transforming thousands of data points into actionable insights to support water resource planning and policy-making.
+                                In all, the tool leverages relational data to depict interdependencies and flows, while pairing this with contextual data. What emerges is a clear picture of Texas's water system, transforming thousands of data points into actionable insights to support water resource planning and policy-making.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -87,7 +88,7 @@ const FAQ: React.FC = () => {
 
                     <Accordion className="shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="overline">What is a “network” in this context? </Typography>
+                            <Typography variant="overline">What is a "network" in this context? </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
@@ -104,10 +105,10 @@ const FAQ: React.FC = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                            Network visualizations are useful in exploratory data analysis. Have you ever heard the expression “a picture tells a thousand words?”. Data visualization makes it easier to identify patterns, trends, and outliers in a dataset. For example: 
+                            Network visualizations are useful in exploratory data analysis. Have you ever heard the expression "a picture tells a thousand words?". Data visualization makes it easier to identify patterns, trends, and outliers in a dataset. For example: 
                             <ol className="pb-4 pt-2 pl-2">
                                 <li>&bull; A network might center around a handful of nodes. A centralized network has advantages and disadvantages. For instance, a centralized network has clear hubs that can efficiently distribute resources. However, the downside is that if a central node fails, the entire system can become vulnerable to disruptions. On the other hand, a decentralized water network distributes control and flow across multiple nodes, increasing resilience to failures and making the system more adaptable to local needs. However, this can also introduce complexities in coordination and maintenance. Visualizing the data is the first step in identifying the advantages and disadvantages of a network.</li>
-                                <li>&bull; A network visualization might highlight disconnection between components in the networks. For example, isolated nodes or clusters might indicate areas with limited access to water resources, inefficiencies in distribution, or vulnerabilities in the system. For instance, if a community’s water supply relies on a single pipeline that is not well-connected to alternative sources, a failure in that pipeline could leave residents without water.</li>
+                                <li>&bull; A network visualization might highlight disconnection between components in the networks. For example, isolated nodes or clusters might indicate areas with limited access to water resources, inefficiencies in distribution, or vulnerabilities in the system. For instance, if a community's water supply relies on a single pipeline that is not well-connected to alternative sources, a failure in that pipeline could leave residents without water.</li>
                             </ol>
                             </Typography>
                         </AccordionDetails>
@@ -207,19 +208,25 @@ const FAQ: React.FC = () => {
                                     <li>&bull; Entities may not submit a survey every year.</li>
                                     <li>&bull; Volumes are self-reported and revised as additional or more accurate data becomes available.</li>
                                     <li>&bull; Volumes might not be consistent due to meter accuracy, water loss, or data errors.</li>
-                                    <li>&bull; Data are estimated for surveys that are not returned using the previous year’s data.</li>
+                                    <li>&bull; Data are estimated for surveys that are not returned using the previous year's data.</li>
                                     <li>&bull; Only data collected from community public water systems are included in this map along with   selected industrial facilities as their buyer.</li>
                                 </ol>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>
-
-                    
-
                 </div>
-            </ main>
+            </main>
         </>
     );
-}
+};
+
+// Main component that wraps FAQContent in Suspense
+const FAQ: React.FC = () => {
+    return (
+        <Suspense fallback={<div className='container m-28 mx-auto px-24 pt-14'>Loading FAQ...</div>}>
+            <FAQContent />
+        </Suspense>
+    );
+};
 
 export default FAQ;

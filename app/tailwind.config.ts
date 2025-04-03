@@ -16,6 +16,8 @@ export default {
         customPulse: 'customPulse 2s ease-in-out 10',
         fadeIn: 'fadeIn 0.75s ease-in-out',
         fadeInSlow: 'fadeIn 2s ease-in-out',
+        fadeInSlower: 'fadeIn 3s ease-in-out',
+        fadeInSlowest: 'fadeIn 4s ease-in-out',
       },
       keyframes: {
         customPulse: {
