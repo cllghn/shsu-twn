@@ -194,3 +194,7 @@ coverage/
 *.iml
 # Local Netlify folder
 .netlify
+
+
+# Stop tracking the output files
+data/outputs/*

@@ -20,7 +20,8 @@ def _():
     from typing import List, Optional
     import os
     import re
-    return List, Optional, json, mo, np, os, pd, plt, re
+    from datetime import datetime
+    return List, Optional, datetime, json, mo, np, os, pd, plt, re
 
 
 @app.cell(hide_code=True)
@@ -231,12 +232,12 @@ def _(List, Optional, os, pd):
             elif row.get('Water Type') == "Ground Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
                 # There are no unknowns in the Aquifer Source
                 if row.get('Aquifer Source') == "OTHER AQUIFER":
-                    return row.get('Source Basin') + ' BASIN'
+                    return row.get('Source Basin') + ' BASIN (Source Unknown)'
                 else:
                     return row.get('Aquifer Source')
             elif row.get('Water Type') == "Surface Water" and row.get('Purchased / Self-Supplied') == "Self-Supplied":
                 if row.get('Surface Water Source') == "UNKNOWN":
-                    return row.get('Source Basin') + ' BASIN' 
+                    return row.get('Source Basin') + ' BASIN (Source Unknown)' 
                 else:
                     return row.get('Surface Water Source')
 
@@ -267,7 +268,7 @@ def _(List, Optional, os, pd):
                     entity = entity.strip()
                     entity = entity.title()
                 return entity
-            
+
             intake.loc[:, 'source'] = intake['source'].apply(clean_entity)
             intake.loc[:, 'target'] = intake['target'].apply(clean_entity)
 
@@ -276,7 +277,7 @@ def _(List, Optional, os, pd):
                 return intake[available_columns]
             else:
                 return intake[default_columns]
-            
+
         else:
             return intake
 
@@ -371,13 +372,13 @@ def _(List, Optional, os, pd):
             # Cleaning rules:
             sales.loc[:, 'source'] = sales['source'].astype(str)
             sales.loc[:, 'target'] = sales['target'].astype(str)
-        
+
             if columns:
                 available_columns = [col for col in columns if col in sales.columns]
                 return sales[available_columns]
             else:
                 return sales[default_columns]
-            
+
         else:
             return sales
 
@@ -425,25 +426,25 @@ def _(el, pd):
                           intake_file: str) -> pd.DataFrame:
         """
         Create a DataFrame with unique node IDs and classify them as either 'water source' or 'water system'.
-    
+
         Parameters:
             el (pd.DataFrame): A DataFrame containing 'source' and 'target' columns.
             intake_file (str): Path to the CSV file containing intake data.
-    
+
         Returns:
             pd.DataFrame: A DataFrame with 'id' and 'preliminary_type' columns.
         """
         # Create an empty DataFrame and add an 'id' column with unique values from 'source' and 'target'
         nodes = pd.DataFrame()
         nodes['id'] = pd.concat([el['source'].astype(str), el['target'].astype(str)]).unique()
-    
+
         # Load intake data and extract unique water source names
         intake = pd.read_csv(intake_file)
         def clean_entity(entity: str) -> str:
             return entity.strip().title() if isinstance(entity, str) else entity
 
         water_sources = [
-            x + ' BASIN' if col == 'Source Basin' else x
+            x + ' BASIN (Source Unknown)' if col == 'Source Basin' else x
             for col in ['Aquifer Source', 'Surface Water Source', 'Source Basin']
             for x in intake[col].dropna().apply(str).unique().tolist()
         ]
@@ -451,12 +452,11 @@ def _(el, pd):
 
         # Assign a preliminary type to each node
         nodes['preliminary_type'] = nodes['id'].apply(lambda x: 'water source' if x in water_sources else 'water system')
-    
+
         return nodes
 
     nodes = create_nodes_list(el, 'inputs/PWS Intake_2022-2023.csv')
     nodes.head(10)
-
     return create_nodes_list, nodes
 
 
@@ -506,10 +506,10 @@ def _(Optional, pd):
         out = (pd.read_csv(retail_df_path, dtype={'TWDB Survey No': str})  
                 .rename(columns={'TWDB Survey No': 'id', 'PWS Name': 'retail_name'})
                ) 
-    
+
         if year is not None:
             out = out.query("Year == @year")
-        
+
         return out
 
     # Load Retail Data
@@ -549,7 +549,7 @@ def _(pd):
                 .rename(columns={'TWDB Survey Number': 'id',
                                  'PWS Name': 'sur_name'})
                ) 
-    
+
         return out
 
     survey_no = get_survey_nodes('inputs/PWS BridgeTable_2022-2023.csv')
@@ -579,7 +579,7 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
         nodes_retail_no = (nodes
                           .merge(retail, on='id', how='left')
                           .merge(survey_no, on='id', how='left'))
-    
+
         # TODO: After joining, there are ~2k nodes that do not have a name.
         # This suggests that they are not in the retail or survey number 
         # files. After quickly drilling down on these, they appear to have
@@ -598,7 +598,7 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
                                            'PWS Name': 'intake_name'}
                                  )[['id', 'intake_name']]
                          )
-    
+
         intake_sellers = (pd.read_csv(intake_df_path,
                                      dtype={'Seller Survey Number': str})
                           .rename(columns={'Seller Survey Number': 'id',
@@ -629,7 +629,7 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
 
         # Unified name column using fillna instead of multiple apply calls
         merged_data['unified_name'] = merged_data[['unified_name', 'intake_name', 'buyer_name', 'seller_name', 'intake_seller_name']].bfill(axis=1).iloc[:, 0]
-    
+
         # Quick round of cleaning
         def clean_entity(entity: str) -> str:
             return entity.strip().title() if isinstance(entity, str) else entity
@@ -644,7 +644,6 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
                      'inputs/PWS Intake_2022-2023.csv', 
                      'inputs/PWS Sales_2022-2023.csv', 
                      year=2022)
-
     return enrich_nodes, nl
 
 
@@ -695,10 +694,14 @@ def _(mo):
 
 
 @app.cell
-def _(el, nl_tidy):
-    nl_tidy.to_csv('outputs/nodes.csv', index=False)
-    el.to_csv('outputs/edges.csv', index=False)
-    return
+def _(datetime, el, nl_tidy):
+    # Get the current date
+    current_date = datetime.now().strftime('%Y%m%d')
+
+    # Save the node and edge lists with the date in the filename
+    nl_tidy.to_csv(f'outputs/nodes_{current_date}.csv', index=False)
+    el.to_csv(f'outputs/edges_{current_date}.csv', index=False)
+    return (current_date,)
 
 
 @app.cell(hide_code=True)
@@ -764,7 +767,7 @@ def _(el, nl_tidy, np, pd):
 
         out["elements"]["nodes"] = [{"data": record} for record in nl.where(pd.notnull(nl), None).replace({np.nan: None}).to_dict(orient='records')]
         out["elements"]["edges"] = [{"data": record} for record in el.where(pd.notnull(el), None).replace({np.nan: None}).to_dict(orient='records')]
-    
+
         return out
 
     cyto = create_cyto_json(nl_tidy,
