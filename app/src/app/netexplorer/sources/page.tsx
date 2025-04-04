@@ -15,7 +15,7 @@ const SourcesPage: React.FC = () => {
     const [filteredNode, setFilteredNode] = useState(null); // New state for filtered node
     const [filteredData, setFilteredData] = useState(null); // New state for filtered data
     const open = Boolean(anchorEl);
-    
+
     const menuItems = nodeKeys
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,11 +30,9 @@ const SourcesPage: React.FC = () => {
     const handleGo = () => {
         function toTitleCase(str: string): string {
             return str
-              .toLowerCase() // Convert to lowercase first
-              .split(" ") // Split into words
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter
-              .join(" "); // Join back to a sentence
-          }
+                .toLowerCase()
+                .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+        }
 
         const selected = menuItems.find((item) => item === selectedItem);
 
@@ -47,7 +45,7 @@ const SourcesPage: React.FC = () => {
             const uniqueNodes = Array.from(new Set([titleSelected, uniqueTargets,
                 ...filteredEdges.map(edge => edge.data.target)]));
             const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
-            
+
             const filteredElements = {
                 elements: {
                     nodes: filteredNodes,
@@ -69,12 +67,12 @@ const SourcesPage: React.FC = () => {
 
     return (
         <>
-            <main className='container flex flex-col md:flex-row w-full mt-16 mb-28 mx-auto px-18 space-x-4 '>
-                <div className="md:w-1/4">
+            <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
+                <div>
                     <Paper elevation={2} className="p-6">
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
                         <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
-                        <br />
+                        <div className="flex items-center">
                         <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
                         <Button
                             variant="text"
@@ -86,15 +84,32 @@ const SourcesPage: React.FC = () => {
                         </Button>
 
                         {/* Go Button */}
-                        <div className="flex justify-center pt-4">
+                        <div className="flex justify-center pt-4 ml-10">
                             <Button
-                                variant="contained"
+                                variant="outlined"
                                 onClick={handleGo}
                                 disabled={selectedItem === "select a source"} // Disable if default is selected
-                                className="bg-blue-600 text-white normal-case shadow-none hover:bg-blue-700"
+                                sx={{
+                                    color: '#ffffff',
+                                    backgroundColor: '#124559',
+                                    borderColor: '#ffffff',
+                                    borderRadius: '5px',
+                                    '&:hover': {
+                                        backgroundColor: '#ffffff',
+                                        borderColor: '#124559',
+                                        color: '#124559',
+                                    },
+                                    '&:disabled': {
+                                        backgroundColor: 'transparent',
+                                        borderColor: '#949494',
+                                        color: '#949494',
+                                        cursor: 'not-allowed',
+                                    },
+                                }}
                             >
                                 Go &rarr;
                             </Button>
+                            </div>
                         </div>
 
 
@@ -113,7 +128,7 @@ const SourcesPage: React.FC = () => {
                     </Paper>
                 </div>
 
-                <div className="md:w-3/4">
+                <div>
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <DynamicGraph data={filteredData} selected={filteredNode} />

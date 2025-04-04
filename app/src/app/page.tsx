@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Typography from "@mui/material/Typography";
 
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import SearchIcon from '@mui/icons-material/Search';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import SourceIcon from '@mui/icons-material/Source';
 
@@ -130,7 +132,7 @@ export default function Home() {
               </div>
               <Typography variant="caption">
                 <Link href="/faq?expand=waterSource" className="aPlus">
-                  Find a source... &rarr;
+                  <SearchIcon/> Find information on sources/systems... &rarr;
                 </Link>
               </Typography>
             </div>
@@ -163,7 +165,7 @@ export default function Home() {
               </div>
               <Typography variant="caption">
                 <Link href="/faq?expand=dataSource" className="aPlus mt-3">
-                  Read FAQs about the data... &rarr;
+                  <LocalLibraryIcon /> Read FAQs about the data... &rarr;
                 </Link>
               </Typography>
             </div>
