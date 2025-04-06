@@ -22,6 +22,19 @@ interface DynamicGraphProps {
     selected: string;
 }
 
+// Define tooltip state interface
+interface TooltipState {
+    show: boolean;
+    x: number;
+    y: number;
+    content: {
+        id: string;
+        name: string;
+        type: string;
+        [key: string]: any;
+    };
+}
+
 cytoscape.use(fcose);
 
 // cytoscape.use(dagre);
@@ -29,8 +42,8 @@ cytoscape.use(fcose);
 // Function to determine color based on preliminary_type
 const getNodeColor = (type: string) => {
     const colorMap: Record<string, string> = {
-        "water source": "#5e4fa2", // Blue
-        "water system": "#9e0142", // Green
+        "water source": "#01161E", // Dark Blue
+        "water system": "#53899D", // Light Blue
     };
     return colorMap[type] || "#808080"; // Default to gray if type is unknown
 };
@@ -45,6 +58,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 id: node.data.id,
                 label: node.data.unified_name,
                 preliminary_type: node.data.preliminary_type,
+                ...node.data, // Spread other properties if needed
             },
         })),
         ...edges.map((edge) => ({
@@ -74,6 +88,19 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 .update();
         }
     };
+
+    // Tooltip state 
+    const [tooltip, setTooltip] = useState<TooltipState>({
+        show: false,
+        x: 0,
+        y: 0,
+        content: {
+            id: '',
+            name: '',
+            type: ''
+        }
+    });
+
     useEffect(() => {
         const cy = cyRef.current;
 
@@ -82,8 +109,45 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 .selector("node")
                 .style({ label: showLabels ? "data(label)" : "" })
                 .update();
+                
+            // Add event listeners for tooltips
+            cy.on('mouseover', 'node', (event) => {
+                const node = event.target;
+                const position = event.renderedPosition || event.position;
+                
+                // Get node data for the tooltip
+                setTooltip({
+                    show: true,
+                    x: position.x,
+                    y: position.y,
+                    content: {
+                        id: node.data('id'),
+                        name: node.data('unified_name'),
+                        type: node.data('preliminary_type'),
+                        // Add any other properties you want to show
+                    }
+                });
+            });
+            
+            cy.on('mouseout', 'node', () => {
+                setTooltip(prev => ({ ...prev, show: false }));
+            });
+            
+            // Update tooltip position when dragging or moving the graph
+            cy.on('drag', () => {
+                if (tooltip.show) {
+                    setTooltip(prev => ({ ...prev, show: false }));
+                }
+            });
+            
+            // Clean up event listeners on unmount
+            return () => {
+                cy.removeListener('mouseover');
+                cy.removeListener('mouseout');
+                cy.removeListener('drag');
+            };
         }
-    }, [showLabels]);
+    }, [showLabels, tooltip.show]);
 
     const handleZoomToFit = () => {
         cyRef.current?.fit();
@@ -102,23 +166,23 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     };
     return (
         <div className='min-h-screen relative'>
-            <Box className="absolute top-[1em] right-3 z-10 bg-blue-500 bg-opacity-20 rounded p-2 shadow-md">
+            <Box className="absolute top-[1em] right-3 z-10 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559]">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
                 <br />
                 <span className="text-sm">
-                    <CircleIcon sx={{ fontSize: 'small', fill: "#5e4fa2" }} /> Water Source
+                    <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /> Water Source
                 </span>
                 <br />
                 <span className="text-sm">
-                    <CircleIcon sx={{ fontSize: 'small', fill: "#9e0142" }} /> Water System
+                    <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /> Water System
                 </span>
             </Box>
             <Tooltip title="Fit to Screen" arrow placement="left">
                 <button
                     onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-3 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
@@ -127,7 +191,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title="Toggle Node Labels" arrow placement="left">
                 <button
                     onClick={handleLabelToggle}
-                    className="absolute top-[5em] left-3 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    className="absolute top-[5em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id="toggle-labels-btn"
                 >
                     <TextFieldsIcon />
@@ -136,12 +200,29 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title="Take Screenshot" arrow placement="left">
                 <button
                     onClick={getScreenshot}
-                    className="absolute top-[9em] left-3 z-10 bg-blue-500 text-white p-2 rounded-full hover:bg-white hover:text-blue-500 shadow-md"
+                    className="absolute top-[9em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='screenshot-btn'
                 >
                     <CameraAltIcon />
                 </button>
             </Tooltip>
+
+            {/* Custom tooltip */}
+            {tooltip.show && (
+                <div 
+                    className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
+                    style={{
+                        left: tooltip.x + 10, // Offset to not cover the node
+                        top: tooltip.y + 10,
+                        pointerEvents: 'none', // Makes the tooltip non-interactive
+                    }}
+                >
+                    <h3 className="font-bold">{tooltip.content.name}</h3>
+                    <p className="text-sm"><b>ID:</b> {tooltip.content.id}</p>
+                    <p className="text-sm pt-2"><b>Type:</b> {tooltip.content.type.toUpperCase()}</p>
+                    {/* ... */}
+                </div>
+            )}
 
             <CytoscapeComponent
                 key={JSON.stringify(data)} // Forces a full re-render when data changes
@@ -156,21 +237,22 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         style: {
                             "background-color": (ele) => getNodeColor(ele.data("preliminary_type")),
                             "label": "data(label)",
-                            "text-valign": "center",
-                            "color": "#fff",
-                            "text-outline-color": "#000",
-                            "text-outline-width": 2,
-                            "font-size": "12px",
+                            "color": "#000",
+                            "font-size": "6px",
+                            "text-transform": "uppercase",
+                            "text-wrap": "ellipsis",
+                            "text-max-width": 60,
+                            "height": 20,
+                            "width": 20,
                         },
                     },
                     {
                         selector: "edge",
                         style: {
-                            "width": 2,
-                            width: "1px",
+                            "width": 1,
                             "line-color": "#ccc",
-                            "target-arrow-shape": "chevron",
-                            "target-arrow-color": "#ccc",
+                            "mid-target-arrow-shape": "vee",
+                            "mid-target-arrow-color": "#ccc",
                         },
                     },
                 ]}

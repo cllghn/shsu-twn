@@ -38,14 +38,14 @@ const FAQ: React.FC = () => {
                         </p>
                     </div>
                 </div>
-                <div className="w-full mt-10">
+                {/* <div className="w-full mt-10">
                     <h1 className='text-4xl font-bold text-left pt-10 pb-10 animate-fadeIn'>Reproducibility</h1>
                     <div className='animate-fadeInSlow'>
                         <p>
                             This Web site and the analysis reflected herein were developed using open-source software. All code is version controlled using <a href='https://github.com/cllghn/shsu-twn' target='_blank' className='aPlus'> <GitHubIcon /> GitHub and can be accessed here.</a>
                         </p>
                     </div>
-                </div>
+                </div> */}
 
 
             </ main>

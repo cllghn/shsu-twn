@@ -3,9 +3,13 @@ import { useState } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
-import { Menu, MenuItem, Button, Paper, Typography } from "@mui/material";
+import { Menu, MenuItem, Button, Paper, Typography, Tabs, Tab, Box, } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import DynamicGraph from "@/components/Graph/DynamicGraph";
+import InfoIcon from '@mui/icons-material/Info';
+import ShareIcon from '@mui/icons-material/Share';
+import InsightsIcon from '@mui/icons-material/Insights';
+
 
 const SourcesPage: React.FC = () => {
     const nodeKeys = Object.keys(metadata.sources.kvs);
@@ -65,6 +69,32 @@ const SourcesPage: React.FC = () => {
         setFilteredNode(selected);
     };
 
+
+    // TabPanel component and support functions
+    function TabPanel(props) {
+        const { children, value, index, ...other } = props;
+      
+        return (
+          <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`tabpanel-${index}`}
+            aria-labelledby={`tab-${index}`}
+            {...other}
+          >
+            {value === index && (
+              <Box sx={{ p: 3 }}>
+                {children}
+              </Box>
+            )}
+          </div>
+        );
+      }
+    const [activeTab, setActiveTab] = React.useState(0);
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
+
     return (
         <>
             <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
@@ -73,42 +103,42 @@ const SourcesPage: React.FC = () => {
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
                         <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
                         <div className="flex items-center">
-                        <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
-                        <Button
-                            variant="text"
-                            onClick={handleClick}
-                            className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
-                            id="dropdown-button"
-                        >
-                            {selectedItem} <ChevronDown size={18} className="ml-1" />
-                        </Button>
-
-                        {/* Go Button */}
-                        <div className="flex justify-center pt-4 ml-10">
+                            <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
                             <Button
-                                variant="outlined"
-                                onClick={handleGo}
-                                disabled={selectedItem === "select a source"} // Disable if default is selected
-                                sx={{
-                                    color: '#ffffff',
-                                    backgroundColor: '#124559',
-                                    borderColor: '#ffffff',
-                                    borderRadius: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#ffffff',
-                                        borderColor: '#124559',
-                                        color: '#124559',
-                                    },
-                                    '&:disabled': {
-                                        backgroundColor: 'transparent',
-                                        borderColor: '#949494',
-                                        color: '#949494',
-                                        cursor: 'not-allowed',
-                                    },
-                                }}
+                                variant="text"
+                                onClick={handleClick}
+                                className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
+                                id="dropdown-button"
                             >
-                                Go &rarr;
+                                {selectedItem} <ChevronDown size={18} className="ml-1" />
                             </Button>
+
+                            {/* Go Button */}
+                            <div className="flex justify-center pt-4 ml-10">
+                                <Button
+                                    variant="outlined"
+                                    onClick={handleGo}
+                                    disabled={selectedItem === "select a source"} // Disable if default is selected
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#124559',
+                                        borderColor: '#ffffff',
+                                        borderRadius: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#ffffff',
+                                            borderColor: '#124559',
+                                            color: '#124559',
+                                        },
+                                        '&:disabled': {
+                                            backgroundColor: 'transparent',
+                                            borderColor: '#949494',
+                                            color: '#949494',
+                                            cursor: 'not-allowed',
+                                        },
+                                    }}
+                                >
+                                    Go &rarr;
+                                </Button>
                             </div>
                         </div>
 
@@ -131,9 +161,38 @@ const SourcesPage: React.FC = () => {
                 <div>
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
-                            <DynamicGraph data={filteredData} selected={filteredNode} />
+                            <Box sx={{ width: '100%' }}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                              <Tabs 
+                                value={activeTab} 
+                                onChange={handleTabChange} 
+                                aria-label="data visualization tabs"
+                              >
+                                <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start"/>
+                                <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start"/>
+                              </Tabs>
+                            </Box>
+                            
+                            <TabPanel value={activeTab} index={0}>
+                              <DynamicGraph data={filteredData} selected={filteredNode} />
+                            </TabPanel>
+                            
+                            
+                            <TabPanel value={activeTab} index={1}>
+                              <Typography variant="h6">Statistics</Typography>
+                              {/* You can add your statistics component here */}
+                              <Typography>
+                                Statistical overview of the filtered data would go here.
+                              </Typography>
+                            </TabPanel>
+                          </Box>
                         ) : (
-                            <p className="p-4">Select a source and click "Go" to explore data.</p>
+                            <div className="flex py-8 justify-center text-lg items-center">
+                                <InfoIcon />
+                                <p className="px-2"> Select a source and click "Go " to explore data.</p>
+                                <InfoIcon />
+                            </div>
+
                         )}
                     </Paper>
 
