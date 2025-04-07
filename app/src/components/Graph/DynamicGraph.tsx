@@ -1,8 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from "cytoscape";
 import fcose from 'cytoscape-fcose';
-// import dagre from 'cytoscape-dagre';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
 import TextFieldsIcon from '@mui/icons-material/TextFields';
@@ -22,8 +21,8 @@ interface DynamicGraphProps {
     selected: string;
 }
 
-// Define tooltip state interface
-interface TooltipState {
+// Define tooltip state interface for nodes
+interface NodeTooltipState {
     show: boolean;
     x: number;
     y: number;
@@ -31,6 +30,19 @@ interface TooltipState {
         id: string;
         name: string;
         type: string;
+        [key: string]: any;
+    };
+}
+
+// Define tooltip state interface for edges
+interface EdgeTooltipState {
+    show: boolean;
+    x: number;
+    y: number;
+    content: {
+        id: string;
+        source: string;
+        target: string;
         [key: string]: any;
     };
 }
@@ -52,12 +64,47 @@ const getNodeColor = (type: string) => {
 const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     const cyRef = useRef<cytoscape.Core | null>(null); // Store Cytoscape instance
     const { nodes, edges } = data.elements;
-    const formattedElements = [
+    
+    // Calculate incoming and outgoing volumes for each node
+    const nodeVolumes = useMemo(() => {
+        const volumeData: NodeVolumeData = {};
+        
+        // Initialize all nodes with zero volumes
+        nodes.forEach(node => {
+            volumeData[node.data.id] = {
+                incomingVolume: 0,
+                outgoingVolume: 0
+            };
+        });
+        
+        // Calculate volumes from edges
+        edges.forEach(edge => {
+            const sourceId = edge.data.source;
+            const targetId = edge.data.target;
+            const volume = parseFloat(edge.data.yearly_volume.replace(/,/g, '')) || 0;
+            
+            // Add to outgoing volume for source node
+            if (volumeData[sourceId]) {
+                volumeData[sourceId].outgoingVolume += volume;
+            }
+            
+            // Add to incoming volume for target node
+            if (volumeData[targetId]) {
+                volumeData[targetId].incomingVolume += volume;
+            }
+        });
+        
+        return volumeData;
+    }, [nodes, edges]);
+    
+    const formattedElements = useMemo(() => [
         ...nodes.map((node) => ({
             data: {
                 id: node.data.id,
                 label: node.data.unified_name,
                 preliminary_type: node.data.preliminary_type,
+                incomingVolume: nodeVolumes[node.data.id]?.incomingVolume || 0,
+                outgoingVolume: nodeVolumes[node.data.id]?.outgoingVolume || 0,
                 ...node.data, // Spread other properties if needed
             },
         })),
@@ -66,17 +113,27 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 id: edge.data.id,
                 source: edge.data.source,
                 target: edge.data.target,
+                ...edge.data, // Spread other properties if needed
             },
         })),
-    ];
+    ], [nodes, edges]); // Only recalculate when nodes or edges change
 
-    const layout = {
+    // const layout = useMemo(() => ({
+    //     name: "fcose",
+    //     fit: true,
+    //     animate: false,
+    //     padding: 20,
+    //   }), []); 
+
+
+    const layout = useMemo(() => ({
         name: "fcose",
-        // name: "dagre",
         fit: true,
         animate: false,
         padding: 20,
-    };
+        randomize: false, // Prevent randomizing positions on re-layout
+        nodeDimensionsIncludeLabels: true,
+    }), []);
 
     const [showLabels, setShowLabels] = useState(true);
     const handleLabelToggle = () => {
@@ -89,15 +146,30 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         }
     };
 
-    // Tooltip state 
-    const [tooltip, setTooltip] = useState<TooltipState>({
+    // Tooltip states using separate tooltip states for nodes and edges
+    const [nodeTooltip, setNodeTooltip] = useState<NodeTooltipState>({
         show: false,
         x: 0,
         y: 0,
         content: {
             id: '',
             name: '',
-            type: ''
+            type: '',
+            incomingVolume: 0,
+            outgoingVolume: 0
+        }
+    });
+
+    const [edgeTooltip, setEdgeTooltip] = useState<EdgeTooltipState>({
+        show: false,
+        x: 0,
+        y: 0,
+        content: {
+            id: '',
+            source: '',
+            target: '',
+            sourceName: '',
+            targetName: ''
         }
     });
 
@@ -115,8 +187,15 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 const node = event.target;
                 const position = event.renderedPosition || event.position;
                 
+                // Hide edge tooltip if it's showing
+                setEdgeTooltip(prev => ({ ...prev, show: false }));
+                
+                 // Format the volume numbers with commas and fixed decimal places
+                 const incomingVolume = node.data('incomingVolume') || 0;
+                 const outgoingVolume = node.data('outgoingVolume') || 0;
+                 
                 // Get node data for the tooltip
-                setTooltip({
+                setNodeTooltip({
                     show: true,
                     x: position.x,
                     y: position.y,
@@ -124,19 +203,61 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         id: node.data('id'),
                         name: node.data('unified_name'),
                         type: node.data('preliminary_type'),
-                        // Add any other properties you want to show
+                        incomingVolume: incomingVolume,
+                        outgoingVolume: outgoingVolume
                     }
                 });
             });
             
             cy.on('mouseout', 'node', () => {
-                setTooltip(prev => ({ ...prev, show: false }));
+                setNodeTooltip(prev => ({ ...prev, show: false }));
             });
-            
+
+            cy.on('mouseover', 'edge', (event) => {
+                const edge = event.target;
+                const position = event.renderedPosition || {
+                    x: (event.position || { x: 0 }).x,
+                    y: (event.position || { y: 0 }).y
+                };
+                
+                // Hide node tooltip if it's showing
+                setNodeTooltip(prev => ({ ...prev, show: false }));
+                
+                // Get source and target nodes for more context
+                const sourceId = edge.data('source');
+                const targetId = edge.data('target');
+                const sourceNode = cy.getElementById(sourceId);
+                const targetNode = cy.getElementById(targetId);
+                
+                setEdgeTooltip({
+                    show: true,
+                    x: position.x,
+                    y: position.y,
+                    content: {
+                        id: edge.data('id'),
+                        source: sourceId,
+                        target: targetId,
+                        sourceName: sourceNode.data('unified_name'),
+                        targetName: targetNode.data('unified_name'),
+                        year: edge.data('year'),
+                        year_volume: edge.data('yearly_volume') + "gallons",
+                        water_type: edge.data('water_type'),
+                        purchase_self: edge.data('purchased_self'),
+                    }
+                });
+            });
+
+            cy.on('mouseout', 'edge', () => {
+                setEdgeTooltip(prev => ({ ...prev, show: false }));
+            });
+
             // Update tooltip position when dragging or moving the graph
             cy.on('drag', () => {
-                if (tooltip.show) {
-                    setTooltip(prev => ({ ...prev, show: false }));
+                if (nodeTooltip.show) {
+                    setNodeTooltip(prev => ({ ...prev, show: false }));
+                }
+                if (edgeTooltip.show) {
+                    setEdgeTooltip(prev => ({ ...prev, show: false }));
                 }
             });
             
@@ -147,7 +268,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 cy.removeListener('drag');
             };
         }
-    }, [showLabels, tooltip.show]);
+    }, [showLabels, nodeTooltip.show, edgeTooltip.show]);
 
     const handleZoomToFit = () => {
         cyRef.current?.fit();
@@ -164,6 +285,11 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             link.click();
         }
     };
+
+    const formatVolume = (volume: number): string => {
+        return volume.toLocaleString(undefined, { maximumFractionDigits: 0 }) + " gallons";
+    };
+
     return (
         <div className='min-h-screen relative'>
             <Box className="absolute top-[1em] right-3 z-10 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559]">
@@ -207,22 +333,48 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 </button>
             </Tooltip>
 
-            {/* Custom tooltip */}
-            {tooltip.show && (
+            {/* Custom node tooltip */}
+            {nodeTooltip.show && (
                 <div 
                     className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
                     style={{
-                        left: tooltip.x + 10, // Offset to not cover the node
-                        top: tooltip.y + 10,
-                        pointerEvents: 'none', // Makes the tooltip non-interactive
+                        left: nodeTooltip.x + 10,
+                        top: nodeTooltip.y + 10,
+                        pointerEvents: 'none',
                     }}
                 >
-                    <h3 className="font-bold">{tooltip.content.name}</h3>
-                    <p className="text-sm"><b>ID:</b> {tooltip.content.id}</p>
-                    <p className="text-sm pt-2"><b>Type:</b> {tooltip.content.type.toUpperCase()}</p>
-                    {/* ... */}
+                    <h3 className="font-bold">Node: {nodeTooltip.content.name}</h3>
+                    <p className="text-sm"><b>ID:</b> {nodeTooltip.content.id}</p>
+                    <p className="text-sm"><b>Type:</b> {nodeTooltip.content.type?.toUpperCase()}</p>
+                    <div className="border-t border-gray-200 mt-2 pt-2">
+                        <p className='text-sm pb-1 font-bold'>Flow Visualized</p>
+                        <p className="text-sm"><b>Incoming Volume:</b> {formatVolume(nodeTooltip.content.incomingVolume)}</p>
+                        <p className="text-sm"><b>Outgoing Volume:</b> {formatVolume(nodeTooltip.content.outgoingVolume)}</p>
+                        {/* <p className="text-sm"><b>Net Flow:</b> {formatVolume(nodeTooltip.content.incomingVolume - nodeTooltip.content.outgoingVolume)}</p> */}
+                    </div>
                 </div>
             )}
+
+            {/* Edge tooltip */}
+            {edgeTooltip.show && (
+                <div 
+                    className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
+                    style={{
+                        left: edgeTooltip.x + 10,
+                        top: edgeTooltip.y + 10,
+                        pointerEvents: 'none',
+                    }}
+                >
+                    <h3 className="font-bold pb-2">Connection Details</h3>
+                    <p className="text-sm"><b>From:</b> {edgeTooltip.content.sourceName}</p>
+                    <p className="text-sm"><b>To:</b> {edgeTooltip.content.targetName}</p>
+                    <p className="text-sm"><b>Year:</b> {edgeTooltip.content.year}</p>
+                    <p className="text-sm"><b>Volume:</b> {edgeTooltip.content.year_volume}</p>
+                    <p className="text-sm"><b>Type:</b> {edgeTooltip.content.water_type}</p>
+                    <p className="text-sm"><b>Purchase or Self:</b> {edgeTooltip.content.purchase_self}</p>
+                </div>
+            )}
+
 
             <CytoscapeComponent
                 key={JSON.stringify(data)} // Forces a full re-render when data changes
@@ -253,6 +405,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             "line-color": "#ccc",
                             "mid-target-arrow-shape": "vee",
                             "mid-target-arrow-color": "#ccc",
+                            "curve-style"  : "bezier",
                         },
                     },
                 ]}

@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
@@ -18,6 +18,7 @@ const SourcesPage: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState("select a source"); // Default text
     const [filteredNode, setFilteredNode] = useState(null); // New state for filtered node
     const [filteredData, setFilteredData] = useState(null); // New state for filtered data
+    const [triggerUpdate, setTriggerUpdate] = useState(false); // Track when to update the graph
     const open = Boolean(anchorEl);
 
     const menuItems = nodeKeys
@@ -31,65 +32,102 @@ const SourcesPage: React.FC = () => {
         setAnchorEl(null);
     };
 
-    const handleGo = () => {
+    // const handleGo = () => {
+    //     function toTitleCase(str: string): string {
+    //         return str
+    //             .toLowerCase()
+    //             .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+    //     }
+
+    //     const selected = menuItems.find((item) => item === selectedItem);
+
+    //     const filterDataBySource = (selected: string) => {
+    //         // Filter edges where the source matches the provided sourceId
+    //         const titleSelected = toTitleCase(selected);
+    //         const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
+    //         const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
+    //         const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
+    //         const uniqueNodes = Array.from(new Set([titleSelected, uniqueTargets,
+    //             ...filteredEdges.map(edge => edge.data.target)]));
+    //         const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
+
+    //         const filteredElements = {
+    //             elements: {
+    //                 nodes: filteredNodes,
+    //                 edges: filteredEdges
+    //             }
+    //         };
+
+    //         console.log(titleSelected);
+    //         console.log(filteredElements);
+    //         // Return only the filtered edges (not affecting nodes)
+    //         return filteredElements;
+
+    //     };
+
+    //     const data = filterDataBySource(selected);
+    //     setFilteredData(data);
+    //     setFilteredNode(selected);
+    // };
+
+    // Memoize filterDataBySource function to prevent unnecessary recalculations
+    const filterDataBySource = useCallback((selected: string) => {
         function toTitleCase(str: string): string {
             return str
                 .toLowerCase()
                 .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
         }
 
-        const selected = menuItems.find((item) => item === selectedItem);
+        // Filter edges where the source matches the provided sourceId
+        const titleSelected = toTitleCase(selected);
+        const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
+        const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
+        const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
+        const uniqueNodes = Array.from(new Set([titleSelected, ...uniqueTargets,
+            ...filteredEdges.map(edge => edge.data.target)])).filter(Boolean);
+        const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
 
-        const filterDataBySource = (selected: string) => {
-            // Filter edges where the source matches the provided sourceId
-            const titleSelected = toTitleCase(selected);
-            const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
-            const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
-            const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
-            const uniqueNodes = Array.from(new Set([titleSelected, uniqueTargets,
-                ...filteredEdges.map(edge => edge.data.target)]));
-            const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
-
-            const filteredElements = {
-                elements: {
-                    nodes: filteredNodes,
-                    edges: filteredEdges
-                }
-            };
-
-            console.log(titleSelected);
-            console.log(filteredElements);
-            // Return only the filtered edges (not affecting nodes)
-            return filteredElements;
-
+        return {
+            elements: {
+                nodes: filteredNodes,
+                edges: filteredEdges
+            }
         };
+    }, []);
 
-        const data = filterDataBySource(selected);
+    // Handle the Go button click
+    const handleGo = () => {
+        if (selectedItem === "select a source") return;
+
+        const data = filterDataBySource(selectedItem);
+
+        // Only update the data and trigger a redraw when Go is clicked
         setFilteredData(data);
-        setFilteredNode(selected);
+        setFilteredNode(selectedItem);
+        setTriggerUpdate(!triggerUpdate); // Toggle to force graph update
     };
 
 
     // TabPanel component and support functions
     function TabPanel(props) {
         const { children, value, index, ...other } = props;
-      
+
         return (
-          <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`tabpanel-${index}`}
-            aria-labelledby={`tab-${index}`}
-            {...other}
-          >
-            {value === index && (
-              <Box sx={{ p: 3 }}>
-                {children}
-              </Box>
-            )}
-          </div>
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`tabpanel-${index}`}
+                aria-labelledby={`tab-${index}`}
+                {...other}
+            >
+                {value === index && (
+                    <Box sx={{ p: 3 }}>
+                        {children}
+                    </Box>
+                )}
+            </div>
         );
-      }
+    }
     const [activeTab, setActiveTab] = React.useState(0);
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
@@ -162,30 +200,30 @@ const SourcesPage: React.FC = () => {
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                              <Tabs 
-                                value={activeTab} 
-                                onChange={handleTabChange} 
-                                aria-label="data visualization tabs"
-                              >
-                                <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start"/>
-                                <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start"/>
-                              </Tabs>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                    <Tabs
+                                        value={activeTab}
+                                        onChange={handleTabChange}
+                                        aria-label="data visualization tabs"
+                                    >
+                                        <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
+                                        <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
+                                    </Tabs>
+                                </Box>
+
+                                <TabPanel value={activeTab} index={0}>
+                                    <DynamicGraph data={filteredData} selected={filteredNode} />
+                                </TabPanel>
+
+
+                                <TabPanel value={activeTab} index={1}>
+                                    <Typography variant="h6">Statistics</Typography>
+                                    {/* You can add your statistics component here */}
+                                    <Typography>
+                                        Statistical overview of the filtered data would go here.
+                                    </Typography>
+                                </TabPanel>
                             </Box>
-                            
-                            <TabPanel value={activeTab} index={0}>
-                              <DynamicGraph data={filteredData} selected={filteredNode} />
-                            </TabPanel>
-                            
-                            
-                            <TabPanel value={activeTab} index={1}>
-                              <Typography variant="h6">Statistics</Typography>
-                              {/* You can add your statistics component here */}
-                              <Typography>
-                                Statistical overview of the filtered data would go here.
-                              </Typography>
-                            </TabPanel>
-                          </Box>
                         ) : (
                             <div className="flex py-8 justify-center text-lg items-center">
                                 <InfoIcon />
