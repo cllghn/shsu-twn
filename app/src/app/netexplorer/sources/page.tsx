@@ -3,15 +3,18 @@ import { useState, useCallback } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
-import { Menu, MenuItem, Button, Paper, Typography, Tabs, Tab, Box, } from "@mui/material";
+import { Menu, MenuItem, Button, Paper, Typography, Tabs, Tab, Box } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import DynamicGraph from "@/components/Graph/DynamicGraph";
 import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import InsightsIcon from '@mui/icons-material/Insights';
+import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 
 
 const SourcesPage: React.FC = () => {
+
+    
     const nodeKeys = Object.keys(metadata.sources.kvs);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -21,7 +24,7 @@ const SourcesPage: React.FC = () => {
     const [triggerUpdate, setTriggerUpdate] = useState(false); // Track when to update the graph
     const open = Boolean(anchorEl);
 
-    const menuItems = nodeKeys
+    const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -32,51 +35,14 @@ const SourcesPage: React.FC = () => {
         setAnchorEl(null);
     };
 
-    // const handleGo = () => {
-    //     function toTitleCase(str: string): string {
-    //         return str
-    //             .toLowerCase()
-    //             .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
-    //     }
-
-    //     const selected = menuItems.find((item) => item === selectedItem);
-
-    //     const filterDataBySource = (selected: string) => {
-    //         // Filter edges where the source matches the provided sourceId
-    //         const titleSelected = toTitleCase(selected);
-    //         const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
-    //         const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
-    //         const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
-    //         const uniqueNodes = Array.from(new Set([titleSelected, uniqueTargets,
-    //             ...filteredEdges.map(edge => edge.data.target)]));
-    //         const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
-
-    //         const filteredElements = {
-    //             elements: {
-    //                 nodes: filteredNodes,
-    //                 edges: filteredEdges
-    //             }
-    //         };
-
-    //         console.log(titleSelected);
-    //         console.log(filteredElements);
-    //         // Return only the filtered edges (not affecting nodes)
-    //         return filteredElements;
-
-    //     };
-
-    //     const data = filterDataBySource(selected);
-    //     setFilteredData(data);
-    //     setFilteredNode(selected);
-    // };
+    function toTitleCase(str: string): string {
+        return str
+            .toLowerCase()
+            .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+    }
 
     // Memoize filterDataBySource function to prevent unnecessary recalculations
     const filterDataBySource = useCallback((selected: string) => {
-        function toTitleCase(str: string): string {
-            return str
-                .toLowerCase()
-                .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
-        }
 
         // Filter edges where the source matches the provided sourceId
         const titleSelected = toTitleCase(selected);
@@ -140,7 +106,7 @@ const SourcesPage: React.FC = () => {
                     <Paper elevation={2} className="p-6">
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
                         <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
-                        <div className="flex items-center">
+                        <div className="flex items-center flex-wrap">
                             <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
                             <Button
                                 variant="text"
@@ -156,7 +122,7 @@ const SourcesPage: React.FC = () => {
                                 <Button
                                     variant="outlined"
                                     onClick={handleGo}
-                                    disabled={selectedItem === "select a source"} // Disable if default is selected
+                                    disabled={selectedItem === "select a source"}
                                     sx={{
                                         color: '#ffffff',
                                         backgroundColor: '#124559',
@@ -217,11 +183,15 @@ const SourcesPage: React.FC = () => {
 
 
                                 <TabPanel value={activeTab} index={1}>
-                                    <Typography variant="h6">Statistics</Typography>
-                                    {/* You can add your statistics component here */}
-                                    <Typography>
-                                        Statistical overview of the filtered data would go here.
-                                    </Typography>
+                                    <div className="flex justify-between items-center">
+                                        <Typography variant="h6">{<div className="text-semibold"><span className="text-[#124559] border-b-2 border-dotted border-[#124559]">{toTitleCase(filteredNode)}</span> Water Flow Insights</div>}</Typography>
+                                    </div>
+                                    <div className="flex pt-4 justify-center items-center">
+                                        <NodeVolumeScoreCards 
+                                        data={filteredData} 
+                                        selected={toTitleCase(filteredNode)}/>
+                                    </div>
+
                                 </TabPanel>
                             </Box>
                         ) : (
@@ -230,7 +200,6 @@ const SourcesPage: React.FC = () => {
                                 <p className="px-2"> Select a source and click "Go " to explore data.</p>
                                 <InfoIcon />
                             </div>
-
                         )}
                     </Paper>
 

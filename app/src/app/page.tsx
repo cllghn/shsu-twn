@@ -69,7 +69,7 @@ export default function Home() {
             <div className="bg-white bg-opacity-10 col-span-10 lg:col-span-7 px-20 py-20 rounded-r-lg">
               <h2 className="pb-5 text-[#53899D] font-bold text-lg">Water Flows <WaterDropIcon /></h2>
               <h3 className="pb-5 text-2xl text-thin text-[#124559]">Interested in learning how water flows through the network?</h3>
-              <div className="container mx-auto flex items-center space-x-2">
+              <div className="container mx-auto flex flex-wrap items-center space-x-2">
                 <div>Explore how water flows from</div>
 
                 {/* Dropdown Button */}
@@ -130,11 +130,13 @@ export default function Home() {
                   ))}
                 </Menu>
               </div>
+              <div className="pt-4">
               <Typography variant="caption">
                 <Link href="/faq?expand=waterSource" className="aPlus">
                   <SearchIcon/> Find information on sources/systems... &rarr;
                 </Link>
               </Typography>
+              </div>
             </div>
           </div>
 
@@ -163,11 +165,13 @@ export default function Home() {
                   Go &rarr;
                 </Button>
               </div>
+              <div className="pt-4">
               <Typography variant="caption">
                 <Link href="/faq?expand=dataSource" className="aPlus mt-3">
                   <LocalLibraryIcon /> Read FAQs about the data... &rarr;
                 </Link>
               </Typography>
+              </div>
             </div>
             <div className="col-span-3 bg-cover bg-center lg:flex hidden flex-col bg-[url('/data.jpg')] rounded-r-lg">
             </div>

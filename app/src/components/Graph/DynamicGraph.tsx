@@ -8,6 +8,8 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
+import SearchIcon from '@mui/icons-material/Search'
+import SearchOffIcon from '@mui/icons-material/SearchOff';;
 import { Box } from '@mui/material';
 
 // Define the types for the props
@@ -64,11 +66,11 @@ const getNodeColor = (type: string) => {
 const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     const cyRef = useRef<cytoscape.Core | null>(null); // Store Cytoscape instance
     const { nodes, edges } = data.elements;
-    
+
     // Calculate incoming and outgoing volumes for each node
     const nodeVolumes = useMemo(() => {
         const volumeData: NodeVolumeData = {};
-        
+
         // Initialize all nodes with zero volumes
         nodes.forEach(node => {
             volumeData[node.data.id] = {
@@ -76,27 +78,27 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 outgoingVolume: 0
             };
         });
-        
+
         // Calculate volumes from edges
         edges.forEach(edge => {
             const sourceId = edge.data.source;
             const targetId = edge.data.target;
             const volume = parseFloat(edge.data.yearly_volume.replace(/,/g, '')) || 0;
-            
+
             // Add to outgoing volume for source node
             if (volumeData[sourceId]) {
                 volumeData[sourceId].outgoingVolume += volume;
             }
-            
+
             // Add to incoming volume for target node
             if (volumeData[targetId]) {
                 volumeData[targetId].incomingVolume += volume;
             }
         });
-        
+
         return volumeData;
     }, [nodes, edges]);
-    
+
     const formattedElements = useMemo(() => [
         ...nodes.map((node) => ({
             data: {
@@ -117,14 +119,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             },
         })),
     ], [nodes, edges]); // Only recalculate when nodes or edges change
-
-    // const layout = useMemo(() => ({
-    //     name: "fcose",
-    //     fit: true,
-    //     animate: false,
-    //     padding: 20,
-    //   }), []); 
-
 
     const layout = useMemo(() => ({
         name: "fcose",
@@ -173,27 +167,40 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         }
     });
 
+    const [allowZoom, setAllowZoom] = useState(false);
+    const handleAllowZoom = () => {
+        setAllowZoom((prev) => !prev);
+        if (cyRef.current) {
+            cyRef.current.userZoomingEnabled(!allowZoom);
+        }
+    };
+
     useEffect(() => {
         const cy = cyRef.current;
 
         if (cy) {
+
+            cy.userZoomingEnabled(allowZoom);
+
             cy.style()
                 .selector("node")
                 .style({ label: showLabels ? "data(label)" : "" })
                 .update();
-                
+
+        
+
             // Add event listeners for tooltips
             cy.on('mouseover', 'node', (event) => {
                 const node = event.target;
                 const position = event.renderedPosition || event.position;
-                
+
                 // Hide edge tooltip if it's showing
                 setEdgeTooltip(prev => ({ ...prev, show: false }));
-                
-                 // Format the volume numbers with commas and fixed decimal places
-                 const incomingVolume = node.data('incomingVolume') || 0;
-                 const outgoingVolume = node.data('outgoingVolume') || 0;
-                 
+
+                // Format the volume numbers with commas and fixed decimal places
+                const incomingVolume = node.data('incomingVolume') || 0;
+                const outgoingVolume = node.data('outgoingVolume') || 0;
+
                 // Get node data for the tooltip
                 setNodeTooltip({
                     show: true,
@@ -208,7 +215,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     }
                 });
             });
-            
+
             cy.on('mouseout', 'node', () => {
                 setNodeTooltip(prev => ({ ...prev, show: false }));
             });
@@ -219,16 +226,16 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     x: (event.position || { x: 0 }).x,
                     y: (event.position || { y: 0 }).y
                 };
-                
+
                 // Hide node tooltip if it's showing
                 setNodeTooltip(prev => ({ ...prev, show: false }));
-                
+
                 // Get source and target nodes for more context
                 const sourceId = edge.data('source');
                 const targetId = edge.data('target');
                 const sourceNode = cy.getElementById(sourceId);
                 const targetNode = cy.getElementById(targetId);
-                
+
                 setEdgeTooltip({
                     show: true,
                     x: position.x,
@@ -260,7 +267,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     setEdgeTooltip(prev => ({ ...prev, show: false }));
                 }
             });
-            
+
             // Clean up event listeners on unmount
             return () => {
                 cy.removeListener('mouseover');
@@ -314,6 +321,15 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <CenterFocusWeakIcon />
                 </button>
             </Tooltip>
+            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="left">
+                <button
+                    onClick={handleAllowZoom}
+                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    id='fit-screen-btn'
+                >
+                    {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
+                </button>
+            </Tooltip>
             <Tooltip title="Toggle Node Labels" arrow placement="left">
                 <button
                     onClick={handleLabelToggle}
@@ -335,7 +351,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
             {/* Custom node tooltip */}
             {nodeTooltip.show && (
-                <div 
+                <div
                     className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
                     style={{
                         left: nodeTooltip.x + 10,
@@ -357,7 +373,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
             {/* Edge tooltip */}
             {edgeTooltip.show && (
-                <div 
+                <div
                     className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
                     style={{
                         left: edgeTooltip.x + 10,
@@ -405,7 +421,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             "line-color": "#ccc",
                             "mid-target-arrow-shape": "vee",
                             "mid-target-arrow-color": "#ccc",
-                            "curve-style"  : "bezier",
+                            "curve-style": "bezier",
                         },
                     },
                 ]}
