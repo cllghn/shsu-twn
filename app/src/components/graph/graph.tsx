@@ -10,8 +10,9 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import Tooltip from '@mui/material/Tooltip';
 import cytoscape from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
-import cola from 'cytoscape-cola';
-import dagre from 'cytoscape-dagre';
+// import cola from 'cytoscape-cola';
+// import dagre from 'cytoscape-dagre';
+import coseBilkent from "cytoscape-cose-bilkent";
 import { NodeSingular as CSNodeSingular } from "cytoscape";
 import NodeInfoModal from "../modals/NodeInfoModal";
 import GraphConfigModal from "../modals/GraphConfigModal";
@@ -33,8 +34,9 @@ import { Tab } from '@mui/base/Tab';
 
 // Initialize Cytoscape extensions
 cytoscape.use(cxtmenu);
-cytoscape.use(cola);
-cytoscape.use(dagre);
+// cytoscape.use(cola);
+// cytoscape.use(dagre);
+cytoscape.use(coseBilkent);
 
 // Type Definitions
 interface NodeData {
@@ -123,9 +125,15 @@ const Graph: React.FC = () => {
     const toggleDrawer = (newOpen: boolean) => () => {
         setGraphConfigModalOpen(newOpen);
     };
-    const [layout, setLayout] = useState({ name: "cola", fit: true });
-    const handleLayoutChange = (newLayout: string) => {
-        setLayout({ name: newLayout, fit: true });
+    // const [layout, setLayout] = useState({ name: "preset", fit: true });
+    // const handleLayoutChange = (newLayout: string) => {
+    //     setLayout({ name: newLayout, fit: true });
+    // };
+    const layout = {
+        name: "cose-bilkent",
+        fit: true,
+        animate: false,
+        padding: 10,
     };
     const [showLabels, setShowLabels] = useState(true);
     const handleLabelToggle = (show: boolean) => {
@@ -413,7 +421,7 @@ const Graph: React.FC = () => {
             <GraphConfigModal
                 open={graphConfigModalOpen}
                 onClose={toggleDrawer(false)}
-                onLayoutChange={handleLayoutChange}
+                // onLayoutChange={handleLayoutChange}
                 defaultShowLabels={showLabels}
                 onLabelToggle={handleLabelToggle}
                 defaultShowEdgeLabels={showEdgeLabels}

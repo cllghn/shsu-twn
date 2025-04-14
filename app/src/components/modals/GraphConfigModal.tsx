@@ -14,7 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 interface GraphConfigModalProps {
     open: boolean;
     onClose: () => void;
-    onLayoutChange: (layout: string) => void;
+    onLayoutChange?: (layout: string) => void;
     defaultLayout?: string;
     defaultShowLabels?: boolean;
     onLabelToggle: (showLabels: boolean) => void;

@@ -1,0 +1,640 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.11.8"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "ba642ef1e3b5bc73d5d0ae9744844687",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h1 id=\"generating-network-data-from-texas-water-use-survey\">Generating Network Data from Texas Water Use Survey</h1></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "6a372873de026541faec24af8a548d1a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "4a5295259ba532bbed7a3ebc0602bd78",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"background\">Background</h2>\n<span class=\"paragraph\">The purpose of this document is to extract the required data to generate a sociogram, or social network graph, of nodes involved in the Texas water system. The data was provided by Texas Water Development Board and it comes from the annual Water Use Survey. The inital data release included four datasets:</span>\n<ol>\n<li>PWS Intake: Water intake (self-supplied &amp; purchased) by water source for all Public Water Systems, 2022-2023. Includes USE County, Basin and SOURCE County, Basin. Does not include any water sales. All units are in gallons.</li>\n<li>PWS Sales: Water sales (wholesale to other PWS or industrial systems) reported by the seller and buyer. It is important to note that the volumes reported may not be the same between the seller and buyer- meter issues, leaks, etc. may cause inconsistent readings. Additionally, some sellers may not report a water sale to a PWS or vise-versa. All units are in gallons.</li>\n<li>PWS Retail: Retail water connections and volumes by category (Single Family, Multi-Family, Instititutional, Industrial, Commercial, Agricultural). Includes population served (reported in the Water Use Survey), total metered, and total un-metered. All units are in gallons.</li>\n<li>PWS-SurveyNo: Bridge table for TWDB Survey Numbers and TCEQ PWS Codes that includes PWS Name, whether system is a Wholesale system (Y / N), Water Use Survey Form Type, and PWS System Class.</li>\n</ol>\n<span class=\"paragraph\">From these datasets, we will derive the data required to generate the analytic sociogram. Briefly, a sociogram is a visual representation of social relationships or interactions within a group. To generate a sociogram, two key types of data are needed: an edge list and a node list. The node list contains information about the individual entities (or actors) in the network. In this situation, each node can represent a water source (e.g., aquifer), a water system, or an industrial system within the sociogram. At a minimum the we need to generate a node list with the following:</span>\n<ul>\n<li>A unique identifier for each node (e.g., ID or name).</li>\n<li>Optional attributes for the nodes, such as demographics, roles, or other characteristics.</li>\n</ul>\n<span class=\"paragraph\">Beyond the node list, in this document we also extract the required edge list. The edge list describes the relationships or interactions between the nodes. Each edge represents a connection between two nodes and includes:</span>\n<ul>\n<li>A pair of node identifiers (source and target).</li>\n<li>Optional attributes, such as the type, weight, or strength of the relationship.</li>\n</ul>\n<span class=\"paragraph\">With a list of data requirements in hand, we can begin transforming our raw data.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "5c5ebd2c165833725d9b1f9132ae110b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"scoping\">Scoping</h2>\n<span class=\"paragraph\">After a high-level scan, it appears that the PWS Intake and PWS Sales files contain relational data that could be incorporated into the edge list. The former, links water sources to water systems. That is, each row in the table represents a water system intaking water from a water source (e.g., aquifer or surface water). For example, the first row in the dataset records Canadian River Municipal Water Authority's intake of groundwater from the Ogallala Aquifer. In this situation, the source node in an edge list would be the aquifer, which provides water to the target water system.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "1b4acb86bd28d07ec322f60a23de7f2f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='847d8c92-3ee1-6969-141b-919a872b6c4c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/3781-43096-sCmphKTd.csv&quot;' data-total-rows='10' data-total-columns='30' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Purchased / Self-Supplied&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;County Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Basin Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source Basin&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Aquifer Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Surface Water Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Seller Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Active Wells&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Brackish / Saline&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Percent Treated Prior to Intake&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; January &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; February &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; March &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; April &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; May &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; June &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; July &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; August &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; September &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; October &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; November &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; December &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Intake (Gallons) &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "a2bf07886d67ea906384e10b203c7739",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Similarly, the latter dataset links water sales from water systems to other water systems or industrial customers. Each row represents a transaction in which water is sold from one entity to another. For example, the first row illustrates the purchase of water by the Amarillo MWS from the Canadian River Municipal Water Authority. In this situation, the source node would be the Canadian River Municipal Water Authority, and the target node would be the buyer.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "272652ba319a431a7d2118ad74771606",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='4402e1ba-b1e7-4ac7-b9cb-6dabd6c844d9'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/372-43096-57CkIEVa.csv&quot;' data-total-rows='1' data-total-columns='13' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Seller Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Seller Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Buyer Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Buyer Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer NAICS Code&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; Volume Used In Net Use &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Volume Source Used In Net Use&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "7dde00e111f7a819dbb46863f96c49f1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Regarding non-relational data, those appear to be located within the PWS Retail and PWS Survey-No files. The former includes information on units served by a water system in a given year. Since those units are not unique nodes, they cannot be considered individual entities within the sociogram. For example, the Upper Leon River MWD and the White River MWD serve single-family homes; however, those single-family homes are not unique entities. The label encompasses a category of units served; as such, this will be recorded as an attribute in the node list.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "02f060765f39881b42b65d3c3200e1d1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='5b2e03a5-f2cd-872e-b3e1-af4f2527fb55'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/583-43096-RJAnejFe.csv&quot;' data-total-rows='1' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "12321a21220ff206c987c57c5d9e5639",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">On the other hand, the PWS Survey-No file includes attributes of the water systems such as the system class, name, etc. These features are then a match for the node list.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "d66c25625d326566d268d114d641adbe",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Kclp-0' random-id='d85a221c-8609-b8ce-b2b8-9a160f3b9f4d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/188-43096-0J1HBswa.csv&quot;' data-total-rows='1' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;TWDB Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "9483343297def106663f981ce84fcb46",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"generating-an-edge-list\">Generating an Edge List</h2>\n<span class=\"paragraph\">We need to extact data from two files, intake and sales, in a standard format that can be used as an edge list and in turn converted into a JSON. Why this conversion? Simply, the front-end app uses the <a href=\"https://js.cytoscape.org/#introduction\" rel=\"noopener\" target=\"_blank\">Cystoscape.js library</a> for graph analysis and visualization. The library has a very limited data model that must be <a href=\"https://js.cytoscape.org/#notation/elements-json\" rel=\"noopener\" target=\"_blank\">met</a> to return a network graph. </span>\n<span class=\"paragraph\">The edge list table <strong>must</strong> include the following fields:</span>\n<ul>\n<li>Source: The starting point or origin of a connection. It represents the node initiating or \"sending\" the relationship.</li>\n<li>Target: The endpoint or recipient of the connection. It represents the node \"receiving\" the relationship.</li>\n<li>Id: An optional unique identifier assigned to each edge (connection) in the network. It serves as a reference to distinguish and manage individual edges, particularly when you need to track, modify, or annotate specific relationships. This field is a requirement for Cytoscape, the graphing library used in the front-end application. For simplicity, the unique id is created by combining the type string with the row index for each observation.</li>\n</ul>\n<span class=\"paragraph\">Beyond these mandatory fields, we could include the following edge attributes which appear to be available in both datasets for each record:</span>\n<ul>\n<li>Volume: Water volume exchanged between the source and target in each record, in gallons.</li>\n<li>Type: Categorical value denoting the type of exchange represented in the connection (e.g., intake or sale).</li>\n<li>Year: Year of transaction.</li>\n<li>Other relevant fields.</li>\n</ul>\n<span class=\"paragraph\">The resulting table would then look something like this:</span>\n<div class=\"codehilite\"><pre><span></span><code>| source | target | id       | volume | type   | year |\n|--------|--------|----------|--------|--------|------|\n| Node A | Node B | intake_1 | 100    | intake | 2022 |\n| Node B | Node C | sale_1   | 100    | sale   | 2023 |\n|                       ...                           |\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "0e1f044a47cf2c0447b4e9323d1b5634",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h3 id=\"intake-edge-list\">Intake Edge List</h3>\n<span class=\"paragraph\">First, let's extract the relevant data from the intake file (here <code>PWS Intake_2022-2023.csv</code>). The following is a list of steps taken in Python to read, clean, and reshape the data into an edge list in the format noted above:</span>\n<ol>\n<li>\n<span class=\"paragraph\">Load the data from a file:</span>\n<ul>\n<li>Read the spreadsheet in CSCV format that contains the water intake water.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Clean up the headers in the table by stripping them of leading and lagging empty spaces.</span>\n</li>\n<li>\n<span class=\"paragraph\">Determine the source of water for each record.</span>\n<ul>\n<li>\n<span class=\"paragraph\">For each row in the dataset, the function looks at specific columns to determine where whater comes from:</span>\n<ul>\n<li>\n<span class=\"paragraph\">If the water is reused and self-supplied, the source is a TWDB Survey Number (self-supplied).</span>\n</li>\n<li>\n<span class=\"paragraph\">If the water is purchased, the source is the Seller\u2019s Survey Number (who sold the water).</span>\n</li>\n<li>\n<span class=\"paragraph\">If the water is groundwater and self-supplied, the source is an Aquifer (or, if the aquifer is labeled as \"OTHER AQUIFER,\" the source is a basin).</span>\n</li>\n<li>\n<span class=\"paragraph\">If the water is surface water and self-supplied, the source is a Surface Water Source (or, if labeled \"UNKNOWN,\" the source is a basin).</span>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Create key values required in the edge list:</span>\n<ul>\n<li>Each record gets a unique ID which serves as the edge identifier.</li>\n<li>Each record is assigned a target of the water (where it's used) from the TWDB Survey Number.</li>\n<li>Each record is labeled as <code>\"intake\"</code>.</li>\n<li>The total volume of water is recorded from the <code>\"Total Intake (Gallons)\"</code> column.</li>\n<li>The year of intake, water type, and whether it was purchased or self-supplied are also saved for each record.</li>\n<li>The source file name is added to keep track of where the data came from.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Filter the data by year when relevant.</span>\n</li>\n<li>\n<span class=\"paragraph\">Return the data as a formated edge list.</span>\n</li>\n</ol>\n<span class=\"paragraph\">The resulting table head is presented below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "f6d4f132b1494035d06c8ba7a57b9842",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='a05a8674-6c4e-68c6-2e04-3220ffc0f55a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-43096-UaXawDKG.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_37048\\__marimo__cell_nWHF_.py:72: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '20' ... '1106713' '1106715' '1106716']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  intake.loc[:, 'target'] = intake['target'].astype(str)\n"
+        }
+      ]
+    },
+    {
+      "id": "iLit",
+      "code_hash": "1bd0b90ee399958091ebe95ff76c67e6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h3 id=\"sales-edge-list\">Sales Edge List</h3>\n<span class=\"paragraph\">Next, let's apply a similar threatment to the sales data, here stored in the <code>PWS Sales_2022-2023.csv</code> file. Like before, the following is a list of the steps applied in Python to munge the data into an edge list:</span>\n<ol>\n<li>Load the data file from a single CSC that contains information about water sales.</li>\n<li>Clean up spreadsheet headers to remove trailing and leading blank spaces.</li>\n<li>\n<span class=\"paragraph\">Identify key information for each sale:</span>\n<ul>\n<li>Assing the water seller as the edge source. Here we used the <code>\"TWDB Seller Survey No\"</code> as the source node.</li>\n<li>Next, we assing a target node that represents the water buyer. We take this value from the <code>\"Buyer Survey No\"</code> column.</li>\n<li>We generate a transaction identifier that will serve as the edge id.</li>\n<li>Categorize every transaction as <code>\"sale\"</code>.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Add additional sale details: </span>\n<ul>\n<li>The yearly volume is pulled from the <code>\"Buyer Volume Reported\"</code> variable.</li>\n<li>The year is copied from the source data.</li>\n<li>The function checks what type of water was sold (e.g., groundwater or surface water) by copying the <code>\"Buyer Water Type\"</code> column.</li>\n<li>Since all the data here refers to water purchases, we assign the <code>self_purchased</code> field to <code>\"Purchased\"</code> for every obeservation.</li>\n<li>We record the name of the file being processed as a source file to that users can track provenance.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">(Optional) We filter data by year (e.g., 2022) to only retain transactions from that year.</span>\n</li>\n<li>Return the data as a formated edge list. </li>\n</ol>\n<span class=\"paragraph\">The resulting table head is presented below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "143c6fb5b54662a78f9f48a80ee1cdce",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ZHCJ-0' random-id='aede3b5c-a19a-e1d8-8bde-70ef0ceb43d8'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/967-43096-zwHk0P13.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_37048\\__marimo__cell_ZHCJ_.py:47: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '10' ... '1106307' '1106308' '1106706']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'source'] = sales['source'].astype(str)\nC:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_37048\\__marimo__cell_ZHCJ_.py:48: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['17600' '36100' '99200' ... '1103980' '1104519' '1106700']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'target'] = sales['target'].astype(str)\n"
+        }
+      ]
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "0ed52d7219ee88a19238566a85cdaf13",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h3 id=\"combining-edge-lists\">Combining Edge Lists</h3>\n<span class=\"paragraph\">With both (intake and sales) edge lists made, we can row bind these tables together. The following table is the resulting edge list.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "9cf81df5490f5cfaef9fe126f53f9eca",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='qnkX-0' random-id='e720afed-197c-dfae-ae35-4cd51002ac0f'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-43096-4C7fsKuS.csv&quot;' data-total-rows='100' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "4c5cc2f49f7afb72551ea0fda299c354",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"generating-a-node-list\">Generating a Node List</h2>\n<span class=\"paragraph\">With the edge list completed, we now turn our attention to generating node list from multiple files (e.g., PWS Retail and Survey-No) and the edge list. The process will require a base table with unique identifiers for the nodes on the edge list. Roughly speaking, these come in two flavors, water sources and water systems. Water sources represent aquifers and surface water, while water systems represent public water systems (PWS) and industrial systems.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "94adf6f8543b9c0803e08a30311ce1a5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Vxnm-0' random-id='980e9fee-0505-0a43-a8c8-9bbf957880e7'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/371-43096-ECTQgu7l.csv&quot;' data-total-rows='10' data-total-columns='2' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "07b5e40d59f0d601a15b74f35e7c0e43",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Next, we can begin enriching the node table with attribute data extracted from the retail and bridge files. The retail file includes attributes for nodes with a survey number. This excludes water sources which do not appear to have a numeric unique identifier and some water systems. Thus, the after joining the base node table with the retail data, only nodes with survey numbers will have attributes.</span>\n<span class=\"paragraph\">From the retail table we will take the following attributes:</span>\n<ul>\n<li>Population Served</li>\n<li>Single Family Volume and Connections</li>\n<li>Multi-Family Volume and Connections</li>\n<li>Commercial Volume and Connections</li>\n<li>Industrial Volume and Connections</li>\n<li>Institutional Volume and Connections</li>\n<li>Agrigultural Volume and Connections</li>\n<li>Total Metered Volume and Connections</li>\n<li>Total Un-Metered Volume and Connections</li>\n</ul>\n<span class=\"paragraph\">The following is a list of steps used to read, clean, and reshape the retail data prior to left joining it to the base node table by TWBDB survey number:</span>\n<ol>\n<li>Read retail data as is from <code>PWS Retail_2022-2023.csv</code>.</li>\n<li>Rename <code>TWDB Survey No</code> to <code>id</code> to make the left join easier.</li>\n<li>Filter out data to only include records for the year 2022.</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "82d5b98402cbe551ee5d99e332a52e76",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ulZA-0' random-id='70ff9ab8-7ce0-4203-7ec3-e92930e1f82d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1060-43096-K1fvinkH.csv&quot;' data-total-rows='5' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;retail_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "3359c7e2b0609c12975a81be97f4d052",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Next, we can bring in the survey number table as additional node attributes. Like before, this survey contains data for nodes that have a survey number. By definition, this excludes water sources which are not linked to unique identifier. </span>\n<span class=\"paragraph\">The following is a list of steps used to read, clean, and reshape the survey number data prior to left joining it to the base node table by TWBDB survey number:</span>\n<ol>\n<li>Read the survey number data as is from <code>PWS BridgeTable_2022-2023.csv</code>.</li>\n<li>Rename <code>TWDB Survey Number</code> to <code>id</code>.</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "37d9d4b58f2f558be4cdeb461462de05",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Pvdt-0' random-id='08c03baa-591e-b287-2d9f-c435dc88b9fa'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/439-43096-KvETnaPz.csv&quot;' data-total-rows='5' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;sur_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "49c5305a45d92ae4d0ba3cbeddaada12",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "3edc09bbd0d1ee25fc9165835049d99a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Clean up the node list a bit more:</span>\n<ol>\n<li>Select specific columns.</li>\n<li>Remove duplicates based on the <code>id</code>.</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "a8ff36728b820bd2bb36448518598de9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nHfw-0' random-id='84b43007-aace-910f-1ae7-5912fcbb15f6'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1376-43096-W2jnFfTV.csv&quot;' data-total-rows='6696' data-total-columns='26' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;unified_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Year&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "eeb8f1429337f34df0c8626fc3b8fd9a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"exporting-data\">Exporting Data</h2>\n<span class=\"paragraph\">First, let write the data out as a comma-separated value (CSV) file to allow Gephi users to work with them.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "aab69fb8e6988cb4fe9b79644071d935",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "e5ae811000faf15bcc09b506c695b9fc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"from-tables-to-json\">From Tables to JSON</h2>\n<span class=\"paragraph\">The front-end application requires data in as a nested JSON. This is the required JSON format:\n<div class=\"codehilite\"><pre><span></span><code> elements: {\n    nodes: [\n      {\n        data: { id: &#39;a&#39; }\n      },\n\n      {\n        data: { id: &#39;b&#39; }\n      }\n    ],\n    edges: [\n      {\n        data: { id: &#39;ab&#39;, source: &#39;a&#39;, target: &#39;b&#39; }\n      }\n    ]\n  },\n</code></pre></div></span>\n<span class=\"paragraph\">In this section, we transform the data accordingly.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "85bc61cf8007fa982e88c9fde45113cf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "99a9b60eddda9b96b14ec28a85d212c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">To export the graph data, we have to shape it into a dictionary. Then, store it as a JSON. The code below tranforms our node and edge list into a single dictionary that Cytoscape.js can understand.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "ee98981ccc416f6e2c24a79be9e2b9de",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "60ac9344fcbd214404e52c079a6514b2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Write it out in the app directory:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "521ac5e0d3595c3f081e700ecc807fc4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "889f5eda74236fea68b04529a33fc567",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"parking-lot\">Parking Lot</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "f64e8059d63e5a56a89646404ad3d0ff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "rEll",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "dGlV",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "SdmI",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "yOPj",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "fwwy",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "LJZf",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "urSm",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "jxvo",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "mWxS",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PjZm",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"wholesale-data\">Wholesale Data</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CcZR",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "YWSi",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "zlud",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "tZnO",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "xvXZ",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "CLip",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "YECM",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "cEAS",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iXej",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}
