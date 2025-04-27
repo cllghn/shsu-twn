@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
@@ -12,7 +12,23 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
 
-const SourcesPage: React.FC = () => {
+// Loading component for Suspense fallback
+const LoadingFallback = () => (
+    <div className="flex justify-center items-center p-8">
+      <p>Loading...</p>
+    </div>
+  );
+  
+  // Main component wrapped with Suspense
+  const SystemsPage: React.FC = () => {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <SystemsPageContent />
+      </Suspense>
+    );
+  };
+
+const SystemsPageContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -83,8 +99,9 @@ const SourcesPage: React.FC = () => {
         };
     }, []);
 
-    // Process URL parameters on component mount
     useEffect(() => {
+        if (!searchParams) return;
+        
         const nodeParam = searchParams.get('node');
         if (nodeParam && menuItems.includes(nodeParam)) {
             setSelectedItem(nodeParam);
@@ -94,8 +111,8 @@ const SourcesPage: React.FC = () => {
                 setFilteredNode(nodeParam);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
 
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -281,4 +298,4 @@ const SourcesPage: React.FC = () => {
     );
 }
 
-export default SourcesPage;
+export default SystemsPage;
