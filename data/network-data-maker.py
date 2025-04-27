@@ -809,7 +809,7 @@ def _():
     #     'year': float(el['year'].unique()[0]),
     #     'sources': {'title': 'Water Source Nodes', 
     #                'value': len(nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))]['id'].unique()), 
-    #                'description': 'Points in the network where water originates, such ground and surface water.',
+    #                'description': 'Points in the network where water originates, such as ground and surface water.',
     #                 'url': '/netexplorer/sources',
     #                'kvs': {x['id']: x['unified_name'] for x in nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))].to_dict(orient='records')}},
     #     'systems': {'title': 'Water System Nodes',

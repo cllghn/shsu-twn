@@ -132,13 +132,13 @@ const FAQContent = () => {
                     onChange={() => setExpandedWater(!expandedWater)}
                     >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="overline">What if I don't know which water system or source am I interested in?
+                            <Typography variant="overline">What if I don't know which water system or source I am interested in?
                             </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
                                 <p>
-                                    If you are unsure what water system or source you are interested in, then take a look at the list of resource below. These will allow you to enter an address or click on a map to find out where water comes from and/or who provides it.
+                                    If you are unsure what water system or source you are interested in, then take a look at the list of resources below. These will allow you to enter an address or click on a map to find out where water comes from and/or who provides it.
                                 </p>
                                 <ol className="pt-2 pb-4 pl-2">
                                     <li>&bull; <a href = "https://www3.twdb.texas.gov/apps/WaterServiceBoundaries" target="_blank" className='aPlus'>This site will tell you where the water providers are.</a></li>

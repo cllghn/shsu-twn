@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
@@ -10,12 +10,14 @@ import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import InsightsIcon from '@mui/icons-material/Insights';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
-
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const SourcesPage: React.FC = () => {
-
+    const router = useRouter();
+    const searchParams = useSearchParams();
     
     const nodeKeys = Object.keys(metadata.sources.kvs);
+    const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedItem, setSelectedItem] = useState("select a source"); // Default text
@@ -23,17 +25,6 @@ const SourcesPage: React.FC = () => {
     const [filteredData, setFilteredData] = useState(null); // New state for filtered data
     const [triggerUpdate, setTriggerUpdate] = useState(false); // Track when to update the graph
     const open = Boolean(anchorEl);
-
-    const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = (item) => {
-        if (item) setSelectedItem(item); // Update button text on selection
-        setAnchorEl(null);
-    };
 
     function toTitleCase(str: string): string {
         return str
@@ -43,6 +34,7 @@ const SourcesPage: React.FC = () => {
 
     // Memoize filterDataBySource function to prevent unnecessary recalculations
     const filterDataBySource = useCallback((selected: string) => {
+        if (!selected || selected === "select a source") return null;
 
         // Filter edges where the source matches the provided sourceId
         const titleSelected = toTitleCase(selected);
@@ -61,16 +53,47 @@ const SourcesPage: React.FC = () => {
         };
     }, []);
 
+    // Process URL parameters on component mount
+    useEffect(() => {
+        const nodeParam = searchParams.get('node');
+        if (nodeParam && menuItems.includes(nodeParam)) {
+            setSelectedItem(nodeParam);
+            const data = filterDataBySource(nodeParam);
+            if (data) {
+                setFilteredData(data);
+                setFilteredNode(nodeParam);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (item) => {
+        if (item) setSelectedItem(item); // Update button text on selection
+        setAnchorEl(null);
+    };
+
     // Handle the Go button click
     const handleGo = () => {
         if (selectedItem === "select a source") return;
 
         const data = filterDataBySource(selectedItem);
 
-        // Only update the data and trigger a redraw when Go is clicked
-        setFilteredData(data);
-        setFilteredNode(selectedItem);
-        setTriggerUpdate(!triggerUpdate); // Toggle to force graph update
+        if (data) {
+            // Update the URL with the selected node
+            const params = new URLSearchParams(searchParams.toString());
+            params.set('node', selectedItem);
+            router.push(`?${params.toString()}`);
+
+            // Update state
+            setFilteredData(data);
+            setFilteredNode(selectedItem);
+            setTriggerUpdate(!triggerUpdate); // Toggle to force graph update
+        }
     };
 
 
@@ -107,7 +130,7 @@ const SourcesPage: React.FC = () => {
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
                         <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
                         <div className="flex items-center flex-wrap">
-                            <Typography variant="body2" className="mb-4">Begin by selecting a source by name.</Typography>
+                            <Typography variant="body1" className="mb-4">Begin by selecting a source by name.</Typography>
                             <Button
                                 variant="text"
                                 onClick={handleClick}
@@ -159,6 +182,14 @@ const SourcesPage: React.FC = () => {
                                 </MenuItem>
                             ))}
                         </Menu>
+
+                        {
+                            filteredData ? (
+                                <div className="pt-6 font-bold text-sm">
+                                    <InfoIcon /> The graph below shows water flowing out from the selected water source. In addition, it shows outputs from the intermediary systems into other systems two-degrees of separation away from the source. It omits inputs that into the water source as those are not captured in the data.
+                                </div>) :
+                                <div></div>
+                        }
                     </Paper>
                 </div>
 
@@ -178,7 +209,10 @@ const SourcesPage: React.FC = () => {
                                 </Box>
 
                                 <TabPanel value={activeTab} index={0}>
-                                    <DynamicGraph data={filteredData} selected={filteredNode} />
+                                    <DynamicGraph 
+                                        data={filteredData}
+                                        selected={toTitleCase(filteredNode)} 
+                                    />
                                 </TabPanel>
 
 

@@ -187,7 +187,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 .style({ label: showLabels ? "data(label)" : "" })
                 .update();
 
-        
+
 
             // Add event listeners for tooltips
             cy.on('mouseover', 'node', (event) => {
@@ -299,7 +299,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     return (
         <div className='min-h-screen relative'>
-            <Box className="absolute top-[1em] right-3 z-10 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559]">
+            <Box className="absolute top-[1em] right-3 z-1000 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559]">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
@@ -310,6 +310,10 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 <br />
                 <span className="text-sm">
                     <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /> Water System
+                </span>
+                <br />
+                <span className="text-sm">
+                    <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /> Selected Node
                 </span>
             </Box>
             <Tooltip title="Fit to Screen" arrow placement="left">
@@ -391,7 +395,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 </div>
             )}
 
-
             <CytoscapeComponent
                 key={JSON.stringify(data)} // Forces a full re-render when data changes
                 elements={formattedElements} // Pass the formatted elements directly
@@ -404,12 +407,14 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         selector: "node",
                         style: {
                             "background-color": (ele) => getNodeColor(ele.data("preliminary_type")),
+                            "border-color": "#6F5A4C",
+                            "border-width": (ele: cytoscape.SingularElementArgument) => ele.data("id") === selected ? 1 : 0,
                             "label": "data(label)",
                             "color": "#000",
-                            "font-size": "6px",
+                            "font-size": "4px",
                             "text-transform": "uppercase",
                             "text-wrap": "ellipsis",
-                            "text-max-width": 60,
+                            "text-max-width": 55,
                             "height": 20,
                             "width": 20,
                         },

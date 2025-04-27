@@ -14,7 +14,7 @@ import SourceIcon from '@mui/icons-material/Source';
 
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedItem, setSelectedItem] = useState("different sources"); // Default text
+  const [selectedItem, setSelectedItem] = useState("sources or systems"); // Default text
   const open = Boolean(anchorEl);
   const router = useRouter(); // Next.js router for navigation
 
@@ -45,12 +45,12 @@ export default function Home() {
         <div className="w-screen h-[500px] bg-[url('/twf-resource-water-data.jpg')] bg-cover bg-center relative animate-fadeIn">
           <div className="grid grid-cols-2 gap-4 w-full h-full items-center px-24 ">
             {/* Left Column - Title & Description */}
-            <div className="col p-10 sm:bg-[#01161E] sm:bg-opacity-25 sm:rounded-lg  sm:border-2 sm:border-[#f4f4f4] animate-fadeInSlow">
+            <div className="col p-10 sm:bg-[#124559] sm:bg-opacity-65 sm:rounded-lg  sm:border-2 sm:border-[#f4f4f4] animate-fadeInSlow">
               <h1 className="text-4xl text-white font-bold text-left">
                 Texas Water Network Explorer
               </h1>
               <p className="text-white text-left pt-4 sm:block hidden">
-                A tool designed to revolutionize the way we interact with water data in Texas.<a href='/about' className='aPlus'>Read more about it... &rarr;</a>
+                A tool designed to modernize the way we interact with water data in Texas.<a href='/about' className='aPlus'>&nbsp;Read more about it... &rarr;</a>
               </p>
             </div>
             {/* Right Column - Placeholder */}
@@ -67,8 +67,8 @@ export default function Home() {
               <PiShareNetworkFill size={70} className="transform rotate-45 lg:block hidden" /> */}
             </div>
             <div className="bg-white bg-opacity-10 col-span-10 lg:col-span-7 px-20 py-20 rounded-r-lg">
-              <h2 className="pb-5 text-[#53899D] font-bold text-lg">Water Flows <WaterDropIcon /></h2>
-              <h3 className="pb-5 text-2xl text-thin text-[#124559]">Interested in learning how water flows through the network?</h3>
+              <h2 className="pb-5 text-2xl text-[#124559]">Water Flows <WaterDropIcon /></h2>
+              <h3 className="pb-5 text-xl text-[#124559]">Interested in learning how water flows through the network?</h3>
               <div className="container mx-auto flex flex-wrap items-center space-x-2">
                 <div>Explore how water flows from</div>
 
@@ -86,7 +86,7 @@ export default function Home() {
                 <Button
                   variant="outlined"
                   onClick={handleGo}
-                  disabled={selectedItem === "different sources"} // Disable if default is selected
+                  disabled={selectedItem === "sources or systems"} // Disable if default is selected
                   // className="bg-blue-600 text-white normal-case shadow-none hover:bg-blue-700"
                   sx={{
                     color: '#ffffff',
@@ -130,7 +130,7 @@ export default function Home() {
                   ))}
                 </Menu>
               </div>
-              <div className="pt-4">
+              <div className="pt-5">
               <Typography variant="caption">
                 <Link href="/faq?expand=waterSource" className="aPlus">
                   <SearchIcon/> Find information on sources/systems... &rarr;
@@ -142,8 +142,8 @@ export default function Home() {
 
           <div className="mt-16 grid grid-cols-10 shadow-lg rounded-lg animate-fadeIn">
             <div className="bg-white bg-opacity-10 col-span-10 lg:col-span-7 px-20 py-20 rounded-lg">
-              <h2 className="pb-5 text-[#53899D] font-bold text-lg">Data Sets <SourceIcon /></h2>
-              <h3 className="pb-5 text-2xl text-thin text-[#124559]">Interested in taking a look at the data?</h3>
+              <h2 className="pb-5 text-[#124559] text-2xl">Data Sets <SourceIcon /></h2>
+              <h3 className="pb-5 text-xl text-[#124559]">Interested in taking a look at the data?</h3>
               <div className="container mx-auto flex items-center space-x-2">
 
                 {/* Go Button */}
@@ -165,7 +165,7 @@ export default function Home() {
                   Go &rarr;
                 </Button>
               </div>
-              <div className="pt-4">
+              <div className="pt-5">
               <Typography variant="caption">
                 <Link href="/faq?expand=dataSource" className="aPlus mt-3">
                   <LocalLibraryIcon /> Read FAQs about the data... &rarr;
