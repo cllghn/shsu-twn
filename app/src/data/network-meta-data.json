@@ -14,7 +14,7 @@
     "sources": {
         "title": "Water Source Nodes",
         "value": 173,
-        "description": "Points in the network where water originates, such ground and surface water.",
+        "description": "Points in the network where water originates, such as ground and surface water.",
         "url": "/netexplorer/sources",
         "kvs": {
             "MEREDITH LAKE/RESERVOIR": "MEREDITH LAKE/RESERVOIR",

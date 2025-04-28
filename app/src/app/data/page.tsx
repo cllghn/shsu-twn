@@ -58,7 +58,7 @@ const DataPage: React.FC = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                            This interactive data dashboard displays historical water use survey and estimate data. The Texas Water Development Board Water Use Survey program conducts an annual survey of about 4,650 public water systems and 2,600 industrial facilities. The water use survey collects the volume of both ground and surface water used, the source of the water, water sales, and other pertinent data from the users. Periodically, the data reports are refreshed to include any new or corrected information.
+                            This interactive data dashboard displays historical water use survey and estimate data. The Texas Water Development Board Water Use Survey program conducts an annual survey of about 4,650 public water systems and 2,600 industrial facilities. The water use survey collects the volume of both ground and surface water used, the source of the water, water sales, and other pertinent data from the users. Periodically, the data reports are refreshed to include any new or corrected information. <b>Note:</b> periodically, the data reports are refreshed to include any new or corrected information.
                             </Typography>
                             <div className='flex justify-end py-5 px-5'>
                                 <Button

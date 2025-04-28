@@ -13,10 +13,10 @@ const FAQ: React.FC = () => {
                     <h1 className='text-4xl font-bold text-left pb-10 animate-fadeIn'>About</h1>
                     <div className='animate-fadeInSlow'>
                         <p>
-                            As part of its commitment  to help equip decision makers and the public with the information they need to navigate the complex water sector, the Texas Water Foundation, in partnership with the Institute for Homeland Security at Sam Houston State University, has developed a this site to improve water data analysis.
+                            As part of its commitment to help equip decision makers and the public with the information they need to navigate the complex water sector, the Texas Water Foundation, in partnership with the Institute for Homeland Security at Sam Houston State University, have developed the Texas Water Network Explorer (TWNet). 
                         </p>
                         <p className="pt-4">
-                            The Texas Water Network Explorer (TWNet) uses network analysis and visualization to simplify complex water data, helping highlight the sector’s central role in Texas’ Critical Infrastructure. This tool maps interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed.
+                            The TWNet uses network analysis and visualization to simplify complex water data, helping highlight the sector’s central role in Texas’ Critical Infrastructure. This tool maps interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. 
                         </p>
                         <p className="pt-4">
                             Users can find value through:
@@ -25,7 +25,7 @@ const FAQ: React.FC = () => {
                             <li><InsertChartIcon fontSize="small" className='mr-2' /><b>Intuitive Visual Statistics:</b> Visualize and interpret complex relationships between water entities, identifying source intakes, sales, and retail distribution.</li>
                             <li><SupportIcon fontSize="small" className='mr-2' /><b>Data-Driven Decision Support:</b> Enhanced insights support informed decision-making in areas like system resilience, risk management, infrastructure planning, and the development of water use policies.</li>
                             <li><SearchIcon fontSize='small' className='mr-2' /><b>Network Dependencies Identification:</b> Pinpoint dependencies and vulnerable connections within the water network to mitigate risks.</li>
-                            <li><MediationIcon fontSize='small' className='mr-2' /><b>Water Movement:</b> Visualization Track water flow through the system for better understanding</li>
+                            <li><MediationIcon fontSize='small' className='mr-2' /><b>Water Movement:</b> Visualization Track water flow through the system for better understanding.</li>
                         </ul>
                     </div>
 

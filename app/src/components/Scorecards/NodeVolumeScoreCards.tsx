@@ -19,7 +19,7 @@ const NodeScorecard = ({ title, value, icon: Icon, iconColor, unit }) => {
   );
 };
 
-const ConnectionScorecardsRow = ({ incomingConnections, outgoingConnections}) => {
+const ConnectionScorecardsRow = ({ incomingConnections, outgoingConnections }) => {
   return (
     <div className="flex flex-col gap-4 w-full md:flex-row md:flex-wrap">
       <NodeScorecard
@@ -73,6 +73,7 @@ const NodeScorecardsRow = ({ incomingValue, outgoingValue, netValue, unit }) => 
 
 // Example usage with sample data
 const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string }) => {
+
   function capitalizeWords(str) {
     // Handle edge cases
     if (!str) return '';
@@ -162,7 +163,15 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
       });
   }, [edges, selected]);
 
-  console.log('edgesWhereSelectedIsSource:', edgesWhereSelectedIsSource);
+  const edgesWhereSelectedIsTarget = useMemo(() => {
+    return edges
+      .filter(edge => edge.data.target === selected)
+      .sort((a, b) => {
+        const volumeA = parseFloat(a.data.yearly_volume.replace(/,/g, '')) || 0;
+        const volumeB = parseFloat(b.data.yearly_volume.replace(/,/g, '')) || 0;
+        return volumeB - volumeA;
+      });
+  }, [edges, selected]);
 
   const incoming = useMemo(() => {
     const nodeData = nodeVolumes[selected];
@@ -171,7 +180,6 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
 
   const outgoing = useMemo(() => {
     const nodeData = nodeVolumes[selected];
-    console.log('nodeData:', nodeData);
     return nodeData ? nodeData.outgoingVolume : 0;
   }, [nodeVolumes, selected]);
 
@@ -184,7 +192,6 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
     const nodeData = nodeConnections[selected];
     return nodeData ? nodeData.outgoingConnections : 0;
   }, [nodeConnections, selected]);
-
 
   const selectedNode = useMemo(() => {
     return data.elements.nodes.find(node => node.data.id === selected);
@@ -203,65 +210,126 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
           <h3 className="text-lg font-medium">{capitalizeWords(selectedNode.data.preliminary_type)} Details</h3>
         </div>
         {selectedNode.data.preliminary_type === 'water source' ? (
-              <div className="flex justify-left flex-col space-y-4">
+          <div className="flex justify-left flex-col space-y-4">
+            <div>
+              <b>Water Source:</b>&nbsp; {selectedNode.data.id}
+            </div>
+            <div className='flex'>
+              <ConnectionScorecardsRow
+                incomingConnections={incomingConnections}
+                outgoingConnections={outgoingConnections}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-left flex-col space-y-4">
+            <div>
+              <b>Water System:</b>&nbsp; {selectedNode.data.unified_name}
+                {selectedNode.data['Water Use Survey Form Type'] && (
                 <div>
-                  <b>Water Source:</b>&nbsp; {selectedNode.data.id}
+                  <b>Water Use Survey Form Type:</b>&nbsp; {selectedNode.data['Water Use Survey Form Type']}
                 </div>
-                <div className='flex'>
-                <ConnectionScorecardsRow
-                  incomingConnections={incomingConnections}
-                  outgoingConnections={outgoingConnections}
-                />
+                )}
+                {selectedNode.data['TCEQ PWS Code'] && (
+                <div>
+                  <b>TCEQ PWS Code:</b>&nbsp; {selectedNode.data['TCEQ PWS Code']}
                 </div>
-              </div>
-            ) : (
-              <div className="flex justify-left">
-                We will put details for water system here.
-              </div>
-            )}
+                )}
+                {selectedNode.data['PWS System Class'] && (
+                <div>
+                  <b>PWS System Class:</b>&nbsp; {selectedNode.data['PWS System Class']}
+                </div>
+                )}
+                {selectedNode.data[' Population Served '] && (
+                <div>
+                  <b>Population Served:</b>&nbsp; {selectedNode.data[' Population Served ']}
+                </div>
+                )}
+            </div>
+            <div className='flex'>
+              <ConnectionScorecardsRow
+                incomingConnections={incomingConnections}
+                outgoingConnections={outgoingConnections}
+              />
+            </div>
+          </div>
+        )}
       </div>
+      {console.log(selectedNode.data)}
 
-      <div className="flex flex-col justify-left pt-8">
-        <h3 className="text-lg font-medium pb-4">Water Outflow Ranked</h3>
-        {/* edgesWhereSelectedIsSource */}
-        <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Source</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Target</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
-              
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Type</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {edgesWhereSelectedIsSource.map((row, index) => (
-              <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.source}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.target}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{capitalizeWords(row.data.type)}</td>
-                <td className="py-2 px-4 text-sm text-gray-900">{row.data.year}</td>
+      {selectedNode.data.preliminary_type !== 'water source' && 
+       edgesWhereSelectedIsTarget.length >= 1 && (
+        <div className="flex flex-col justify-left pt-8">
+          <h3 className="text-lg font-medium pb-4">Water Inflow into the System Ranked</h3>
+          {/* edgesWhereSelectedIsTarget */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Source</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Target</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Type</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {edgesWhereSelectedIsTarget.map((row, index) => (
+                  <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.source}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.target}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{capitalizeWords(row.data.type)}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.year}</td>
 
-      </div>
-
-      {selectedNode.data.preliminary_type !== 'water source' && (
-        <div className="flex justify-left pt-8">
-          <h3 className="text-lg font-medium">Top Water Suppliers</h3>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
+
+      {edgesWhereSelectedIsSource.length >= 1 && (
+        <div className="flex flex-col justify-left pt-8">
+          <h3 className="text-lg font-medium pb-4">Water Outflow out of the System Ranked</h3>
+          {/* edgesWhereSelectedIsSource */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Source</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Target</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
+
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Type</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {edgesWhereSelectedIsSource.map((row, index) => (
+                  <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.source}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.target}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{capitalizeWords(row.data.type)}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.year}</td>
+
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>)}
     </div>
   );
 };
