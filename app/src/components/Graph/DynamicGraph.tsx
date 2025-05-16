@@ -1,9 +1,11 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from "cytoscape";
-import fcose from 'cytoscape-fcose';
+// import fcose from 'cytoscape-fcose';
+import cola from 'cytoscape-cola';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -11,6 +13,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
 import SearchOffIcon from '@mui/icons-material/SearchOff';;
 import { Box } from '@mui/material';
+import { symlink } from 'fs';
 
 // Define the types for the props
 interface DynamicGraphProps {
@@ -49,7 +52,7 @@ interface EdgeTooltipState {
     };
 }
 
-cytoscape.use(fcose);
+cytoscape.use(cola);
 
 // cytoscape.use(dagre);
 
@@ -121,7 +124,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     ], [nodes, edges]); // Only recalculate when nodes or edges change
 
     const layout = useMemo(() => ({
-        name: "fcose",
+        name: "cola",
         fit: true,
         animate: false,
         padding: 20,
@@ -181,19 +184,28 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         if (cy) {
 
             cy.userZoomingEnabled(allowZoom);
-
             cy.style()
                 .selector("node")
                 .style({ label: showLabels ? "data(label)" : "" })
                 .update();
 
-
+            // Function to reset all styles
+            const resetStyles = () => {
+                cy.elements().removeClass('highlighted');
+                cy.elements().removeClass('faded');
+            };
 
             // Add event listeners for tooltips
             cy.on('mouseover', 'node', (event) => {
+                resetStyles();
                 const node = event.target;
-                const position = event.renderedPosition || event.position;
+                const neighborhood = node.neighborhood().add(node);
+                
+                neighborhood.addClass('highlighted');
+                cy.elements().difference(neighborhood).addClass('faded');
 
+                const position = event.renderedPosition || event.position;
+                
                 // Hide edge tooltip if it's showing
                 setEdgeTooltip(prev => ({ ...prev, show: false }));
 
@@ -217,11 +229,21 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             });
 
             cy.on('mouseout', 'node', () => {
+                resetStyles();
+
                 setNodeTooltip(prev => ({ ...prev, show: false }));
+
+                // Remove highlight class from all nodes
             });
 
             cy.on('mouseover', 'edge', (event) => {
+                resetStyles();
                 const edge = event.target;
+                const connectedNodes = edge.connectedNodes();
+                const elements = edge.add(connectedNodes); 
+                elements.addClass('highlighted');
+                cy.elements().difference(elements).addClass('faded');
+                
                 const position = event.renderedPosition || {
                     x: (event.position || { x: 0 }).x,
                     y: (event.position || { y: 0 }).y
@@ -256,6 +278,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
             cy.on('mouseout', 'edge', () => {
                 setEdgeTooltip(prev => ({ ...prev, show: false }));
+                resetStyles();
             });
 
             // Update tooltip position when dragging or moving the graph
@@ -266,16 +289,23 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 if (edgeTooltip.show) {
                     setEdgeTooltip(prev => ({ ...prev, show: false }));
                 }
+                resetStyles();
+            });
+            cy.on('click', function(event) {
+                if (event.target === cy) {
+                    resetStyles();
+                }
             });
 
             // Clean up event listeners on unmount
             return () => {
-                cy.removeListener('mouseover');
-                cy.removeListener('mouseout');
-                cy.removeListener('drag');
+                // cy.removeListener('mouseover');
+                // cy.removeListener('mouseout');
+                // cy.removeListener('drag');
+                cy.removeAllListeners();
             };
         }
-    }, [showLabels, nodeTooltip.show, edgeTooltip.show]);
+    }, [showLabels, nodeTooltip.show, edgeTooltip.show, allowZoom]);
 
     const handleZoomToFit = () => {
         cyRef.current?.fit();
@@ -299,7 +329,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     return (
         <div className='min-h-screen relative'>
-            <Box className="absolute top-[1em] right-3 z-1000 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559]">
+            <Box className="hidden sm:block absolute top-[1em] right-3 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
@@ -316,19 +346,44 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /> Selected Node
                 </span>
             </Box>
-            <Tooltip title="Fit to Screen" arrow placement="left">
+            <Box className="block sm:hidden absolute bottom-[1em] right-3 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
+                <div className="flex flex-row items-center gap-4 text-sm">
+                    <span className="text-sm text-center">
+                        <ArrowBackIcon sx={{ fontSize: 'small' }} /><br/> Water Flow
+                    </span>
+                    <span className="text-sm text-center">
+                        <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br/> Water Source
+                    </span>
+                    <span className="text-sm text-center">
+                        <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /><br/> Water System
+                    </span>
+                    <span className="text-sm text-center">
+                        <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /><br/> Selected Node
+                    </span>
+                </div>
+            </Box>
+            <Tooltip title="Learn More!" arrow placement="left">
+                <button
+                    onClick={() => window.alert("This is work in progress, the tutorial will go here.")}
+                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    id='fit-screen-btn'
+                >
+                    <HelpCenterIcon />
+                </button>
+            </Tooltip>
+            <Tooltip title="Fit to Screen" arrow placement="right">
                 <button
                     onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
                 </button>
             </Tooltip>
-            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="left">
+            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="right">
                 <button
                     onClick={handleAllowZoom}
-                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
@@ -399,7 +454,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 key={JSON.stringify(data)} // Forces a full re-render when data changes
                 elements={formattedElements} // Pass the formatted elements directly
                 id="cy-graph"
-                style={{ width: "100%", height: "100vh" }} // Define size for the graph
+                style={{ width: "100%", height: "100vh", zIndex:1}} // Define size for the graph
                 layout={layout} // Apply the layout configuration
                 cy={(cy) => (cyRef.current = cy)} // Store Cytoscape instance
                 stylesheet={[
@@ -415,8 +470,10 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             "text-transform": "uppercase",
                             "text-wrap": "ellipsis",
                             "text-max-width": 55,
-                            "height": 20,
-                            "width": 20,
+                            "height": 10,
+                            "width": 10,
+                            "transition-property": "opacity",
+                            "transition-duration": "0.2s",
                         },
                     },
                     {
@@ -427,8 +484,28 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             "mid-target-arrow-shape": "vee",
                             "mid-target-arrow-color": "#ccc",
                             "curve-style": "bezier",
+                            "transition-property": "opacity",
+                            "transition-duration": "0.2s",
                         },
                     },
+                    {
+                        selector: "node.highlighted",
+                        style: {
+                            "opacity": 1,
+                        },
+                    },
+                    {
+                        selector: "edge.highlighted",
+                        style: {
+                            "opacity": 1,
+                        },
+                    },
+                    {
+                        selector: ".faded",
+                        style: {
+                            "opacity": 0.2
+                        }
+                    }
                 ]}
             />
         </div>

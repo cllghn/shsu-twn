@@ -21,7 +21,8 @@ def _():
     import os
     import re
     from datetime import datetime
-    return List, Optional, datetime, json, mo, np, os, pd, plt, re
+    import networkx as nx
+    return List, Optional, datetime, json, mo, np, nx, os, pd, plt, re
 
 
 @app.cell(hide_code=True)
@@ -681,6 +682,63 @@ def _(nl):
     return columns_to_keep, nl_tidy
 
 
+@app.cell
+def _(nl_tidy):
+    nl_tidy[nl_tidy['id'] == "10"]
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""In May 2025, the TWDB partner asked us to prioritize the intake purchases over the sales when we have parallel edges. Let's take a quick stab at doing that. First, figure out how many repeats we got:""")
+    return
+
+
+@app.cell
+def _(el):
+    el['pedge_count'] = el.groupby(['source', 'target'])['type'].transform('count')
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""Now take a quick look. It appears that we tot a couple intakes and a single sale, which roughly add up to the same value. """)
+    return
+
+
+@app.cell
+def _(el):
+    el[(el['source'] == "10") & (el['target'] == "684600")]
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""Let's go a little further, if there is only one parallel edge (that is, no parallel edge), do nothing. Else, filter to only retain the intake values:""")
+    return
+
+
+@app.cell
+def _(el):
+    el[
+        ((el['pedge_count'] == 1) | ((el['pedge_count'] > 1) & (el['type'] == 'intake'))) & 
+        ((el['source'] == "10") & (el['target'] == "684600"))
+    ]
+    return
+
+
+@app.cell
+def _(el):
+    el_noparallel = el[((el['pedge_count'] == 1) | ((el['pedge_count'] > 1) & (el['type'] == 'intake')))].drop(columns=['pedge_count'])
+    return (el_noparallel,)
+
+
+@app.cell
+def _(el_noparallel):
+    el_noparallel.head(10)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
@@ -694,13 +752,13 @@ def _(mo):
 
 
 @app.cell
-def _(datetime, el, nl_tidy):
+def _(datetime, el_noparallel, nl_tidy):
     # Get the current date
     current_date = datetime.now().strftime('%Y%m%d')
 
     # Save the node and edge lists with the date in the filename
     nl_tidy.to_csv(f'outputs/nodes_{current_date}.csv', index=False)
-    el.to_csv(f'outputs/edges_{current_date}.csv', index=False)
+    el_noparallel.to_csv(f'outputs/edges_{current_date}.csv', index=False)
     return (current_date,)
 
 
@@ -750,7 +808,7 @@ def _(mo):
 
 
 @app.cell
-def _(el, nl_tidy, np, pd):
+def _(el_noparallel, nl_tidy, np, pd):
     def create_cyto_json(nl: pd.DataFrame, el: pd.DataFrame) -> dict:
         """
         Create a JSON object for Cytoscape.js.
@@ -771,7 +829,7 @@ def _(el, nl_tidy, np, pd):
         return out
 
     cyto = create_cyto_json(nl_tidy,
-                            el.rename(columns={'from': 'source',
+                            el_noparallel.rename(columns={'from': 'source',
                                                'to': 'target'})
                            )
     return create_cyto_json, cyto
@@ -791,37 +849,62 @@ def _(cyto, json):
 
 
 @app.cell
+def _(el_noparallel):
+    len(el_noparallel)
+    return
+
+
+@app.cell
 def _(mo):
     mo.md(r"""## Parking Lot""")
     return
 
 
 @app.cell
-def _():
-    # graph_meta_data = {
-    #     'nodes' : {'title': 'Nodes', 
-    #                'value': G.number_of_nodes(), 
-    #                'description': 'These are key points where water is sourced, sold, stored, transferred, or consumed.'},
-    #     'edges' : {'title': 'Connections', 
-    #                'value': G.number_of_edges(), 
-    #                'description': 'These represent the pathways through which water moves between nodes.'},
-    #     'directed': G.is_directed(),
-    #     'year': float(el['year'].unique()[0]),
-    #     'sources': {'title': 'Water Source Nodes', 
-    #                'value': len(nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))]['id'].unique()), 
-    #                'description': 'Points in the network where water originates, such as ground and surface water.',
-    #                 'url': '/netexplorer/sources',
-    #                'kvs': {x['id']: x['unified_name'] for x in nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))].to_dict(orient='records')}},
-    #     'systems': {'title': 'Water System Nodes',
-    #                 'value': len(nl[nl['preliminary_type'] == 'water system']['id'].unique()),
-    #                 'description': 'Points in the networks involved in the sale and distribution of water.',
-    #                 'url': '/netexplorer/systems',
-    #                 'kvs': {x['id']: x['unified_name'] for x in nl[nl['preliminary_type'] == 'water system'].to_dict(orient='records')}}
-    # }
+def _(el_noparallel, nx):
+    G = nx.from_pandas_edgelist(el_noparallel, source='source', target='target', create_using=nx.DiGraph())
+
+    return (G,)
+
+
+@app.cell
+def _(G):
+    G.is_directed()
+    return
+
+
+@app.cell
+def _(G, el_noparallel, json, nl):
+    graph_meta_data = {
+        'nodes' : {'title': 'Nodes', 
+                   'value': len(G.nodes.data()), 
+                   'description': 'These are key points where water is sourced, sold, stored, transferred, or consumed.'},
+        'edges' : {'title': 'Connections', 
+                   'value': len(G.edges.data()), 
+                   'description': 'These represent the pathways through which water moves between nodes.'},
+        'directed': G.is_directed(),
+        'year': float(el_noparallel['year'].unique()[0]),
+        'sources': {'title': 'Water Source Nodes', 
+                   'value': len(nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))]['id'].unique()), 
+                   'description': 'Points in the network where water originates, such as ground and surface water.',
+                    'url': '/netexplorer/sources',
+                   'kvs': {x['id']: x['unified_name'].upper() for x in nl[(nl['preliminary_type'] == 'water source') & (~nl['id'].str.contains('BASIN'))].to_dict(orient='records')}},
+        'systems': {'title': 'Water System Nodes',
+                    'value': len(nl[nl['preliminary_type'] == 'water system']['id'].unique()),
+                    'description': 'Points in the networks involved in the sale and distribution of water.',
+                    'url': '/netexplorer/systems',
+                    'kvs': {x['id']: x['unified_name'].upper() for x in nl[nl['preliminary_type'] == 'water system'].to_dict(orient='records')}}
+    }
 
     # graph_meta_data
-    # with open('../app/src/data/network-meta-data.json', 'w') as md:
-    #     json.dump(graph_meta_data, md, indent=4)
+    with open('../app/src/data/network-meta-data.json', 'w') as md:
+        json.dump(graph_meta_data, md, indent=4)
+    return graph_meta_data, md
+
+
+@app.cell
+def _(graph_meta_data):
+    graph_meta_data
     return
 
 

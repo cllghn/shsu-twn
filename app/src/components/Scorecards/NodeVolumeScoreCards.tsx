@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ArrowUpFromDot, ArrowDownToDot, ArrowUpDown, MoveDownLeft, MoveUpRight, Move } from 'lucide-react';
+import { ArrowUpFromDot, ArrowDownToDot, ArrowUpDown, MoveDownLeft, MoveUpRight, Move, Info } from 'lucide-react';
 
 const NodeScorecard = ({ title, value, icon: Icon, iconColor, unit }) => {
   return (
@@ -199,6 +199,10 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
 
   return (
     <div className="p-6 w-full">
+      {/* <div className='flex items-start space-x-2 pb-5'>
+        <Info className='w-[25px] h-[25px] shrink-0' /> 
+        <p>This section provides information about the {selectedNode.data.preliminary_type === 'water source' ? 'water source' : 'water system'} node, including its connections within the network. The number of outgoing connections represents how many directed links carry water from this node to others, indicating the paths through which water flows out. Conversely, the number of incoming connections reflects how many directed links bring water into this node from other sources/systems. Together, these connections help illustrate the node's role in the overall water flow network.</p>
+      </div> */}
       <NodeScorecardsRow
         incomingValue={incoming.toLocaleString()}
         outgoingValue={outgoing.toLocaleString()}
@@ -208,13 +212,18 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
       <div className="flex flex-col justify-left pt-8 space-y-4">
         <div>
           <h3 className="text-lg font-medium">{capitalizeWords(selectedNode.data.preliminary_type)} Details</h3>
+          <div className='flex items-start space-x-2 py-5'>
+            <Info className='w-[25px] h-[25px] shrink-0' /> 
+            <p>This section provides information about the {selectedNode.data.preliminary_type === 'water source' ? 'water source' : 'water system'} node, including its connections within the network. The number of outgoing connections represents how many directed links carry water from this node to others, indicating the paths through which water flows out. Conversely, the number of incoming connections reflects how many directed links bring water into this node from other sources/systems. Together, these connections help illustrate the node's role in the overall water flow network.</p>
+          </div>
         </div>
         {selectedNode.data.preliminary_type === 'water source' ? (
           <div className="flex justify-left flex-col space-y-4">
             <div>
               <b>Water Source:</b>&nbsp; {selectedNode.data.id}
             </div>
-            <div className='flex'>
+            <div className='flex flex-col'>
+              
               <ConnectionScorecardsRow
                 incomingConnections={incomingConnections}
                 outgoingConnections={outgoingConnections}
@@ -255,7 +264,7 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
           </div>
         )}
       </div>
-      {console.log(selectedNode.data)}
+      {/* {console.log(selectedNode.data)} */}
 
       {selectedNode.data.preliminary_type !== 'water source' && 
        edgesWhereSelectedIsTarget.length >= 1 && (
