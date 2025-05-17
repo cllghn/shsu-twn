@@ -14,6 +14,8 @@ import SearchIcon from '@mui/icons-material/Search'
 import SearchOffIcon from '@mui/icons-material/SearchOff';;
 import { Box } from '@mui/material';
 import { symlink } from 'fs';
+import cxtmenu from "cytoscape-cxtmenu";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // Define the types for the props
 interface DynamicGraphProps {
@@ -53,6 +55,7 @@ interface EdgeTooltipState {
 }
 
 cytoscape.use(cola);
+cytoscape.use(cxtmenu);
 
 // cytoscape.use(dagre);
 
@@ -67,6 +70,9 @@ const getNodeColor = (type: string) => {
 
 
 const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     const cyRef = useRef<cytoscape.Core | null>(null); // Store Cytoscape instance
     const { nodes, edges } = data.elements;
 
@@ -291,17 +297,36 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 }
                 resetStyles();
             });
+
             cy.on('click', function(event) {
                 if (event.target === cy) {
                     resetStyles();
                 }
             });
 
+            cy.cxtmenu({
+                selector: 'node',
+                commands: [
+                    {
+                        content: 'See node network',
+                        select: (node) => {
+                            const params = new URLSearchParams(searchParams.toString());
+                            const nodeData = node.data();
+                            const waterPath = nodeData.preliminary_type === "water source" ? "sources" : "systems";
+                            const nodeName = waterPath === "sources" ? nodeData.unified_name : nodeData.unified_name.toUpperCase();
+                            params.set('node', nodeName);
+                            router.push(`/netexplorer/${waterPath}?${params.toString()}`);
+                        },
+                        openMenuEvents: 'cxttapstart taphold',
+                        outsideMenuCancel: true
+                    }
+                ],
+
+                
+            });
+
             // Clean up event listeners on unmount
             return () => {
-                // cy.removeListener('mouseover');
-                // cy.removeListener('mouseout');
-                // cy.removeListener('drag');
                 cy.removeAllListeners();
             };
         }
@@ -355,14 +380,14 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br/> Water Source
                     </span>
                     <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /><br/> Water System
+                        <CircleIcon sx={{ fontSize: 'small', fill: "" }} /><br/> Water System
                     </span>
                     <span className="text-sm text-center">
                         <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /><br/> Selected Node
                     </span>
                 </div>
             </Box>
-            <Tooltip title="Learn More!" arrow placement="left">
+            {/* <Tooltip title="Learn More!" arrow placement="left">
                 <button
                     onClick={() => window.alert("This is work in progress, the tutorial will go here.")}
                     className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
@@ -370,11 +395,11 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 >
                     <HelpCenterIcon />
                 </button>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Fit to Screen" arrow placement="right">
                 <button
                     onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
@@ -383,7 +408,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="right">
                 <button
                     onClick={handleAllowZoom}
-                    className="absolute top-[1em] left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
@@ -413,7 +438,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 <div
                     className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
                     style={{
-                        left: nodeTooltip.x + 10,
+                        left: nodeTooltip.x + 50,
                         top: nodeTooltip.y + 10,
                         pointerEvents: 'none',
                     }}
@@ -445,8 +470,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <p className="text-sm"><b>To:</b> {edgeTooltip.content.targetName}</p>
                     <p className="text-sm"><b>Year:</b> {edgeTooltip.content.year}</p>
                     <p className="text-sm"><b>Volume:</b> {edgeTooltip.content.year_volume}</p>
-                    <p className="text-sm"><b>Type:</b> {edgeTooltip.content.water_type}</p>
-                    <p className="text-sm"><b>Purchase or Self:</b> {edgeTooltip.content.purchase_self}</p>
+                    <p className="text-sm"><b>Water Type:</b> {edgeTooltip.content.water_type}</p>
+                    <p className="text-sm"><b>Supply Method:</b> {edgeTooltip.content.purchase_self}</p>
                 </div>
             )}
 

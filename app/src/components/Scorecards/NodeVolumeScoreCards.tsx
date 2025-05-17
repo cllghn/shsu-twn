@@ -160,8 +160,23 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
         const volumeA = parseFloat(a.data.yearly_volume.replace(/,/g, '')) || 0;
         const volumeB = parseFloat(b.data.yearly_volume.replace(/,/g, '')) || 0;
         return volumeB - volumeA;
+      })
+      .map(edge => {
+        // Find the node whose id matches the target of this edge
+        const targetNode = nodes.find(node => node.data.id === edge.data.target);
+        const sourceNode = nodes.find(node => node.data.id === edge.data.source);
+        // If found, add unified_name to the edge row for display
+        return {
+          ...edge,
+          data: {
+            ...edge.data,
+            sourceUnifiedName: sourceNode?.data.unified_name || edge.data.source,
+            targetUnifiedName: targetNode?.data.unified_name || edge.data.target
+          }
+        };
       });
-  }, [edges, selected]);
+  }, [edges, nodes, selected]);
+  console.log('edgesWhereSelectedIsSource', edgesWhereSelectedIsSource);
 
   const edgesWhereSelectedIsTarget = useMemo(() => {
     return edges
@@ -170,6 +185,20 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
         const volumeA = parseFloat(a.data.yearly_volume.replace(/,/g, '')) || 0;
         const volumeB = parseFloat(b.data.yearly_volume.replace(/,/g, '')) || 0;
         return volumeB - volumeA;
+      })
+      .map(edge => {
+        // Find the node whose id matches the target of this edge
+        const targetNode = nodes.find(node => node.data.id === edge.data.target);
+        const sourceNode = nodes.find(node => node.data.id === edge.data.source);
+        // If found, add unified_name to the edge row for display
+        return {
+          ...edge,
+          data: {
+            ...edge.data,
+            sourceUnifiedName: sourceNode?.data.unified_name || edge.data.source,
+            targetUnifiedName: targetNode?.data.unified_name || edge.data.target
+          }
+        };
       });
   }, [edges, selected]);
 
@@ -264,7 +293,6 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
           </div>
         )}
       </div>
-      {/* {console.log(selectedNode.data)} */}
 
       {selectedNode.data.preliminary_type !== 'water source' && 
        edgesWhereSelectedIsTarget.length >= 1 && (
@@ -275,21 +303,21 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
             <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Source</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Target</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Sender</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Receiver</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
 
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Type</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Flow Type</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {edgesWhereSelectedIsTarget.map((row, index) => (
                   <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.source}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.target}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
@@ -312,21 +340,21 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
             <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Source</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Target</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Sender</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Receiver</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
 
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Type</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Flow Type</th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {edgesWhereSelectedIsSource.map((row, index) => (
                   <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.source}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.target}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>

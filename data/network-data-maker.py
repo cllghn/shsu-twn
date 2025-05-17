@@ -702,7 +702,7 @@ def _(el):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md("""Now take a quick look. It appears that we tot a couple intakes and a single sale, which roughly add up to the same value. """)
+    mo.md("""Now take a quick look. It appears that we tot a couple intakes and a single sale, which roughly add up to the same value.""")
     return
 
 
