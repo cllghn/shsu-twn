@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from "cytoscape";
-// import fcose from 'cytoscape-fcose';
+import fcose from 'cytoscape-fcose';
 import cola from 'cytoscape-cola';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
@@ -55,6 +55,7 @@ interface EdgeTooltipState {
 }
 
 cytoscape.use(cola);
+cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 
 // cytoscape.use(dagre);
@@ -75,6 +76,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     const cyRef = useRef<cytoscape.Core | null>(null); // Store Cytoscape instance
     const { nodes, edges } = data.elements;
+    const dynamicLayout = nodes.length < 20 ? "cola" : "fcose"; 
 
     // Calculate incoming and outgoing volumes for each node
     const nodeVolumes = useMemo(() => {
@@ -129,14 +131,23 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         })),
     ], [nodes, edges]); // Only recalculate when nodes or edges change
 
-    const layout = useMemo(() => ({
-        name: "cola",
+    // const layout = useMemo(() => ({
+    //     name: dynamicLayout,
+    //     fit: true,
+    //     animate: false,
+    //     padding: 20,
+    //     randomize: false, // Prevent randomizing positions on re-layout
+    //     nodeDimensionsIncludeLabels: false,
+    // }), []);
+    const layout = {
+        name: dynamicLayout,
         fit: true,
         animate: false,
         padding: 20,
         randomize: false, // Prevent randomizing positions on re-layout
         nodeDimensionsIncludeLabels: true,
-    }), []);
+    };
+
 
     const [showLabels, setShowLabels] = useState(true);
     const handleLabelToggle = () => {
