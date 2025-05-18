@@ -214,7 +214,7 @@ export default function Home() {
             ></div>
             <div className="bg-white bg-opacity-10 px-20 py-20 rounded-lg">
               <h2 className="pb-5 text-[#124559] text-2xl">Mapping Critical Water Systems <SchemaIcon /></h2>
-              <h3 className="pb-5 text-xl text-[#124559]">Where does the water come from—and where does it go? Take a look at these key visualizations.</h3>
+              <h3 className="pb-5 text-xl text-[#124559]">Where does the water come from—and where does it go? Take a look at these key visualizations to get started.</h3>
               <div className="container mx-auto items-start grid sm:grid-cols-2 sm:space-x-4">
                 <div className="flex flex-col items-start col-span-1">
                   <h4 className="pb-5 text-lg text-[#124559]">Water Sources</h4>
