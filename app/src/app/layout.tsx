@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer/Footer";
 import FadeMenu from "@/components/Menu/Menu";
-import 'shepherd.js/dist/css/shepherd.css';
+import BackToTop from "@/components/Buttons/BackToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +35,10 @@ export default function RootLayout({
         {/* {children} */}
         <main className="flex-grow">{children}</main>
         <Footer />
+        <BackToTop />
         <Analytics />
       </body>
-      
+
 
     </html>
   );

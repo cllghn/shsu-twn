@@ -9,29 +9,32 @@ import DynamicGraph from "@/components/Graph/DynamicGraph";
 import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import InsightsIcon from '@mui/icons-material/Insights';
+import ArticleIcon from '@mui/icons-material/Article';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
+
+import Glossary from "@/components/Glossary/Glossary";
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
     <div className="flex justify-center items-center p-8">
-      <p>Loading...</p>
+        <p>Loading...</p>
     </div>
-  );
-  
-  // Main component wrapped with Suspense
-  const SourcesPage: React.FC = () => {
+);
+
+// Main component wrapped with Suspense
+const SourcesPage: React.FC = () => {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <SourcesPageContent />
-      </Suspense>
+        <Suspense fallback={<LoadingFallback />}>
+            <SourcesPageContent />
+        </Suspense>
     );
-  };
+};
 
 const SourcesPageContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
     const nodeKeys = Object.keys(metadata.sources.kvs);
     const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
 
@@ -72,7 +75,7 @@ const SourcesPageContent: React.FC = () => {
     // Process URL parameters on component mount
     useEffect(() => {
         if (!searchParams) return;
-        
+
         const nodeParam = searchParams.get('node');
         if (nodeParam && menuItems.includes(nodeParam)) {
             setSelectedItem(nodeParam);
@@ -82,7 +85,7 @@ const SourcesPageContent: React.FC = () => {
                 setFilteredNode(nodeParam);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -222,27 +225,35 @@ const SourcesPageContent: React.FC = () => {
                                     >
                                         <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
                                         <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
+                                        <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
                                     </Tabs>
                                 </Box>
 
                                 <TabPanel value={activeTab} index={0}>
-                                    <DynamicGraph 
+                                    <DynamicGraph
                                         data={filteredData}
-                                        selected={toTitleCase(filteredNode)} 
+                                        selected={toTitleCase(filteredNode)}
                                     />
                                 </TabPanel>
 
 
                                 <TabPanel value={activeTab} index={1}>
                                     <div className="flex justify-between items-center">
-                                        <Typography variant="h6">{<div className="text-semibold"><span className="text-[#124559] border-b-2 border-dotted border-[#124559]">{toTitleCase(filteredNode)}</span> Water Flow Insights</div>}</Typography>
+                                        <Typography variant="h5">{<div className="text-semibold"><span className="text-[#124559] border-b-2 border-dotted border-[#124559]">{toTitleCase(filteredNode)}</span> Water Flow Insights</div>}</Typography>
                                     </div>
                                     <div className="flex pt-4 justify-center items-center">
-                                        <NodeVolumeScoreCards 
-                                        data={filteredData} 
-                                        selected={toTitleCase(filteredNode)}/>
+                                        <NodeVolumeScoreCards
+                                            data={filteredData}
+                                            selected={toTitleCase(filteredNode)} />
                                     </div>
 
+                                </TabPanel>
+
+                                <TabPanel value={activeTab} index={2}>
+                                    <div className="flex justify-between items-center">
+                                        <Typography variant="h5">{<div className="text-semibold">Glossary of Terms</div>}</Typography>
+                                    </div>
+                                    <Glossary />
                                 </TabPanel>
                             </Box>
                         ) : (

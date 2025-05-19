@@ -18,7 +18,7 @@ const Footer = () => {
                 <div>
                     <div className="flex justify-left mt-2">
                         <img
-                            src="/SH_orange.png"
+                            src="/SH_white.svg"
                             alt="SHSU Logo"
                             className="h-20"
                         />

@@ -9,8 +9,10 @@ import DynamicGraph from "@/components/Graph/DynamicGraph";
 import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import InsightsIcon from '@mui/icons-material/Insights';
+import ArticleIcon from '@mui/icons-material/Article';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
+import Glossary from "@/components/Glossary/Glossary";
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
@@ -252,6 +254,7 @@ const SystemsPageContent: React.FC = () => {
                                     >
                                         <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
                                         <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
+                                        <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
                                     </Tabs>
                                 </Box>
 
@@ -265,7 +268,6 @@ const SystemsPageContent: React.FC = () => {
                                         }
                                     />
                                 </TabPanel>
-
 
                                 <TabPanel value={activeTab} index={1}>
                                     <div className="flex justify-between items-center">
@@ -281,6 +283,13 @@ const SystemsPageContent: React.FC = () => {
                                             } />
                                     </div>
 
+                                </TabPanel>
+
+                                <TabPanel value={activeTab} index={2}>
+                                    <div className="flex justify-between items-center">
+                                        <Typography variant="h5">{<div className="text-semibold">Glossary of Terms</div>}</Typography>
+                                    </div>
+                                    <Glossary />
                                 </TabPanel>
                             </Box>
                         ) : (
