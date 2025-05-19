@@ -12,6 +12,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import ArticleIcon from '@mui/icons-material/Article';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from "next/link";
 
 import Glossary from "@/components/Glossary/Glossary";
 
@@ -149,44 +150,47 @@ const SourcesPageContent: React.FC = () => {
                     <Paper elevation={2} className="p-6">
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
                         <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
-                        <div className="flex items-center flex-wrap">
-                            <Typography variant="body1" className="mb-4">Begin by selecting a source by name.</Typography>
-                            <Button
-                                variant="text"
-                                onClick={handleClick}
-                                className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
-                                id="dropdown-button"
-                            >
-                                {selectedItem} <ChevronDown size={18} className="ml-1" />
-                            </Button>
-
-                            {/* Go Button */}
-                            <div className="flex justify-center pt-4 ml-10">
+                        <div className="flex flex-col flex-wrap">
+                            <Typography variant="body1" className="mb-4">Begin by selecting a source by name. If you don't know which water source to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus mt-3">list of resources.</Link></Typography>
+                            <div className="flex flex-row">
                                 <Button
-                                    variant="outlined"
-                                    onClick={handleGo}
-                                    disabled={selectedItem === "select a source"}
-                                    sx={{
-                                        color: '#ffffff',
-                                        backgroundColor: '#124559',
-                                        borderColor: '#ffffff',
-                                        borderRadius: '5px',
-                                        '&:hover': {
-                                            backgroundColor: '#ffffff',
-                                            borderColor: '#124559',
-                                            color: '#124559',
-                                        },
-                                        '&:disabled': {
-                                            backgroundColor: 'transparent',
-                                            borderColor: '#949494',
-                                            color: '#949494',
-                                            cursor: 'not-allowed',
-                                        },
-                                    }}
+                                    variant="text"
+                                    onClick={handleClick}
+                                    className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
+                                    id="dropdown-button"
                                 >
-                                    Go &rarr;
+                                    {selectedItem} <ChevronDown size={18} className="ml-1" />
                                 </Button>
+
+                                {/* Go Button */}
+                                <div className="flex justify-center pt-4 ml-10">
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleGo}
+                                        disabled={selectedItem === "select a source"}
+                                        sx={{
+                                            color: '#ffffff',
+                                            backgroundColor: '#124559',
+                                            borderColor: '#ffffff',
+                                            borderRadius: '5px',
+                                            '&:hover': {
+                                                backgroundColor: '#ffffff',
+                                                borderColor: '#124559',
+                                                color: '#124559',
+                                            },
+                                            '&:disabled': {
+                                                backgroundColor: 'transparent',
+                                                borderColor: '#949494',
+                                                color: '#949494',
+                                                cursor: 'not-allowed',
+                                            },
+                                        }}
+                                    >
+                                        Go &rarr;
+                                    </Button>
+                                </div>
                             </div>
+
                         </div>
 
 
