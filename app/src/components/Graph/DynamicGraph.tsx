@@ -56,6 +56,7 @@ interface EdgeTooltipState {
 
 cytoscape.use(cola);
 cytoscape.use(fcose);
+// cytoscape.use(dagre);
 cytoscape.use(cxtmenu);
 
 // cytoscape.use(dagre);
@@ -141,6 +142,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
     // }), []);
     const layout = {
         name: dynamicLayout,
+        // name: "dagre",
         fit: true,
         animate: false,
         padding: 20,
