@@ -97,7 +97,7 @@ export default function Home() {
                 <div>or</div>
                 <Button
                   variant="contained"
-                  onClick={goToSources}
+                  onClick={goToSystems}
                   sx={{
                     color: '#ffffff',
                     textTransform: 'uppercase',
