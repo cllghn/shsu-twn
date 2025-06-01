@@ -201,6 +201,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         const cy = cyRef.current;
 
         if (cy) {
+            
 
             cy.userZoomingEnabled(allowZoom);
             cy.style()

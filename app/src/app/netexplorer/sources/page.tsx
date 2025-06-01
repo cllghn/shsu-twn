@@ -13,6 +13,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from "next/link";
+import Feedback from "@/components/Buttons/FeedbackButton";
 
 import Glossary from "@/components/Glossary/Glossary";
 
@@ -146,6 +147,7 @@ const SourcesPageContent: React.FC = () => {
     return (
         <>
             <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
+                <Feedback />
                 <div>
                     <Paper elevation={2} className="p-6">
                         <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
