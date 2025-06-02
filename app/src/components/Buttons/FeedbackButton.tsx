@@ -44,7 +44,7 @@ const Feedback = () => {
                 subject: feedback.subject || 'Website Feedback',
                 message: feedback.message,
                 rating: feedback.rating || null,
-                to_email: 'twnetshsu@gmail.com'
+                to_email: 'twnetshsu@gmail.com; rll040@shsu.edu; cjcallaghan88@gmail.com'
             };
 
             await emailjs.send(
