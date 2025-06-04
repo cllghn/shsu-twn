@@ -44,7 +44,7 @@ export default function FadeMenu() {
 // bg-white bg-opacity-25 shadow-lg
     return (
         <div
-            className={`fixed top-0 w-full p-5 transition-colors duration-300 flex ${scrolled ? "bg-[#f4f4f4] shadow-lg" : "bg-[#f4f4f4] shadow-lg"
+            className={`fixed top-0 z-50 w-full p-5 transition-colors duration-300 flex ${scrolled ? "bg-[#f4f4f4] shadow-lg" : "bg-[#f4f4f4] shadow-lg"
                 }`}
         >
             <div onClick={() => router.push("/")} className="flex items-center cursor-pointer">

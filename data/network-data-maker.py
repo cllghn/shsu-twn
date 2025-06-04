@@ -863,7 +863,6 @@ def _(mo):
 @app.cell
 def _(el_noparallel, nx):
     G = nx.from_pandas_edgelist(el_noparallel, source='source', target='target', create_using=nx.DiGraph())
-
     return (G,)
 
 
