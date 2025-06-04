@@ -19,17 +19,17 @@ const Footer = () => {
                     <div className="flex justify-left mt-2">
                         <img
                             src="/Horizontal_member_white.png"
-                            alt="SHSU Logo"
+                            alt="Sam Houston State University Logo"
                             className="h-20"
                         />
                         <img
                             src="/IHSLogo_Icon.png"
-                            alt="IHS Logo"
+                            alt="Institute for Homeland Security Logo"
                             className="h-20"
                         />
                         <img
                             src="/twf_logo.png"
-                            alt="TWF Logo"
+                            alt="Texas Water Foundation Logo"
                             className="h-20"
                         />
                     </div>
