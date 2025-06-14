@@ -174,7 +174,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 // Center view on the node
                 cy.animate({
                     center: { eles: node },
-                    zoom: Math.max(cy.zoom(), 1.5)
+                    zoom: Math.max(cy.zoom(), 3)
                 }, {
                     duration: 500
                 });
@@ -527,7 +527,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title="Toggle Node Labels" arrow placement="top">
                 <button
                     onClick={handleLabelToggle}
-                    className="absolute top-[1em] left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[5em] left-3 sm:top-[1em] sm:left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id="toggle-labels-btn"
                 >
                     <TextFieldsIcon />
@@ -536,7 +536,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title="Take Screenshot" arrow placement="top">
                 <button
                     onClick={getScreenshot}
-                    className="absolute top-[1em] left-[13em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute hidden sm:block sm:top-[1em] sm:left-[13em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='screenshot-btn'
                 >
                     <CameraAltIcon />
@@ -751,7 +751,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             "border-color": "#ff6b6b",
                             "border-style": "solid",
                             "transition-property": "border-width, border-color",
-                            "transition-duration": "0.5s",
+                            "transition-duration": "4s",
                             "transition-timing-function": "ease-in-out"
                         }
                     }

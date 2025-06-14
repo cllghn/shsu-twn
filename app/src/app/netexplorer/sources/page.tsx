@@ -3,7 +3,19 @@ import { useState, useCallback, useEffect, Suspense } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
-import { Menu, MenuItem, Button, Paper, Typography, Tabs, Tab, Box } from "@mui/material";
+import { 
+    Button, 
+    Paper, 
+    Typography, 
+    Tabs, 
+    Tab, 
+    Box,
+    Autocomplete,
+    TextField,
+    InputAdornment,
+    IconButton,
+    Alert
+} from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import DynamicGraph from "@/components/Graph/DynamicGraph";
 import InfoIcon from '@mui/icons-material/Info';
