@@ -5,17 +5,25 @@ import fcose from 'cytoscape-fcose';
 import cola from 'cytoscape-cola';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
-import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
 import SearchOffIcon from '@mui/icons-material/SearchOff';;
-import { Box } from '@mui/material';
-import { symlink } from 'fs';
 import cxtmenu from "cytoscape-cxtmenu";
 import { useSearchParams, useRouter } from 'next/navigation';
+
+// Search ingredients for the graph
+import {
+    TextField,
+    Autocomplete,
+    Paper,
+    Typography,
+    Chip,
+    InputAdornment,
+    IconButton
+} from '@mui/material';
 
 // Define the types for the props
 interface DynamicGraphProps {
@@ -56,10 +64,8 @@ interface EdgeTooltipState {
 
 cytoscape.use(cola);
 cytoscape.use(fcose);
-// cytoscape.use(dagre);
 cytoscape.use(cxtmenu);
 
-// cytoscape.use(dagre);
 
 // Function to determine color based on preliminary_type
 const getNodeColor = (type: string) => {
@@ -77,7 +83,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     const cyRef = useRef<cytoscape.Core | null>(null); // Store Cytoscape instance
     const { nodes, edges } = data.elements;
-    const dynamicLayout = nodes.length < 20 ? "cola" : "fcose"; 
+    const dynamicLayout = nodes.length < 20 ? "cola" : "fcose";
 
     // Calculate incoming and outgoing volumes for each node
     const nodeVolumes = useMemo(() => {
@@ -96,12 +102,10 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             const sourceId = edge.data.source;
             const targetId = edge.data.target;
             const volume = parseFloat(edge.data.yearly_volume.replace(/,/g, '')) || 0;
-
             // Add to outgoing volume for source node
             if (volumeData[sourceId]) {
                 volumeData[sourceId].outgoingVolume += volume;
             }
-
             // Add to incoming volume for target node
             if (volumeData[targetId]) {
                 volumeData[targetId].incomingVolume += volume;
@@ -110,6 +114,18 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
         return volumeData;
     }, [nodes, edges]);
+
+    // Search term and selected node state -------------------------------------
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedSearchNode, setSelectedSearchNode] = useState(null);
+    const searchOptions = useMemo(() => {
+        return nodes.map(node => ({
+            id: node.data.id,
+            label: node.data.unified_name,
+            type: node.data.preliminary_type,
+            volume: (nodeVolumes[node.data.id]?.incomingVolume || 0) + (nodeVolumes[node.data.id]?.outgoingVolume || 0)
+        }));
+    }, [nodes, nodeVolumes]);
 
     const formattedElements = useMemo(() => [
         ...nodes.map((node) => ({
@@ -132,23 +148,39 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         })),
     ], [nodes, edges]); // Only recalculate when nodes or edges change
 
-    // const layout = useMemo(() => ({
-    //     name: dynamicLayout,
-    //     fit: true,
-    //     animate: false,
-    //     padding: 20,
-    //     randomize: false, // Prevent randomizing positions on re-layout
-    //     nodeDimensionsIncludeLabels: false,
-    // }), []);
     const layout = {
         name: dynamicLayout,
-        // name: "dagre",
         fit: true,
         animate: false,
         padding: 20,
         randomize: false, // Prevent randomizing positions on re-layout
         nodeDimensionsIncludeLabels: true,
     };
+
+    // Search logic useEffect---------------------------------------------------
+    useEffect(() => {
+        const cy = cyRef.current;
+        if (!cy) return;
+
+        if (selectedSearchNode) {
+            const node = cy.getElementById(selectedSearchNode.id);
+            if (node.length > 0) {
+
+                node.addClass('search-highlighted');
+                setTimeout(() => {
+                    node.removeClass('search-highlighted');
+                }, 1000); // Remove after 1 second
+
+                // Center view on the node
+                cy.animate({
+                    center: { eles: node },
+                    zoom: Math.max(cy.zoom(), 1.5)
+                }, {
+                    duration: 500
+                });
+            }
+        }
+    }, [selectedSearchNode]); //------------------------------------------------
 
 
     const [showLabels, setShowLabels] = useState(true);
@@ -191,9 +223,16 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     const [allowZoom, setAllowZoom] = useState(false);
     const handleAllowZoom = () => {
-        setAllowZoom((prev) => !prev);
+        const newZoomState = !allowZoom;
+        setAllowZoom(newZoomState);
         if (cyRef.current) {
-            cyRef.current.userZoomingEnabled(!allowZoom);
+            cyRef.current.userZoomingEnabled(newZoomState);
+
+            // Set zoom limits when enabling zoom
+            if (newZoomState) {
+                cyRef.current.minZoom(0.5);
+                cyRef.current.maxZoom(5);
+            }
         }
     };
 
@@ -201,7 +240,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         const cy = cyRef.current;
 
         if (cy) {
-            
 
             cy.userZoomingEnabled(allowZoom);
             cy.style()
@@ -216,16 +254,49 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             };
 
             // Add event listeners for tooltips
+            const calculateNodeTooltipPosition = (renderedX, renderedY, tooltipWidth = 300, tooltipHeight = 200) => {
+                const cy = cyRef.current;
+                if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
+
+                // Get container dimensions
+                const extent = cy.extent();
+                const containerWidth = cy.width();
+                const containerHeight = cy.height();
+                const padding = 10;
+
+                let x = renderedX + 50;
+                let y = renderedY + 10;
+
+                // Check if tooltip would overflow container
+                if (x + tooltipWidth > containerWidth - padding) {
+                    x = renderedX - tooltipWidth - padding;
+                }
+
+                if (y + tooltipHeight > containerHeight - padding) {
+                    y = renderedY - tooltipHeight - padding;
+                }
+
+                if (x < padding) {
+                    x = padding;
+                }
+
+                if (y < padding) {
+                    y = padding;
+                }
+
+                return { x, y };
+            };
             cy.on('mouseover', 'node', (event) => {
                 resetStyles();
                 const node = event.target;
                 const neighborhood = node.neighborhood().add(node);
-                
+
                 neighborhood.addClass('highlighted');
                 cy.elements().difference(neighborhood).addClass('faded');
 
                 const position = event.renderedPosition || event.position;
-                
+                const tooltipPos = calculateNodeTooltipPosition(position.x, position.y);
+
                 // Hide edge tooltip if it's showing
                 setEdgeTooltip(prev => ({ ...prev, show: false }));
 
@@ -236,8 +307,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 // Get node data for the tooltip
                 setNodeTooltip({
                     show: true,
-                    x: position.x,
-                    y: position.y,
+                    x: tooltipPos.x,
+                    y: tooltipPos.y,
                     content: {
                         id: node.data('id'),
                         name: node.data('unified_name'),
@@ -256,18 +327,52 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 // Remove highlight class from all nodes
             });
 
+            const calculateEdgeTooltipPosition = (renderedX, renderedY, tooltipWidth = 300, tooltipHeight = 200) => {
+                const cy = cyRef.current;
+                if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
+
+                // Get container dimensions
+                const extent = cy.extent();
+                const containerWidth = cy.width();
+                const containerHeight = cy.height();
+                const padding = 10;
+
+                let x = renderedX;
+                let y = renderedY + 10;
+
+                // Check if tooltip would overflow container
+                if (x + tooltipWidth > containerWidth - padding) {
+                    x = renderedX - tooltipWidth - padding;
+                }
+
+                if (y + tooltipHeight > containerHeight - padding) {
+                    y = renderedY - tooltipHeight - padding;
+                }
+
+                if (x < padding) {
+                    x = padding;
+                }
+
+                if (y < padding) {
+                    y = padding;
+                }
+
+                return { x, y };
+            };
             cy.on('mouseover', 'edge', (event) => {
                 resetStyles();
                 const edge = event.target;
                 const connectedNodes = edge.connectedNodes();
-                const elements = edge.add(connectedNodes); 
+                const elements = edge.add(connectedNodes);
                 elements.addClass('highlighted');
                 cy.elements().difference(elements).addClass('faded');
-                
+
                 const position = event.renderedPosition || {
                     x: (event.position || { x: 0 }).x,
                     y: (event.position || { y: 0 }).y
                 };
+
+                const tooltipPos = calculateEdgeTooltipPosition(position.x, position.y, 250, 150);
 
                 // Hide node tooltip if it's showing
                 setNodeTooltip(prev => ({ ...prev, show: false }));
@@ -280,8 +385,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
                 setEdgeTooltip({
                     show: true,
-                    x: position.x,
-                    y: position.y,
+                    x: tooltipPos.x,
+                    y: tooltipPos.y,
                     content: {
                         id: edge.data('id'),
                         source: sourceId,
@@ -312,7 +417,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 resetStyles();
             });
 
-            cy.on('click', function(event) {
+            cy.on('click', function (event) {
                 if (event.target === cy) {
                     resetStyles();
                 }
@@ -336,7 +441,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     }
                 ],
 
-                
+
             });
 
             // Clean up event listeners on unmount
@@ -368,7 +473,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     return (
         <div className='min-h-screen relative'>
-            <Box className="hidden sm:block absolute top-[1em] right-3 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
+            <Paper className="hidden sm:block absolute top-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
@@ -384,33 +489,24 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 <span className="text-sm">
                     <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /> Selected Node
                 </span>
-            </Box>
-            <Box className="block sm:hidden absolute bottom-[1em] right-3 bg-[#124559] bg-opacity-20 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
+            </Paper>
+            <Paper className="block sm:hidden absolute bottom-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
                 <div className="flex flex-row items-center gap-4 text-sm">
                     <span className="text-sm text-center">
-                        <ArrowBackIcon sx={{ fontSize: 'small' }} /><br/> Water Flow
+                        <ArrowBackIcon sx={{ fontSize: 'small' }} /><br /> Water Flow
                     </span>
                     <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br/> Water Source
+                        <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br /> Water Source
                     </span>
                     <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', fill: "" }} /><br/> Water System
+                        <CircleIcon sx={{ fontSize: 'small', fill: "" }} /><br /> Water System
                     </span>
                     <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /><br/> Selected Node
+                        <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /><br /> Selected Node
                     </span>
                 </div>
-            </Box>
-            {/* <Tooltip title="Learn More!" arrow placement="left">
-                <button
-                    onClick={() => window.alert("This is work in progress, the tutorial will go here.")}
-                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='fit-screen-btn'
-                >
-                    <HelpCenterIcon />
-                </button>
-            </Tooltip> */}
-            <Tooltip title="Fit to Screen" arrow placement="right">
+            </Paper>
+            <Tooltip title="Fit to Screen" arrow placement="top">
                 <button
                     onClick={handleZoomToFit}
                     className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
@@ -419,7 +515,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <CenterFocusWeakIcon />
                 </button>
             </Tooltip>
-            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="right">
+            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
                 <button
                     onClick={handleAllowZoom}
                     className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
@@ -428,32 +524,135 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
                 </button>
             </Tooltip>
-            <Tooltip title="Toggle Node Labels" arrow placement="left">
+            <Tooltip title="Toggle Node Labels" arrow placement="top">
                 <button
                     onClick={handleLabelToggle}
-                    className="absolute top-[5em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id="toggle-labels-btn"
                 >
                     <TextFieldsIcon />
                 </button>
             </Tooltip>
-            <Tooltip title="Take Screenshot" arrow placement="left">
+            <Tooltip title="Take Screenshot" arrow placement="top">
                 <button
                     onClick={getScreenshot}
-                    className="absolute top-[9em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[13em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='screenshot-btn'
                 >
                     <CameraAltIcon />
                 </button>
             </Tooltip>
 
+            <Paper
+                className="hidden sm:block absolute top-[5em] left-3 z-10 shadow-lg"
+                sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid #12455 9'
+                }}
+            >
+                <Autocomplete
+                    id="node-search"
+                    options={searchOptions}
+                    getOptionLabel={(option) => option.label}
+                    style={{ width: 240 }}
+                    value={selectedSearchNode}
+                    onChange={(event, newValue) => {
+                        setSelectedSearchNode(newValue);
+                    }}
+                    inputValue={searchTerm}
+                    onInputChange={(event, newInputValue) => {
+                        setSearchTerm(newInputValue);
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            placeholder="Search nodes..."
+                            variant="outlined"
+                            size="small"
+                            slotProp={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon sx={{ color: '#124559' }} />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <>
+                                        {selectedSearchNode && (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setSelectedSearchNode(null);
+                                                        setSearchTerm('');
+                                                    }}
+                                                >
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )}
+                                        {params.InputProps.endAdornment}
+                                    </>
+                                ),
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#124559',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#124559',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#124559',
+                                    },
+                                },
+                            }}
+                        />
+                    )}
+                    renderOption={(props, option) => (
+                        <li {...props}>
+                            <div className="flex flex-col w-full">
+                                <div className="flex items-center justify-between">
+                                    <Typography variant="body2" className="font-medium">
+                                        {option.label}
+                                    </Typography>
+                                    <Chip
+                                        label={option.type}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: getNodeColor(option.type),
+                                            color: 'white',
+                                            fontSize: '0.7rem'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </li>
+                    )}
+                    filterOptions={(options, { inputValue }) => {
+                        // Custom filter for better search experience
+                        const filtered = options.filter(option =>
+                            option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+                            option.type.toLowerCase().includes(inputValue.toLowerCase())
+                        );
+                        return filtered.slice(0, 10); // Limit results
+                    }}
+                    noOptionsText="No nodes found"
+                    clearOnBlur={false}
+                    clearOnEscape
+                    autoComplete
+                />
+            </Paper>
+
+
             {/* Custom node tooltip */}
             {nodeTooltip.show && (
                 <div
                     className="absolute z-20 bg-white text-black p-3 rounded shadow-lg border border-[#124559]"
                     style={{
-                        left: nodeTooltip.x + 50,
-                        top: nodeTooltip.y + 10,
+                        left: nodeTooltip.x,
+                        top: nodeTooltip.y,
                         pointerEvents: 'none',
                     }}
                 >
@@ -493,7 +692,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 key={JSON.stringify(data)} // Forces a full re-render when data changes
                 elements={formattedElements} // Pass the formatted elements directly
                 id="cy-graph"
-                style={{ width: "100%", height: "100vh", zIndex:1}} // Define size for the graph
+                style={{ width: "100%", height: "100vh", zIndex: 1 }} // Define size for the graph
                 layout={layout} // Apply the layout configuration
                 cy={(cy) => (cyRef.current = cy)} // Store Cytoscape instance
                 stylesheet={[
@@ -543,6 +742,17 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         selector: ".faded",
                         style: {
                             "opacity": 0.2
+                        }
+                    },
+                    {
+                        selector: "node.search-highlighted",
+                        style: {
+                            "border-width": 2,
+                            "border-color": "#ff6b6b",
+                            "border-style": "solid",
+                            "transition-property": "border-width, border-color",
+                            "transition-duration": "0.5s",
+                            "transition-timing-function": "ease-in-out"
                         }
                     }
                 ]}
