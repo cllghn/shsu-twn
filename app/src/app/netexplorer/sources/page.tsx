@@ -243,7 +243,7 @@ const SourcesPageContent: React.FC = () => {
 
                                 <TabPanel value={activeTab} index={1}>
                                     <div className="flex justify-between items-center">
-                                        <Typography variant="h5">{<div className="text-semibold"><span className="text-[#124559] border-b-2 border-dotted border-[#124559]">{toTitleCase(filteredNode)}</span> Water Flow Insights</div>}</Typography>
+                                        <Typography variant="h5">{<div className="text-semibold">{toTitleCase(filteredNode)} Water Flow Insights</div>}</Typography>
                                     </div>
                                     <div className="flex pt-4 justify-center items-center">
                                         <NodeVolumeScoreCards

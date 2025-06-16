@@ -19,7 +19,7 @@
     },
     {
       "id": "MJUe",
-      "code_hash": "6a372873de026541faec24af8a548d1a",
+      "code_hash": "17be3e6505eb7d996bbc827e58692abd",
       "outputs": [
         {
           "type": "data",
@@ -63,7 +63,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='2774229b-053f-7682-cac6-4a558a76545c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/3781-53620-OoLdYlfK.csv&quot;' data-total-rows='10' data-total-columns='30' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Purchased / Self-Supplied&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;County Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Basin Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source Basin&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Aquifer Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Surface Water Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Seller Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Active Wells&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Brackish / Saline&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Percent Treated Prior to Intake&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; January &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; February &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; March &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; April &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; May &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; June &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; July &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; August &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; September &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; October &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; November &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; December &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Intake (Gallons) &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='93da9f93-f403-0409-53cf-8c5a1aed6c83'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/3781-113080-BihLtLIE.csv&quot;' data-total-rows='10' data-total-columns='30' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Purchased / Self-Supplied&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;County Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Basin Used&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Source Basin&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Aquifer Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Surface Water Source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Seller Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Active Wells&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Brackish / Saline&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Percent Treated Prior to Intake&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; January &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; February &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; March &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; April &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; May &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; June &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; July &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; August &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; September &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; October &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; November &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; December &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Intake (Gallons) &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -89,7 +89,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='4402e1ba-b1e7-4ac7-b9cb-6dabd6c844d9'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/372-43096-57CkIEVa.csv&quot;' data-total-rows='1' data-total-columns='13' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Seller Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Seller Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Buyer Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Buyer Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer NAICS Code&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; Volume Used In Net Use &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Volume Source Used In Net Use&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='1acfc6ca-4ad2-5c97-393c-45b156b66afe'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/372-113080-AfrLypKx.csv&quot;' data-total-rows='1' data-total-columns='13' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Seller Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller County&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Seller Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Seller Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;Buyer Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer Water Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Buyer Volume Reported &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Buyer NAICS Code&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot; Volume Used In Net Use &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Volume Source Used In Net Use&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -115,7 +115,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='7bf03356-8fb4-c0fd-fafd-8f8ca007e163'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/583-53620-xWoQfkzq.csv&quot;' data-total-rows='1' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='ff19176e-0a20-40ee-7ec7-fb419e6781a4'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/583-113080-aQNmGJRR.csv&quot;' data-total-rows='1' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TWDB Survey No&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -141,7 +141,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Kclp-0' random-id='3ed57165-9204-911a-c01a-c4163cd76787'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/188-53620-c1cX99ry.csv&quot;' data-total-rows='1' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;TWDB Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='Kclp-0' random-id='326686bb-11e5-748e-d577-9ee61635f41b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/188-113080-GayYpvGP.csv&quot;' data-total-rows='1' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;TWDB Survey Number&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS Name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -180,7 +180,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='eceda69b-6b6a-e668-3e0a-498ff98eeedb'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-53620-YLO8Flxg.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='9d40217f-0236-9fbd-8676-a3df767ab85f'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-113080-OP68cPml.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -188,7 +188,7 @@
         {
           "type": "stream",
           "name": "stderr",
-          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_30052\\__marimo__cell_nWHF_.py:72: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '20' ... '1106713' '1106715' '1106716']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  intake.loc[:, 'target'] = intake['target'].astype(str)\n"
+          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_114220\\__marimo__cell_nWHF_.py:72: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '20' ... '1106713' '1106715' '1106716']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  intake.loc[:, 'target'] = intake['target'].astype(str)\n"
         }
       ]
     },
@@ -212,7 +212,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='ZHCJ-0' random-id='a9cd98ae-2bcc-2c4b-20ba-15776fcd3d52'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/967-53620-4o10KHFy.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='ZHCJ-0' random-id='4a109bc1-a26f-8fa9-48e3-8d5827444dfa'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/967-113080-qEOFSOmp.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -220,7 +220,7 @@
         {
           "type": "stream",
           "name": "stderr",
-          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_30052\\__marimo__cell_ZHCJ_.py:47: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '10' ... '1106307' '1106308' '1106706']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'source'] = sales['source'].astype(str)\nC:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_30052\\__marimo__cell_ZHCJ_.py:48: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['17600' '36100' '99200' ... '1103980' '1104519' '1106700']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'target'] = sales['target'].astype(str)\n"
+          "text": "C:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_114220\\__marimo__cell_ZHCJ_.py:47: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['10' '10' '10' ... '1106307' '1106308' '1106706']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'source'] = sales['source'].astype(str)\nC:\\Users\\CCallaghan\\AppData\\Local\\Temp\\marimo_114220\\__marimo__cell_ZHCJ_.py:48: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '['17600' '36100' '99200' ... '1103980' '1104519' '1106700']' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.\n  sales.loc[:, 'target'] = sales['target'].astype(str)\n"
         }
       ]
     },
@@ -244,7 +244,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='qnkX-0' random-id='791373ff-02ea-2a1b-c104-e3f07f004853'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-53620-JHxUXu6a.csv&quot;' data-total-rows='100' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='qnkX-0' random-id='03615c80-af62-ff03-150a-9529ebaa9c5c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-113080-ocdBfSb3.csv&quot;' data-total-rows='100' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -270,7 +270,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Vxnm-0' random-id='49f6ba82-b6ad-8e6d-2c7e-b5135097cd5e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/371-53620-3UwDVFZu.csv&quot;' data-total-rows='10' data-total-columns='2' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='Vxnm-0' random-id='d58d8786-5db2-54fc-f084-035005070287'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/371-113080-zGgDzvmq.csv&quot;' data-total-rows='10' data-total-columns='2' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -296,7 +296,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='ulZA-0' random-id='b4eea22b-698f-102d-838e-4bcf279c76f1'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1060-53620-vLKB1YcA.csv&quot;' data-total-rows='5' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;retail_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='ulZA-0' random-id='45c3c228-55c4-b75a-083c-44133c5d62cd'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1060-113080-A2CUVHou.csv&quot;' data-total-rows='5' data-total-columns='21' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;retail_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -322,7 +322,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Pvdt-0' random-id='c4cb441d-2b94-94f6-a22d-3df53ec9dc6b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/439-53620-gZwCtBgi.csv&quot;' data-total-rows='5' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;sur_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='Pvdt-0' random-id='396a148d-dedd-1b3b-36d0-175424632b7b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/439-113080-lGeUj7Iq.csv&quot;' data-total-rows='5' data-total-columns='6' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;sur_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -361,7 +361,7 @@
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='nHfw-0' random-id='c75f9f72-e28b-e379-ac1c-eada84b48c6f'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1376-53620-dgW43e1H.csv&quot;' data-total-rows='6696' data-total-columns='26' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;unified_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Year&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='nHfw-0' random-id='aa673c7f-5323-7cc5-87fc-d06bbe6570b5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1376-113080-c20eicSU.csv&quot;' data-total-rows='6696' data-total-columns='26' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;unified_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Year&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -369,12 +369,12 @@
     },
     {
       "id": "xXTn",
-      "code_hash": "eeb8f1429337f34df0c8626fc3b8fd9a",
+      "code_hash": "fcf79dfad39f4c3d5a90656a6312e5db",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"exporting-data\">Exporting Data</h2>\n<span class=\"paragraph\">First, let write the data out as a comma-separated value (CSV) file to allow Gephi users to work with them.</span></span>"
+            "text/html": "<marimo-ui-element object-id='xXTn-0' random-id='f178e8ae-52c1-1d78-0b30-13572b7c06c1'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/675-113080-7g6hC0x8.csv&quot;' data-total-rows='1' data-total-columns='26' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;unified_name&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;preliminary_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Year&quot;, [&quot;number&quot;, &quot;float64&quot;]], [&quot;TWDB Estimated?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Population Served &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Single Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Multi-Family Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Commercial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Industrial Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Institutional Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Volumes &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Agricultural Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Volume &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot; Total Un-metered Connections &quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;TCEQ PWS Code&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Wholesale System?&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;Water Use Survey Form Type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;PWS System Class&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -382,7 +382,20 @@
     },
     {
       "id": "AjVT",
-      "code_hash": "aab69fb8e6988cb4fe9b79644071d935",
+      "code_hash": "88ff43d9834bdb4afd6035e656da08e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">In May 2025, the TWDB partner asked us to prioritize the intake purchases over the sales when we have parallel edges. Let's take a quick stab at doing that. First, figure out how many repeats we got:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "16d9f88d084ccc0ac46808f492be6d48",
       "outputs": [
         {
           "type": "data",
@@ -394,21 +407,8 @@
       "console": []
     },
     {
-      "id": "pHFh",
-      "code_hash": "e5ae811000faf15bcc09b506c695b9fc",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"from-tables-to-json\">From Tables to JSON</h2>\n<span class=\"paragraph\">The front-end application requires data in as a nested JSON. This is the required JSON format:\n<div class=\"codehilite\"><pre><span></span><code> elements: {\n    nodes: [\n      {\n        data: { id: &#39;a&#39; }\n      },\n\n      {\n        data: { id: &#39;b&#39; }\n      }\n    ],\n    edges: [\n      {\n        data: { id: &#39;ab&#39;, source: &#39;a&#39;, target: &#39;b&#39; }\n      }\n    ]\n  },\n</code></pre></div></span>\n<span class=\"paragraph\">In this section, we transform the data accordingly.</span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
       "id": "NCOB",
-      "code_hash": "85bc61cf8007fa982e88c9fde45113cf",
+      "code_hash": "ae3c3becf7b5d356c003c80af6f53f47",
       "outputs": [
         {
           "type": "data",
@@ -421,12 +421,12 @@
     },
     {
       "id": "aqbW",
-      "code_hash": "99a9b60eddda9b96b14ec28a85d212c4",
+      "code_hash": "60477501cde55982c7d3d37872a82869",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">To export the graph data, we have to shape it into a dictionary. Then, store it as a JSON. The code below tranforms our node and edge list into a single dictionary that Cytoscape.js can understand.</span></span>"
+            "text/html": "<marimo-ui-element object-id='aqbW-0' random-id='6f8a3ac9-cde2-ed21-4d90-b03d473ab9ca'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/392-113080-3BnKa9o8.csv&quot;' data-total-rows='3' data-total-columns='10' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;pedge_count&quot;, [&quot;integer&quot;, &quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -434,7 +434,7 @@
     },
     {
       "id": "TRpd",
-      "code_hash": "ee98981ccc416f6e2c24a79be9e2b9de",
+      "code_hash": "291d1275fce857b51d18ca4bc153d560",
       "outputs": [
         {
           "type": "data",
@@ -447,12 +447,12 @@
     },
     {
       "id": "TXez",
-      "code_hash": "60ac9344fcbd214404e52c079a6514b2",
+      "code_hash": "f9d83c531acf7b7fde63e480fd2b7abe",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<span class=\"markdown prose dark:prose-invert\"><span class=\"paragraph\">Write it out in the app directory:</span></span>"
+            "text/html": "<marimo-ui-element object-id='TXez-0' random-id='cba40c4f-471f-684b-9602-9eaa8624f73a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/306-113080-yBjQyIOE.csv&quot;' data-total-rows='2' data-total-columns='10' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;pedge_count&quot;, [&quot;integer&quot;, &quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -460,7 +460,7 @@
     },
     {
       "id": "dNNg",
-      "code_hash": "521ac5e0d3595c3f081e700ecc807fc4",
+      "code_hash": "6906915b49a78083f313acdf03c42760",
       "outputs": [
         {
           "type": "data",
@@ -473,12 +473,12 @@
     },
     {
       "id": "yCnT",
-      "code_hash": "889f5eda74236fea68b04529a33fc567",
+      "code_hash": "af3725aa7d4b8754ed9395ccf10948d3",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<span class=\"markdown prose dark:prose-invert\"><h2 id=\"parking-lot\">Parking Lot</h2></span>"
+            "text/html": "<marimo-ui-element object-id='yCnT-0' random-id='ac2d235a-b090-464e-f92f-4fcf87f6de00'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;./@file/1267-113080-0OP41QQu.csv&quot;' data-total-rows='10' data-total-columns='9' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;source&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;target&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;id&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;yearly_volume&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;year&quot;, [&quot;integer&quot;, &quot;int64&quot;]], [&quot;water_type&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;purchased_self&quot;, [&quot;string&quot;, &quot;object&quot;]], [&quot;source_file&quot;, [&quot;string&quot;, &quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-row-headers='[&quot;&quot;]' data-has-stable-row-id='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -486,7 +486,7 @@
     },
     {
       "id": "wlCL",
-      "code_hash": "abc8388b5f5d0f3d7a8eb3e69a178b8d",
+      "code_hash": "eeb8f1429337f34df0c8626fc3b8fd9a",
       "outputs": [
         {
           "type": "data",
@@ -499,73 +499,80 @@
     },
     {
       "id": "kqZH",
-      "code_hash": null,
-      "outputs": [],
+      "code_hash": "4f4baf580a4a6a7c04741c31843615e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
       "console": []
     },
     {
       "id": "wAgl",
-      "code_hash": null,
+      "code_hash": "e5ae811000faf15bcc09b506c695b9fc",
       "outputs": [],
       "console": []
     },
     {
       "id": "rEll",
-      "code_hash": null,
+      "code_hash": "85bc61cf8007fa982e88c9fde45113cf",
       "outputs": [],
       "console": []
     },
     {
       "id": "dGlV",
-      "code_hash": null,
+      "code_hash": "99a9b60eddda9b96b14ec28a85d212c4",
       "outputs": [],
       "console": []
     },
     {
       "id": "SdmI",
-      "code_hash": null,
+      "code_hash": "dbc5bdd7204f3cd5f07d73e4ff3aad3c",
       "outputs": [],
       "console": []
     },
     {
       "id": "lgWD",
-      "code_hash": null,
+      "code_hash": "60ac9344fcbd214404e52c079a6514b2",
       "outputs": [],
       "console": []
     },
     {
       "id": "yOPj",
-      "code_hash": null,
+      "code_hash": "521ac5e0d3595c3f081e700ecc807fc4",
       "outputs": [],
       "console": []
     },
     {
       "id": "fwwy",
-      "code_hash": null,
+      "code_hash": "9a77b2d7544845e8d48e6353c798cdfa",
       "outputs": [],
       "console": []
     },
     {
       "id": "LJZf",
-      "code_hash": null,
+      "code_hash": "889f5eda74236fea68b04529a33fc567",
       "outputs": [],
       "console": []
     },
     {
       "id": "urSm",
-      "code_hash": null,
+      "code_hash": "5ab9abbf6ebb5847c420fabcc383fcd1",
       "outputs": [],
       "console": []
     },
     {
       "id": "jxvo",
-      "code_hash": null,
+      "code_hash": "8614504eabee4badff1886e3076bc78b",
       "outputs": [],
       "console": []
     },
     {
       "id": "mWxS",
-      "code_hash": null,
+      "code_hash": "1d8583ae5f09639f09f50ee0fcc7ae23",
       "outputs": [],
       "console": []
     },
@@ -584,7 +591,7 @@
     },
     {
       "id": "CcZR",
-      "code_hash": null,
+      "code_hash": "bacb84c6c24387de4326560637a24f5c",
       "outputs": [],
       "console": []
     },
@@ -638,7 +645,7 @@
     },
     {
       "id": "GqGz",
-      "code_hash": "65c10911d8b8591219a21ebacf46da01",
+      "code_hash": null,
       "outputs": [
         {
           "type": "data",
