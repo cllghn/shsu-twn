@@ -201,3 +201,7 @@ data/outputs/*
 data/__marimo__/
 __marimo__/
 
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
