@@ -1,12 +1,14 @@
 import marimo
 
-__generated_with = "0.11.8"
+__generated_with = "0.17.7"
 app = marimo.App(width="medium")
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# Generating Network Data from Texas Water Use Survey""")
+    mo.md(r"""
+    # Generating Network Data from Texas Water Use Survey
+    """)
     return
 
 
@@ -22,47 +24,44 @@ def _():
     import re
     from datetime import datetime
     import networkx as nx
-    return List, Optional, datetime, json, mo, np, nx, os, pd, plt, re
+    import geopandas as gpd
+    return List, Optional, datetime, gpd, json, mo, np, nx, os, pd
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        """
-        ## Background
+    mo.md("""
+    ## Background
 
-        The purpose of this document is to extract the required data to generate a sociogram, or social network graph, of nodes involved in the Texas water system. The data was provided by Texas Water Development Board and it comes from the annual Water Use Survey. The inital data release included four datasets:
+    The purpose of this document is to extract the required data to generate a sociogram, or social network graph, of nodes involved in the Texas water system. The data was provided by Texas Water Development Board and it comes from the annual Water Use Survey. The inital data release included four datasets:
 
-         1. PWS Intake: Water intake (self-supplied & purchased) by water source for all Public Water Systems, 2022-2023. Includes USE County, Basin and SOURCE County, Basin. Does not include any water sales. All units are in gallons.
-         2. PWS Sales: Water sales (wholesale to other PWS or industrial systems) reported by the seller and buyer. It is important to note that the volumes reported may not be the same between the seller and buyer- meter issues, leaks, etc. may cause inconsistent readings. Additionally, some sellers may not report a water sale to a PWS or vise-versa. All units are in gallons.
-        3. PWS Retail: Retail water connections and volumes by category (Single Family, Multi-Family, Instititutional, Industrial, Commercial, Agricultural). Includes population served (reported in the Water Use Survey), total metered, and total un-metered. All units are in gallons.
-        4. PWS-SurveyNo: Bridge table for TWDB Survey Numbers and TCEQ PWS Codes that includes PWS Name, whether system is a Wholesale system (Y / N), Water Use Survey Form Type, and PWS System Class.
+    1. PWS Intake: Water intake (self-supplied & purchased) by water source for all Public Water Systems, 2022-2023. Includes USE County, Basin and SOURCE County, Basin. Does not include any water sales. All units are in gallons.
+    2. PWS Sales: Water sales (wholesale to other PWS or industrial systems) reported by the seller and buyer. It is important to note that the volumes reported may not be the same between the seller and buyer- meter issues, leaks, etc. may cause inconsistent readings. Additionally, some sellers may not report a water sale to a PWS or vise-versa. All units are in gallons.
+    3. PWS Retail: Retail water connections and volumes by category (Single Family, Multi-Family, Instititutional, Industrial, Commercial, Agricultural). Includes population served (reported in the Water Use Survey), total metered, and total un-metered. All units are in gallons.
+    4. PWS-SurveyNo: Bridge table for TWDB Survey Numbers and TCEQ PWS Codes that includes PWS Name, whether system is a Wholesale system (Y / N), Water Use Survey Form Type, and PWS System Class.
 
-        From these datasets, we will derive the data required to generate the analytic sociogram. Briefly, a sociogram is a visual representation of social relationships or interactions within a group. To generate a sociogram, two key types of data are needed: an edge list and a node list. The node list contains information about the individual entities (or actors) in the network. In this situation, each node can represent a water source (e.g., aquifer), a water system, or an industrial system within the sociogram. At a minimum the we need to generate a node list with the following:
+    From these datasets, we will derive the data required to generate the analytic sociogram. Briefly, a sociogram is a visual representation of social relationships or interactions within a group. To generate a sociogram, two key types of data are needed: an edge list and a node list. The node list contains information about the individual entities (or actors) in the network. In this situation, each node can represent a water source (e.g., aquifer), a water system, or an industrial system within the sociogram. At a minimum the we need to generate a node list with the following:
 
-        - A unique identifier for each node (e.g., ID or name).
-        - Optional attributes for the nodes, such as demographics, roles, or other characteristics.
+    - A unique identifier for each node (e.g., ID or name).
+    - Optional attributes for the nodes, such as demographics, roles, or other characteristics.
 
-        Beyond the node list, in this document we also extract the required edge list. The edge list describes the relationships or interactions between the nodes. Each edge represents a connection between two nodes and includes:
+    Beyond the node list, in this document we also extract the required edge list. The edge list describes the relationships or interactions between the nodes. Each edge represents a connection between two nodes and includes:
 
-        - A pair of node identifiers (source and target).
-        - Optional attributes, such as the type, weight, or strength of the relationship.
+    - A pair of node identifiers (source and target).
+    - Optional attributes, such as the type, weight, or strength of the relationship.
 
-        With a list of data requirements in hand, we can begin transforming our raw data.
-        """
-    )
+    With a list of data requirements in hand, we can begin transforming our raw data.
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        """
-        ## Scoping
+    mo.md("""
+    ## Scoping
 
-        After a high-level scan, it appears that the PWS Intake and PWS Sales files contain relational data that could be incorporated into the edge list. The former, links water sources to water systems. That is, each row in the table represents a water system intaking water from a water source (e.g., aquifer or surface water). For example, the first row in the dataset records Canadian River Municipal Water Authority's intake of groundwater from the Ogallala Aquifer. In this situation, the source node in an edge list would be the aquifer, which provides water to the target water system.
-        """
-    )
+    After a high-level scan, it appears that the PWS Intake and PWS Sales files contain relational data that could be incorporated into the edge list. The former, links water sources to water systems. That is, each row in the table represents a water system intaking water from a water source (e.g., aquifer or surface water). For example, the first row in the dataset records Canadian River Municipal Water Authority's intake of groundwater from the Ogallala Aquifer. In this situation, the source node in an edge list would be the aquifer, which provides water to the target water system.
+    """)
     return
 
 
@@ -74,7 +73,9 @@ def _(pd):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Similarly, the latter dataset links water sales from water systems to other water systems or industrial customers. Each row represents a transaction in which water is sold from one entity to another. For example, the first row illustrates the purchase of water by the Amarillo MWS from the Canadian River Municipal Water Authority. In this situation, the source node would be the Canadian River Municipal Water Authority, and the target node would be the buyer.""")
+    mo.md(r"""
+    Similarly, the latter dataset links water sales from water systems to other water systems or industrial customers. Each row represents a transaction in which water is sold from one entity to another. For example, the first row illustrates the purchase of water by the Amarillo MWS from the Canadian River Municipal Water Authority. In this situation, the source node would be the Canadian River Municipal Water Authority, and the target node would be the buyer.
+    """)
     return
 
 
@@ -86,7 +87,9 @@ def _(pd):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md("""Regarding non-relational data, those appear to be located within the PWS Retail and PWS Survey-No files. The former includes information on units served by a water system in a given year. Since those units are not unique nodes, they cannot be considered individual entities within the sociogram. For example, the Upper Leon River MWD and the White River MWD serve single-family homes; however, those single-family homes are not unique entities. The label encompasses a category of units served; as such, this will be recorded as an attribute in the node list.""")
+    mo.md("""
+    Regarding non-relational data, those appear to be located within the PWS Retail and PWS Survey-No files. The former includes information on units served by a water system in a given year. Since those units are not unique nodes, they cannot be considered individual entities within the sociogram. For example, the Upper Leon River MWD and the White River MWD serve single-family homes; however, those single-family homes are not unique entities. The label encompasses a category of units served; as such, this will be recorded as an attribute in the node list.
+    """)
     return
 
 
@@ -98,7 +101,9 @@ def _(pd):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""On the other hand, the PWS Survey-No file includes attributes of the water systems such as the system class, name, etc. These features are then a match for the node list.""")
+    mo.md(r"""
+    On the other hand, the PWS Survey-No file includes attributes of the water systems such as the system class, name, etc. These features are then a match for the node list.
+    """)
     return
 
 
@@ -110,87 +115,83 @@ def _(pd):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ## Generating an Edge List
+    mo.md(r"""
+    ## Generating an Edge List
 
-        We need to extact data from two files, intake and sales, in a standard format that can be used as an edge list and in turn converted into a JSON. Why this conversion? Simply, the front-end app uses the [Cystoscape.js library](https://js.cytoscape.org/#introduction) for graph analysis and visualization. The library has a very limited data model that must be [met](https://js.cytoscape.org/#notation/elements-json) to return a network graph. 
+    We need to extact data from two files, intake and sales, in a standard format that can be used as an edge list and in turn converted into a JSON. Why this conversion? Simply, the front-end app uses the [Cystoscape.js library](https://js.cytoscape.org/#introduction) for graph analysis and visualization. The library has a very limited data model that must be [met](https://js.cytoscape.org/#notation/elements-json) to return a network graph.
 
-        The edge list table **must** include the following fields:
+    The edge list table **must** include the following fields:
 
-        - Source: The starting point or origin of a connection. It represents the node initiating or "sending" the relationship.
-        - Target: The endpoint or recipient of the connection. It represents the node "receiving" the relationship.
-        - Id: An optional unique identifier assigned to each edge (connection) in the network. It serves as a reference to distinguish and manage individual edges, particularly when you need to track, modify, or annotate specific relationships. This field is a requirement for Cytoscape, the graphing library used in the front-end application. For simplicity, the unique id is created by combining the type string with the row index for each observation.
+    - Source: The starting point or origin of a connection. It represents the node initiating or "sending" the relationship.
+    - Target: The endpoint or recipient of the connection. It represents the node "receiving" the relationship.
+    - Id: An optional unique identifier assigned to each edge (connection) in the network. It serves as a reference to distinguish and manage individual edges, particularly when you need to track, modify, or annotate specific relationships. This field is a requirement for Cytoscape, the graphing library used in the front-end application. For simplicity, the unique id is created by combining the type string with the row index for each observation.
 
-        Beyond these mandatory fields, we could include the following edge attributes which appear to be available in both datasets for each record:
+    Beyond these mandatory fields, we could include the following edge attributes which appear to be available in both datasets for each record:
 
-        - Volume: Water volume exchanged between the source and target in each record, in gallons.
-        - Type: Categorical value denoting the type of exchange represented in the connection (e.g., intake or sale).
-        - Year: Year of transaction.
-        - Other relevant fields.
+    - Volume: Water volume exchanged between the source and target in each record, in gallons.
+    - Type: Categorical value denoting the type of exchange represented in the connection (e.g., intake or sale).
+    - Year: Year of transaction.
+    - Other relevant fields.
 
-        The resulting table would then look something like this:
+    The resulting table would then look something like this:
 
-        ```
-        | source | target | id       | volume | type   | year |
-        |--------|--------|----------|--------|--------|------|
-        | Node A | Node B | intake_1 | 100    | intake | 2022 |
-        | Node B | Node C | sale_1   | 100    | sale   | 2023 |
-        |                       ...                           |
-        ```
-        """
-    )
+    ```
+    | source | target | id       | volume | type   | year |
+    |--------|--------|----------|--------|--------|------|
+    | Node A | Node B | intake_1 | 100    | intake | 2022 |
+    | Node B | Node C | sale_1   | 100    | sale   | 2023 |
+    |                       ...                           |
+    ```
+    """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ### Intake Edge List
+    mo.md(r"""
+    ### Intake Edge List
 
-        First, let's extract the relevant data from the intake file (here `PWS Intake_2022-2023.csv`). The following is a list of steps taken in Python to read, clean, and reshape the data into an edge list in the format noted above:
+    First, let's extract the relevant data from the intake file (here `PWS Intake_2022-2023.csv`). The following is a list of steps taken in Python to read, clean, and reshape the data into an edge list in the format noted above:
 
-        1. Load the data from a file:
-               - Read the spreadsheet in CSCV format that contains the water intake water.
+    1. Load the data from a file:
+           - Read the spreadsheet in CSCV format that contains the water intake water.
 
-        2. Clean up the headers in the table by stripping them of leading and lagging empty spaces.
-
-
-        3. Determine the source of water for each record.
+    2. Clean up the headers in the table by stripping them of leading and lagging empty spaces.
 
 
-               - For each row in the dataset, the function looks at specific columns to determine where whater comes from:
-
-                   - If the water is reused and self-supplied, the source is a TWDB Survey Number (self-supplied).
-
-                   - If the water is purchased, the source is the Seller’s Survey Number (who sold the water).
-
-                   - If the water is groundwater and self-supplied, the source is an Aquifer (or, if the aquifer is labeled as "OTHER AQUIFER," the source is a basin).
-
-                   - If the water is surface water and self-supplied, the source is a Surface Water Source (or, if labeled "UNKNOWN," the source is a basin).
-
-        4. Create key values required in the edge list:
-
-            - Each record gets a unique ID which serves as the edge identifier.
-            - Each record is assigned a target of the water (where it's used) from the TWDB Survey Number.
-            - Each record is labeled as `"intake"`.
-            - The total volume of water is recorded from the `"Total Intake (Gallons)"` column.
-            - The year of intake, water type, and whether it was purchased or self-supplied are also saved for each record.
-            - The source file name is added to keep track of where the data came from.
-
-        5. Filter the data by year when relevant.
-
-        6. Return the data as a formated edge list.
+    3. Determine the source of water for each record.
 
 
-        The resulting table head is presented below.
-        """
-    )
+           - For each row in the dataset, the function looks at specific columns to determine where whater comes from:
+
+               - If the water is reused and self-supplied, the source is a TWDB Survey Number (self-supplied).
+
+               - If the water is purchased, the source is the Seller’s Survey Number (who sold the water).
+
+               - If the water is groundwater and self-supplied, the source is an Aquifer (or, if the aquifer is labeled as "OTHER AQUIFER," the source is a basin).
+
+               - If the water is surface water and self-supplied, the source is a Surface Water Source (or, if labeled "UNKNOWN," the source is a basin).
+
+    4. Create key values required in the edge list:
+
+        - Each record gets a unique ID which serves as the edge identifier.
+        - Each record is assigned a target of the water (where it's used) from the TWDB Survey Number.
+        - Each record is labeled as `"intake"`.
+        - The total volume of water is recorded from the `"Total Intake (Gallons)"` column.
+        - The year of intake, water type, and whether it was purchased or self-supplied are also saved for each record.
+        - The source file name is added to keep track of where the data came from.
+
+    5. Filter the data by year when relevant.
+
+    6. Return the data as a formated edge list.
+
+
+    The resulting table head is presented below.
+    """)
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(List, Optional, os, pd):
     # Intake
     def create_intake_el(df_path: str,
@@ -244,9 +245,13 @@ def _(List, Optional, os, pd):
 
         # Apply source processing
         intake['source'] = intake.apply(process_source, axis=1)
+        # !!! TODO: Confirm with Reyna this logic !!!
+        intake['source_county'] = intake.get('Source County')
 
         # Create other columns safely(ish)
         intake['target'] = intake.get('TWDB Survey No', None)
+        # !!! TODO: Confirm with Reyna this logic !!!
+        intake['target_county'] = intake.get('County Used')
         intake['id'] = 'intake_' + intake.index.astype(str)
         intake['type'] = 'intake'
         intake['yearly_volume'] = intake.get('Total Intake (Gallons)', None) # This defaults to None if the column is not found
@@ -259,7 +264,7 @@ def _(List, Optional, os, pd):
             intake = intake.query("year == @year")
 
         if el:
-            default_columns = ['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 'purchased_self', 'source_file']
+            default_columns = ['source', 'target', 'id', 'yearly_volume', 'type', 'year', 'water_type', 'purchased_self', 'source_file', 'source_county', 'target_county']
 
             # Cleaning rules:
             intake.loc[:, 'source'] = intake['source'].astype(str)
@@ -287,39 +292,43 @@ def _(List, Optional, os, pd):
 
     # Look at the top 10 rows in that edge list
     intake_el.head(10)
-    return create_intake_el, intake_el
+    return (intake_el,)
+
+
+@app.cell
+def _(intake_el):
+    intake_el.describe()
+    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ### Sales Edge List
+    mo.md(r"""
+    ### Sales Edge List
 
-        Next, let's apply a similar threatment to the sales data, here stored in the `PWS Sales_2022-2023.csv` file. Like before, the following is a list of the steps applied in Python to munge the data into an edge list:
+    Next, let's apply a similar threatment to the sales data, here stored in the `PWS Sales_2022-2023.csv` file. Like before, the following is a list of the steps applied in Python to munge the data into an edge list:
 
-        1. Load the data file from a single CSC that contains information about water sales.
-        2. Clean up spreadsheet headers to remove trailing and leading blank spaces.
-        3. Identify key information for each sale:
+    1. Load the data file from a single CSC that contains information about water sales.
+    2. Clean up spreadsheet headers to remove trailing and leading blank spaces.
+    3. Identify key information for each sale:
 
-               - Assing the water seller as the edge source. Here we used the `"TWDB Seller Survey No"` as the source node.
-               - Next, we assing a target node that represents the water buyer. We take this value from the `"Buyer Survey No"` column.
-               - We generate a transaction identifier that will serve as the edge id.
-               - Categorize every transaction as `"sale"`.
+           - Assing the water seller as the edge source. Here we used the `"TWDB Seller Survey No"` as the source node.
+           - Next, we assing a target node that represents the water buyer. We take this value from the `"Buyer Survey No"` column.
+           - We generate a transaction identifier that will serve as the edge id.
+           - Categorize every transaction as `"sale"`.
 
-        4. Add additional sale details: 
-            - The yearly volume is pulled from the `"Buyer Volume Reported"` variable.
-            - The year is copied from the source data.
-            - The function checks what type of water was sold (e.g., groundwater or surface water) by copying the `"Buyer Water Type"` column.
-            - Since all the data here refers to water purchases, we assign the `self_purchased` field to `"Purchased"` for every obeservation.
-            - We record the name of the file being processed as a source file to that users can track provenance.
+    4. Add additional sale details:
+        - The yearly volume is pulled from the `"Buyer Volume Reported"` variable.
+        - The year is copied from the source data.
+        - The function checks what type of water was sold (e.g., groundwater or surface water) by copying the `"Buyer Water Type"` column.
+        - Since all the data here refers to water purchases, we assign the `self_purchased` field to `"Purchased"` for every obeservation.
+        - We record the name of the file being processed as a source file to that users can track provenance.
 
-        5. (Optional) We filter data by year (e.g., 2022) to only retain transactions from that year.
-        6. Return the data as a formated edge list. 
+    5. (Optional) We filter data by year (e.g., 2022) to only retain transactions from that year.
+    6. Return the data as a formated edge list.
 
-        The resulting table head is presented below.
-        """
-    )
+    The resulting table head is presented below.
+    """)
     return
 
 
@@ -354,7 +363,11 @@ def _(List, Optional, os, pd):
 
         # Create columns safely(ish)
         sales['source'] = sales.get('TWDB Seller Survey No')
+        # !!! TODO: Confirm with Reyna this logic !!!
+        sales['source_county'] = sales.get('Seller County')
         sales['target'] = sales.get('Buyer Survey No')
+        # !!! TODO: Confirm with Reyna this logic !!!
+        sales['target_county'] = 'Not listed in Sales data.'
         sales['id'] = 'sales_' + sales.index.astype(str)
         sales['type'] = 'sale'
         # Which volume could be reported per transaction? Is this correct?
@@ -387,18 +400,16 @@ def _(List, Optional, os, pd):
                                el=True, 
                                year=2022)
     sales_el.head(10)
-    return create_sales_el, sales_el
+    return (sales_el,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ### Combining Edge Lists
+    mo.md(r"""
+    ### Combining Edge Lists
 
-        With both (intake and sales) edge lists made, we can row bind these tables together. The following table is the resulting edge list.
-        """
-    )
+    With both (intake and sales) edge lists made, we can row bind these tables together. The following table is the resulting edge list.
+    """)
     return
 
 
@@ -411,18 +422,141 @@ def _(intake_el, pd, sales_el):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        """
-        ## Generating a Node List
-
-        With the edge list completed, we now turn our attention to generating node list from multiple files (e.g., PWS Retail and Survey-No) and the edge list. The process will require a base table with unique identifiers for the nodes on the edge list. Roughly speaking, these come in two flavors, water sources and water systems. Water sources represent aquifers and surface water, while water systems represent public water systems (PWS) and industrial systems.
-        """
-    )
+    mo.md(r"""
+    ### Cleaning Edges
+    """)
     return
 
 
 @app.cell
 def _(el, pd):
+    # Convert keys to values for speed.
+    tranformation_list = {
+        # Brazos River System to Brazos River System, issue appears to be created by double seller ID from user inputs
+        "331": "325",
+        # Beach and Tennis Club Hoa appears in two tables intakes and sales, but recoded using the number seen in the bridge table
+        "1104065": "1104547",#
+        # Cedar Creek Reservoir appears twice in the intake seller survery number variable, bad user input
+        "175": "190", #
+        # Cedar Creek Water system appears to be a two individual systems
+        # Cedar Creek Water Systems!
+        # Cisco is three numbers!
+        # City of Bryan appears in bridge table as 102400, so we went with that
+        "1103744": "102400", #
+        # City of Bryan appears in bridge table as 185000, so we went with that
+        "1103607": "185000", #
+        # City of Morgans Point appears in bridge table as 578600, so we went with that
+        "1106104": "578600", #
+        # There are two cities of Reno, so we went with keeping both
+        # 722750 != 722750
+        # City of Rose City and City of Royse are different
+        # 742622 != 750700
+        # Eagle Mountain we assumed that the id for seller was a user error and recoded as the source
+        '195': 'Eagle Mountain Lake/Reservoir',
+        # Emerald Forest appears in bridge table as 60134, so we went with that
+        "1103775": "60134", #
+        # There are two Enchanted Forests in the bridge table
+        # 267275 != 817582
+        # There are two FMC Technologies Inc in the Seller data under the buyer column, we went with one over the other for no particular reason, but assuming that this is an input error.abs
+        "291334": "623100", #
+        # G & W WSC has two unique nodes
+        # 312941 != 312943
+        # Green trails mud, confirmed valid number against the bridge table
+        "1101657": "342282", #
+        # Confirmed Harris County 91 against the bridge table
+        "1106324": "371091", #
+        # Hickory Hollow Water System was confirmed against the bridge table
+        "385415": "880970", #
+        # Two Hidalgo County LDs
+        # 800 != 805
+        # Two Hidalgo Irrigation Districts
+        # 1103097 != 1105159
+        ## TODO: Industrial Utilities Service
+        # Lago Vista Water System
+        "1103477": "479500", #
+        # Consolidate Lake Houston
+        "250": "Lake Houston", #
+        # Mill Creek, keep as is
+        # Oak Hollow Subdivision there are two in the bridge table
+        # '617710' !=  '817589',
+        # Oak Shores Water System there are two in the bridge table
+        # 618415 != 618510,
+        # Pecan Grove Mobile Home Park there are two in the bridge table
+        # 653867 != 1106279 ,
+        ## TODO: Figure out Possum Kingdom
+        '370': 'Possum Kingdom Lake/Reservoir',
+        ## TODO: Figure out Run of The River
+        # DELETE THESE NODES -------------------
+        # SHADY ACRES two of them in the bridge table
+        # 873016 != 1102390
+        # SHADY OAKS MHP wto of them on the bridge table
+        # 1104504 != 1104574
+        # Sk Mobile Home Park there are two on the bridge table
+        # 626055 != 801181
+        # Southmost Regional Water Authority or 1102242 on bridge table
+        "1103610": "1102242", #
+        # Tarrant Regional Water District
+        "1102621": "1104223", #
+        ## TODO: TOLEDO BEND
+        '80': 'Toledo Bend Lake/Reservoir',
+        # Tra Trinity County Regional
+        "950": "873990", #
+        # Travis County Mud 18
+        '1103692': '1103819', #
+        # TODO: FIgure out what to do with the unspecified facility
+        # DELETE THESE NODES -------------------
+        # West Travis County Public Utility Agency
+        '1103957': '891348', #
+        # Two westwood subdivisions
+        # 919658 != 938320
+    }
+
+    # {'1103957', # 
+    #  '1104065', # 
+    #  '175', # 
+    #  '1101657', # 
+    #  '1103692', #
+    #  '1103775', #
+    #  '1102621', # 
+    #  '1103477', #
+    #  '950',# 
+    #  '1103607', # 
+    #  '1106324', #
+    #  '250', # 
+    #  '1103610', #
+    #  '1103744', # 
+    #  '291334',  #
+    #  '385415', #
+    #  '1106104'} #
+
+    def recode_nodes(df: pd.DataFrame, trans_dict: dict) -> pd.DataFrame:
+        df_recoded = df.copy()
+        df_recoded['source'] = df_recoded['source'].replace(trans_dict)
+        df_recoded['target'] = df_recoded['target'].replace(trans_dict)
+        return df_recoded
+
+    recode_nodes(el, tranformation_list).head(100)
+    return recode_nodes, tranformation_list
+
+
+@app.cell
+def _(el, recode_nodes, tranformation_list):
+    el_ = recode_nodes(el, tranformation_list)
+    return (el_,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Generating a Node List
+
+    With the edge list completed, we now turn our attention to generating node list from multiple files (e.g., PWS Retail and Survey-No) and the edge list. The process will require a base table with unique identifiers for the nodes on the edge list. Roughly speaking, these come in two flavors, water sources and water systems. Water sources represent aquifers and surface water, while water systems represent public water systems (PWS) and industrial systems.
+    """)
+    return
+
+
+@app.cell
+def _(el_, pd):
     def create_nodes_list(el: pd.DataFrame,
                           intake_file: str) -> pd.DataFrame:
         """
@@ -456,36 +590,34 @@ def _(el, pd):
 
         return nodes
 
-    nodes = create_nodes_list(el, 'inputs/PWS Intake_2022-2023.csv')
-    nodes.head(10)
-    return create_nodes_list, nodes
+    nodes = create_nodes_list(el_, 'inputs/PWS Intake_2022-2023.csv')
+    nodes.describe()
+    return (nodes,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        """
-        Next, we can begin enriching the node table with attribute data extracted from the retail and bridge files. The retail file includes attributes for nodes with a survey number. This excludes water sources which do not appear to have a numeric unique identifier and some water systems. Thus, the after joining the base node table with the retail data, only nodes with survey numbers will have attributes.
+    mo.md("""
+    Next, we can begin enriching the node table with attribute data extracted from the retail and bridge files. The retail file includes attributes for nodes with a survey number. This excludes water sources which do not appear to have a numeric unique identifier and some water systems. Thus, the after joining the base node table with the retail data, only nodes with survey numbers will have attributes.
 
-        From the retail table we will take the following attributes:
+    From the retail table we will take the following attributes:
 
-        - Population Served
-        - Single Family Volume and Connections
-        - Multi-Family Volume and Connections
-        - Commercial Volume and Connections
-        - Industrial Volume and Connections
-        - Institutional Volume and Connections
-        - Agrigultural Volume and Connections
-        - Total Metered Volume and Connections
-        - Total Un-Metered Volume and Connections
+    - Population Served
+    - Single Family Volume and Connections
+    - Multi-Family Volume and Connections
+    - Commercial Volume and Connections
+    - Industrial Volume and Connections
+    - Institutional Volume and Connections
+    - Agrigultural Volume and Connections
+    - Total Metered Volume and Connections
+    - Total Un-Metered Volume and Connections
 
-        The following is a list of steps used to read, clean, and reshape the retail data prior to left joining it to the base node table by TWBDB survey number:
+    The following is a list of steps used to read, clean, and reshape the retail data prior to left joining it to the base node table by TWBDB survey number:
 
-        1. Read retail data as is from `PWS Retail_2022-2023.csv`.
-        2. Rename `TWDB Survey No` to `id` to make the left join easier.
-        3. Filter out data to only include records for the year 2022.
-        """
-    )
+    1. Read retail data as is from `PWS Retail_2022-2023.csv`.
+    2. Rename `TWDB Survey No` to `id` to make the left join easier.
+    3. Filter out data to only include records for the year 2022.
+    """)
     return
 
 
@@ -516,21 +648,19 @@ def _(Optional, pd):
     # Load Retail Data
     retail = get_retail_nodes('inputs/PWS Retail_2022-2023.csv')
     retail.head()
-    return get_retail_nodes, retail
+    return (get_retail_nodes,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        """
-        Next, we can bring in the survey number table as additional node attributes. Like before, this survey contains data for nodes that have a survey number. By definition, this excludes water sources which are not linked to unique identifier. 
+    mo.md("""
+    Next, we can bring in the survey number table as additional node attributes. Like before, this survey contains data for nodes that have a survey number. By definition, this excludes water sources which are not linked to unique identifier.
 
-        The following is a list of steps used to read, clean, and reshape the survey number data prior to left joining it to the base node table by TWBDB survey number:
+    The following is a list of steps used to read, clean, and reshape the survey number data prior to left joining it to the base node table by TWBDB survey number:
 
-        1. Read the survey number data as is from `PWS BridgeTable_2022-2023.csv`.
-        2. Rename `TWDB Survey Number` to `id`.
-        """
-    )
+    1. Read the survey number data as is from `PWS BridgeTable_2022-2023.csv`.
+    2. Rename `TWDB Survey Number` to `id`.
+    """)
     return
 
 
@@ -555,7 +685,7 @@ def _(pd):
 
     survey_no = get_survey_nodes('inputs/PWS BridgeTable_2022-2023.csv')
     survey_no.head()
-    return get_survey_nodes, survey_no
+    return (get_survey_nodes,)
 
 
 @app.cell
@@ -645,19 +775,22 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
                      'inputs/PWS Intake_2022-2023.csv', 
                      'inputs/PWS Sales_2022-2023.csv', 
                      year=2022)
-    return enrich_nodes, nl
+    return (nl,)
+
+
+@app.cell
+def _():
+    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        Clean up the node list a bit more:
+    mo.md(r"""
+    Clean up the node list a bit more:
 
-        1. Select specific columns.
-        2. Remove duplicates based on the `id`.
-        """
-    )
+    1. Select specific columns.
+    2. Remove duplicates based on the `id`.
+    """)
     return
 
 
@@ -679,7 +812,7 @@ def _(nl):
     nl_tidy = nl.loc[~nl.duplicated(subset='id', keep='first'),
     columns_to_keep]
     nl_tidy
-    return columns_to_keep, nl_tidy
+    return (nl_tidy,)
 
 
 @app.cell
@@ -690,7 +823,9 @@ def _(nl_tidy):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""In May 2025, the TWDB partner asked us to prioritize the intake purchases over the sales when we have parallel edges. Let's take a quick stab at doing that. First, figure out how many repeats we got:""")
+    mo.md(r"""
+    In May 2025, the TWDB partner asked us to prioritize the intake purchases over the sales when we have parallel edges. Let's take a quick stab at doing that. First, figure out how many repeats we got:
+    """)
     return
 
 
@@ -702,7 +837,9 @@ def _(el):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md("""Now take a quick look. It appears that we tot a couple intakes and a single sale, which roughly add up to the same value.""")
+    mo.md("""
+    Now take a quick look. It appears that we tot a couple intakes and a single sale, which roughly add up to the same value.
+    """)
     return
 
 
@@ -714,7 +851,9 @@ def _(el):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Let's go a little further, if there is only one parallel edge (that is, no parallel edge), do nothing. Else, filter to only retain the intake values:""")
+    mo.md(r"""
+    Let's go a little further, if there is only one parallel edge (that is, no parallel edge), do nothing. Else, filter to only retain the intake values:
+    """)
     return
 
 
@@ -741,13 +880,11 @@ def _(el_noparallel):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ## Exporting Data
+    mo.md(r"""
+    ## Exporting Data
 
-        First, let write the data out as a comma-separated value (CSV) file to allow Gephi users to work with them.
-        """
-    )
+    First, let write the data out as a comma-separated value (CSV) file to allow Gephi users to work with them.
+    """)
     return
 
 
@@ -759,38 +896,36 @@ def _(datetime, el_noparallel, nl_tidy):
     # Save the node and edge lists with the date in the filename
     nl_tidy.to_csv(f'outputs/nodes_{current_date}.csv', index=False)
     el_noparallel.to_csv(f'outputs/edges_{current_date}.csv', index=False)
-    return (current_date,)
+    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-        ## From Tables to JSON
+    mo.md(r"""
+    ## From Tables to JSON
 
-        The front-end application requires data in as a nested JSON. This is the required JSON format:
-        ```
-         elements: {
-            nodes: [
-              {
-                data: { id: 'a' }
-              },
-
-              {
-                data: { id: 'b' }
-              }
-            ],
-            edges: [
-              {
-                data: { id: 'ab', source: 'a', target: 'b' }
-              }
-            ]
+    The front-end application requires data in as a nested JSON. This is the required JSON format:
+    ```
+     elements: {
+        nodes: [
+          {
+            data: { id: 'a' }
           },
-        ```
 
-        In this section, we transform the data accordingly.
-        """
-    )
+          {
+            data: { id: 'b' }
+          }
+        ],
+        edges: [
+          {
+            data: { id: 'ab', source: 'a', target: 'b' }
+          }
+        ]
+      },
+    ```
+
+    In this section, we transform the data accordingly.
+    """)
     return
 
 
@@ -803,7 +938,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md("""To export the graph data, we have to shape it into a dictionary. Then, store it as a JSON. The code below tranforms our node and edge list into a single dictionary that Cytoscape.js can understand.""")
+    mo.md("""
+    To export the graph data, we have to shape it into a dictionary. Then, store it as a JSON. The code below tranforms our node and edge list into a single dictionary that Cytoscape.js can understand.
+    """)
     return
 
 
@@ -832,12 +969,14 @@ def _(el_noparallel, nl_tidy, np, pd):
                             el_noparallel.rename(columns={'from': 'source',
                                                'to': 'target'})
                            )
-    return create_cyto_json, cyto
+    return (cyto,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Write it out in the app directory:""")
+    mo.md(r"""
+    Write it out in the app directory:
+    """)
     return
 
 
@@ -845,7 +984,7 @@ def _(mo):
 def _(cyto, json):
     with open('../app/src/data/network-data.json', 'w') as f:
         json.dump(cyto, f, indent=4)
-    return (f,)
+    return
 
 
 @app.cell
@@ -856,7 +995,143 @@ def _(el_noparallel):
 
 @app.cell
 def _(mo):
-    mo.md(r"""## Parking Lot""")
+    mo.md(r"""
+    ## Geography of Water Systems
+
+    Only takes into account those within the bridge table that we can also locate in the intake and sales data.
+    """)
+    return
+
+
+@app.cell
+def _(pd):
+    def get_node_geography(master_table_path: str, 
+                           intake_table_path: str, 
+                           year: str = None, how: str = 'left'
+                          ) -> pd.DataFrame:
+    
+        assert how in ['outer', 'left', 'right'], f"`how` argument must be outer, left, or right. Nothing else, nothing more."
+    
+        master_table = pd.read_csv(
+            master_table_path,
+            usecols=['TWDB Survey Number', 'TCEQ PWS Code', 'PWS Name'],
+            dtype=str 
+        ).rename(
+            columns={
+                'TWDB Survey Number': 'id',
+                'TCEQ PWS Code': 'tceq_id',
+                'PWS Name': 'name'
+            }
+        )
+    
+        intake_table = pd.read_csv(
+            intake_table_path,
+            usecols=['TWDB Survey No', 'PWS Name', 'County Used', 'Year'],
+            dtype=str
+        ).rename(
+            columns={
+                'TWDB Survey No': 'id',
+                'PWS Name': 'name_on_intake',
+                'County Used': 'county'
+            }
+        )
+
+        if year: 
+            intake_table = intake_table[intake_table['Year'] == str(year)]
+
+        out = pd.merge(
+            master_table,
+            intake_table,  
+            on='id',
+            how=how)
+
+    
+    
+        return out.drop(columns='Year')
+
+    geo_nodes = get_node_geography(
+        master_table_path='inputs\PWS BridgeTable_2022-2023.csv',
+        intake_table_path='inputs\PWS Intake_2022-2023.csv',
+        year='2022',
+        how='left'
+    ).drop_duplicates(subset=['id', 'county', 'name_on_intake'])
+    return (geo_nodes,)
+
+
+@app.cell
+def _(geo_nodes):
+    geo_nodes
+    return
+
+
+@app.cell
+def _(geo_nodes, pd):
+    # How systems are missing a county?
+    n = geo_nodes[pd.isna(geo_nodes['county'])].shape[0]
+    t = geo_nodes.shape[0]
+    print(f'{n} of {t} or {round((n/t)*100, ndigits=2)}% of the sample.')
+    return
+
+
+@app.cell
+def _(geo_nodes, pd):
+    def reorient_by_geo(geo_nodes_df: pd.DataFrame) -> dict:
+        temp = geo_nodes.to_dict(orient='index')
+        out = {}
+        for v in temp.values(): 
+            c = v.get('county')
+            if  pd.isna(c):
+                c = "NOT AVAILABLE"
+            
+            if c not in out:
+                out[c] = []
+
+            out[c].append(v)
+        
+        return out
+
+    reo_geo_nodes = reorient_by_geo(geo_nodes)
+
+    return (reo_geo_nodes,)
+
+
+@app.cell
+def _(reo_geo_nodes):
+    reo_geo_nodes
+    return
+
+
+@app.cell
+def _(gpd):
+    counties = gpd.read_file('https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip')
+    texas_counties = counties[counties['STATEFP'] == '48'].copy()
+    texas_counties.plot()
+    return (texas_counties,)
+
+
+@app.cell
+def _(texas_counties):
+    texas_counties['NAMES_CAP'] = texas_counties['NAME'].str.upper()
+
+
+    texas_counties.to_geo_dict()
+    return
+
+
+@app.cell
+def _(json, reo_geo_nodes, texas_counties):
+    with open('../app/src/data/geo-nodes.json', 'w') as f:
+        json.dump(reo_geo_nodes, f, indent=4)
+
+    texas_counties.to_file('../app/src/data/geo-shapes.json', driver='GeoJSON')
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Parking Lot
+    """)
     return
 
 
@@ -898,7 +1173,7 @@ def _(G, el_noparallel, json, nl):
     # graph_meta_data
     with open('../app/src/data/network-meta-data.json', 'w') as md:
         json.dump(graph_meta_data, md, indent=4)
-    return graph_meta_data, md
+    return (graph_meta_data,)
 
 
 @app.cell

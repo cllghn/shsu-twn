@@ -13,6 +13,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from "next/link";
+import Tooltip from '@mui/material/Tooltip';
 
 import Glossary from "@/components/Glossary/Glossary";
 
@@ -148,8 +149,7 @@ const SourcesPageContent: React.FC = () => {
             <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
                 <div>
                     <Paper elevation={2} className="p-6">
-                        <Typography variant="h4" className="pb-4">Explore How Data Flows from Water Sources</Typography>
-                        <Typography variant="body1" className="pb-4">Water sources include surface water and ground water from which water flows into the system.</Typography>
+                        <Typography variant="h4" className="pb-4">Explore How Data Flows from <Tooltip title="Water sources include surface water and ground water from which water flows into the system." arrow><span className="border-b-2 border-dotted border-[#124559]">Water Sources</span></Tooltip></Typography>
                         <div className="flex flex-col flex-wrap">
                             <Typography variant="body1" className="mb-4">Begin by selecting a source by name. If you don't know which water source to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus mt-3">list of resources.</Link></Typography>
                             <div className="flex flex-row">
@@ -206,14 +206,6 @@ const SourcesPageContent: React.FC = () => {
                                 </MenuItem>
                             ))}
                         </Menu>
-
-                        {
-                            filteredData ? (
-                                <div className="pt-6 font-bold text-sm">
-                                    <InfoIcon /> The graph below shows water flowing out from the selected water source. In addition, it shows outputs from the intermediary systems into other systems two-degrees of separation away from the source. It omits inputs that into the water source as those are not captured in the data.
-                                </div>) :
-                                <div></div>
-                        }
                     </Paper>
                 </div>
 
@@ -221,6 +213,13 @@ const SourcesPageContent: React.FC = () => {
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
+                                <div className="py-4 px-6 font-medium text-sm justify-center flex items-center bg-[#124559] text-white">
+                                        <InfoIcon />
+                                        <div className="px-2">
+                                            The graph below shows how water flows out of the selected water source. It also includes the outputs from any systems directly connected to it, showing where water goes two steps away. Inputs into the water source are not shown because they are not available in the data.
+                                        </div>
+                                        <InfoIcon />
+                                </div>
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <Tabs
                                         value={activeTab}

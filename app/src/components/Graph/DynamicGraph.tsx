@@ -10,7 +10,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
-import SearchOffIcon from '@mui/icons-material/SearchOff';;
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 import cxtmenu from "cytoscape-cxtmenu";
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -506,42 +506,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     </span>
                 </div>
             </Paper>
-            <Tooltip title="Fit to Screen" arrow placement="top">
-                <button
-                    onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='fit-screen-btn'
-                >
-                    <CenterFocusWeakIcon />
-                </button>
-            </Tooltip>
-            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
-                <button
-                    onClick={handleAllowZoom}
-                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='fit-screen-btn'
-                >
-                    {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
-                </button>
-            </Tooltip>
-            <Tooltip title="Toggle Node Labels" arrow placement="top">
-                <button
-                    onClick={handleLabelToggle}
-                    className="absolute top-[5em] left-3 sm:top-[1em] sm:left-[9em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id="toggle-labels-btn"
-                >
-                    <TextFieldsIcon />
-                </button>
-            </Tooltip>
-            <Tooltip title="Take Screenshot" arrow placement="top">
-                <button
-                    onClick={getScreenshot}
-                    className="absolute hidden sm:block sm:top-[1em] sm:left-[13em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='screenshot-btn'
-                >
-                    <CameraAltIcon />
-                </button>
-            </Tooltip>
 
             <Paper
                 className="hidden sm:block absolute top-[5em] left-3 z-10 shadow-lg"
@@ -644,6 +608,24 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     autoComplete
                 />
             </Paper>
+            <Tooltip title="Fit to Screen" arrow placement="top">
+                <button
+                    onClick={handleZoomToFit}
+                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    id='fit-screen-btn'
+                >
+                    <CenterFocusWeakIcon />
+                </button>
+            </Tooltip>
+            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
+                <button
+                    onClick={handleAllowZoom}
+                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    id='fit-screen-btn'
+                >
+                    {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
+                </button>
+            </Tooltip>
 
 
             {/* Custom node tooltip */}

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { ArrowUpFromDot, ArrowDownToDot, ArrowUpDown, MoveDownLeft, MoveUpRight, Move, Info } from 'lucide-react';
+import { ArrowUpFromDot, ArrowDownToDot, ArrowUpDown, MoveDownLeft, MoveUpRight, Move, Info, DownloadIcon } from 'lucide-react';
+import { Button } from '@mui/material';
 
 const NodeScorecard = ({ title, value, icon: Icon, iconColor, unit }) => {
   return (
@@ -222,6 +223,59 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
     return nodeData ? nodeData.outgoingConnections : 0;
   }, [nodeConnections, selected]);
 
+  const DownloadFlowData = () => {
+    // Function to escape CSV values that contain commas, quotes, or newlines
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      // If the value contains comma, quote, or newline, wrap it in quotes and escape existing quotes
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+
+    const headers = ['Source', 'Target', 'Yearly Volume (gal)', 'Water Type', 'Supply Method', 'Flow Type', 'Year', 'Flow Direction'];
+
+    // Mark edges from target array as "Inflow"
+    const inflowRows = edgesWhereSelectedIsTarget.map(edge => [
+      escapeCSV(edge.data.sourceUnifiedName),
+      escapeCSV(edge.data.targetUnifiedName),
+      escapeCSV(edge.data.yearly_volume),
+      escapeCSV(edge.data.water_type),
+      escapeCSV(edge.data.purchased_self),
+      escapeCSV(capitalizeWords(edge.data.type)),
+      escapeCSV(edge.data.year),
+      'Inflow'
+    ]);
+
+    // Mark edges from source array as "Outflow"
+    const outflowRows = edgesWhereSelectedIsSource.map(edge => [
+      escapeCSV(edge.data.sourceUnifiedName),
+      escapeCSV(edge.data.targetUnifiedName),
+      escapeCSV(edge.data.yearly_volume),
+      escapeCSV(edge.data.water_type),
+      escapeCSV(edge.data.purchased_self),
+      escapeCSV(capitalizeWords(edge.data.type)),
+      escapeCSV(edge.data.year),
+      'Outflow'
+    ]);
+
+    const rows = [...inflowRows, ...outflowRows];
+
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `node_flow_data_${selected}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // Clean up the URL object
+  };
+
   const selectedNode = useMemo(() => {
     return data.elements.nodes.find(node => node.data.id === selected);
   }, [data.elements.nodes, selected]);
@@ -240,9 +294,53 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
       />
       <div className="flex flex-col justify-left pt-8 space-y-4">
         <div>
-          <h3 className="text-lg font-medium">{capitalizeWords(selectedNode.data.preliminary_type)} Details</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">{capitalizeWords(selectedNode.data.preliminary_type)} Details</h3>
+            <div className='hidden md:block'>
+              <Button
+                variant="outlined"
+                className='hidden md:block'
+                onClick={DownloadFlowData}
+                sx={{
+                  color: '#ffffff',
+                  backgroundColor: '#124559',
+                  borderColor: '#ffffff',
+                  borderRadius: '5px',
+                  '&:hover': {
+                    backgroundColor: '#ffffff',
+                    borderColor: '#124559',
+                    color: '#124559',
+                  }
+                }}
+
+              >
+                Download Flow Data <DownloadIcon className="ml-2 items-center" size={15} />
+              </Button>
+            </div>
+            <div className='md:hidden sm:block'>
+              <Button
+                variant="outlined"
+                className='hidden md:block'
+                onClick={DownloadFlowData}
+                sx={{
+                  color: '#ffffff',
+                  backgroundColor: '#124559',
+                  borderColor: '#ffffff',
+                  borderRadius: '5px',
+                  '&:hover': {
+                    backgroundColor: '#ffffff',
+                    borderColor: '#124559',
+                    color: '#124559',
+                  }
+                }}
+
+              >
+                Download <DownloadIcon className="ml-2 items-center" size={15} />
+              </Button>
+            </div>
+          </div>
           <div className='flex items-start space-x-2 py-5'>
-            <Info className='w-[25px] h-[25px] shrink-0' /> 
+            <Info className='w-[25px] h-[25px] shrink-0' />
             <p>This section provides information about the {selectedNode.data.preliminary_type === 'water source' ? 'water source' : 'water system'} node, including its connections within the network. The number of outgoing connections represents how many directed links carry water from this node to others, indicating the paths through which water flows out. Conversely, the number of incoming connections reflects how many directed links bring water into this node from other sources/systems. Together, these connections help illustrate the node's role in the overall water flow network.</p>
           </div>
         </div>
@@ -252,7 +350,7 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
               <b>Water Source:</b>&nbsp; {selectedNode.data.id}
             </div>
             <div className='flex flex-col'>
-              
+
               <ConnectionScorecardsRow
                 incomingConnections={incomingConnections}
                 outgoingConnections={outgoingConnections}
@@ -263,26 +361,26 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
           <div className="flex justify-left flex-col space-y-4">
             <div>
               <b>Water System:</b>&nbsp; {selectedNode.data.unified_name}
-                {selectedNode.data['Water Use Survey Form Type'] && (
+              {selectedNode.data['Water Use Survey Form Type'] && (
                 <div>
                   <b>Water Use Survey Form Type:</b>&nbsp; {selectedNode.data['Water Use Survey Form Type']}
                 </div>
-                )}
-                {selectedNode.data['TCEQ PWS Code'] && (
+              )}
+              {selectedNode.data['TCEQ PWS Code'] && (
                 <div>
                   <b>TCEQ PWS Code:</b>&nbsp; {selectedNode.data['TCEQ PWS Code']}
                 </div>
-                )}
-                {selectedNode.data['PWS System Class'] && (
+              )}
+              {selectedNode.data['PWS System Class'] && (
                 <div>
                   <b>PWS System Class:</b>&nbsp; {selectedNode.data['PWS System Class']}
                 </div>
-                )}
-                {selectedNode.data[' Population Served '] && (
+              )}
+              {selectedNode.data[' Population Served '] && (
                 <div>
                   <b>Population Served:</b>&nbsp; {selectedNode.data[' Population Served ']}
                 </div>
-                )}
+              )}
             </div>
             <div className='flex'>
               <ConnectionScorecardsRow
@@ -294,47 +392,57 @@ const NodeVolumeScoreCards = ({ data, selected }: { data: any, selected: string 
         )}
       </div>
 
-      {selectedNode.data.preliminary_type !== 'water source' && 
-       edgesWhereSelectedIsTarget.length >= 1 && (
-        <div className="flex flex-col justify-left pt-8">
-          <h3 className="text-lg font-medium pb-4">Water Inflow into the System Ranked</h3>
-          {/* edgesWhereSelectedIsTarget */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+      {selectedNode.data.preliminary_type !== 'water source' &&
+        edgesWhereSelectedIsTarget.length >= 1 && (
+            <div className="flex flex-col justify-left pt-8">
+            <div className="flex items-center gap-2 pb-4">
+              <div className='p-2 rounded-full bg-[#3E6445] '>
+                <ArrowDownToDot size={20} className='text-white'/>
+              </div>
+              <h3 className="text-lg font-medium">Water Inflow Into the System Ranked</h3>
+            </div>
+            {/* edgesWhereSelectedIsTarget */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Sender</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Receiver</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Sender</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Receiver</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Yearly Volume (gal)</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Water Type</th>
 
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Flow Type</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Supply Method</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Flow Type</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider border-b">Year</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {edgesWhereSelectedIsTarget.map((row, index) => (
-                  <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{capitalizeWords(row.data.type)}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.year}</td>
+                <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.yearly_volume}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{capitalizeWords(row.data.type)}</td>
+                  <td className="py-2 px-4 text-sm text-gray-900">{row.data.year}</td>
 
-                  </tr>
+                </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+              </table>
+            </div>
+            </div>
+        )}
 
       {edgesWhereSelectedIsSource.length >= 1 && (
         <div className="flex flex-col justify-left pt-8">
-          <h3 className="text-lg font-medium pb-4">Water Outflow out of the System Ranked</h3>
+          <div className="flex items-center gap-2 pb-4">
+              <div className='p-2 rounded-full bg-[#6f5a4c] '>
+                <ArrowUpFromDot size={20} className='text-white'/>
+              </div>
+              <h3 className="text-lg font-medium">Water Outflow Out of the System Ranked</h3>
+          </div>
           {/* edgesWhereSelectedIsSource */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
