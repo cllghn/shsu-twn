@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // This middleware will run on all routes
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Check if user is authenticated
   const isAuthenticated = request.cookies.get('authenticated')?.value === 'true'
   
