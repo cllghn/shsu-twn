@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback, useEffect, Suspense } from "react";
+import { useState, useCallback, useEffect, Suspense, useRef } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
@@ -16,6 +16,7 @@ import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
 
 import Glossary from "@/components/Glossary/Glossary";
+import { scrollToRef } from "@/utils/scrollHelpers";
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
@@ -36,6 +37,8 @@ const SourcesPage: React.FC = () => {
 const SourcesPageContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    const graphContainerRef = useRef<HTMLDivElement>(null);
 
     const nodeKeys = Object.keys(metadata.sources.kvs);
     const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
@@ -115,6 +118,7 @@ const SourcesPageContent: React.FC = () => {
             setFilteredData(data);
             setFilteredNode(selectedItem);
             setTriggerUpdate(!triggerUpdate); // Toggle to force graph update
+            scrollToRef(graphContainerRef);
         }
     };
 
@@ -214,14 +218,16 @@ const SourcesPageContent: React.FC = () => {
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
                                 <div className="py-4 px-6 font-medium text-sm justify-center flex items-center bg-[#124559] text-white">
-                                        <InfoIcon />
-                                        <div className="px-2">
-                                            The graph below shows how water flows out of the selected water source. It also includes the outputs from any systems directly connected to it, showing where water goes two steps away. Inputs into the water source are not shown because they are not available in the data.
-                                        </div>
-                                        <InfoIcon />
+                                    <InfoIcon />
+                                    <div className="px-2" >
+                                        The graph below shows how water flows out of the selected water source. It also includes the outputs from any systems directly connected to it, showing where water goes two steps away. Inputs into the water source are not shown because they are not available in the data.
+                                    </div>
+                                    <InfoIcon />
                                 </div>
+                
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                    <Tabs
+                                    <div ref={graphContainerRef} className="scroll-mt-24">
+<Tabs
                                         value={activeTab}
                                         onChange={handleTabChange}
                                         aria-label="data visualization tabs"
@@ -230,13 +236,17 @@ const SourcesPageContent: React.FC = () => {
                                         <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
                                         <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
                                     </Tabs>
+                                    </div>
+                                    
                                 </Box>
 
                                 <TabPanel value={activeTab} index={0}>
-                                    <DynamicGraph
-                                        data={filteredData}
-                                        selected={toTitleCase(filteredNode)}
-                                    />
+
+                                        <DynamicGraph
+                                            data={filteredData}
+                                            selected={toTitleCase(filteredNode)}
+                                        />
+
                                 </TabPanel>
 
 
@@ -247,7 +257,9 @@ const SourcesPageContent: React.FC = () => {
                                     <div className="flex pt-4 justify-center items-center">
                                         <NodeVolumeScoreCards
                                             data={filteredData}
-                                            selected={toTitleCase(filteredNode)} />
+                                            selected={toTitleCase(filteredNode)}
+                                            nodeType="source"
+                                        />
                                     </div>
 
                                 </TabPanel>

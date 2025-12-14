@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback, useEffect, Suspense } from "react";
+import { useState, useCallback, useEffect, Suspense, useRef } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
@@ -15,6 +15,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Glossary from "@/components/Glossary/Glossary";
 import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
+import { scrollToRef } from "@/utils/scrollHelpers";
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
@@ -35,6 +36,8 @@ const SystemsPage: React.FC = () => {
 const SystemsPageContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    const graphContainerRef = useRef<HTMLDivElement>(null);
 
     // Use keys instead of values
     const nodeKeys = Object.keys(metadata.systems.kvs);
@@ -128,6 +131,8 @@ const SystemsPageContent: React.FC = () => {
             setFilteredData(data);
             setFilteredNode(selectedItem);
             setTriggerUpdate(!triggerUpdate);
+            scrollToRef(graphContainerRef);
+            
         }
     };
 
@@ -249,7 +254,7 @@ const SystemsPageContent: React.FC = () => {
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
-                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                
                                     <div className="py-4 px-6 font-medium text-sm justify-center flex items-center bg-[#124559] text-white">
                                         <InfoIcon />
                                         <div className="px-2">
@@ -257,6 +262,8 @@ const SystemsPageContent: React.FC = () => {
                                         </div>
                                         <InfoIcon />
                                     </div>
+                                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                        <div ref={graphContainerRef} className="scroll-mt-24">
                                     <Tabs
                                         value={activeTab}
                                         onChange={handleTabChange}
@@ -266,6 +273,7 @@ const SystemsPageContent: React.FC = () => {
                                         <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
                                         <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
                                     </Tabs>
+                                    </div>
                                 </Box>
 
                                 <TabPanel value={activeTab} index={0}>
@@ -287,6 +295,7 @@ const SystemsPageContent: React.FC = () => {
                                         <NodeVolumeScoreCards
                                             data={filteredData}
                                             selected={filteredNode}
+                                            nodeType="systems"
                                         />
                                     </div>
                                 </TabPanel>

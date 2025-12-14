@@ -312,7 +312,7 @@ export default function Home() {
             <div className="bg-white bg-opacity-10 px-20 py-20 rounded-lg">
               <h2 className="pb-5 text-[#124559] text-2xl">Mapping Critical Water Systems <SchemaIcon /></h2>
               <h3 className="pb-5 text-xl text-[#124559]">Where does the water come from—and where does it go? Take a look at these key visualizations to get started.</h3>
-              <div className="container mx-auto items-start grid sm:grid-cols-2 sm:space-x-4 space-y-6">
+              <div className="container mx-auto items-start grid sm:grid-cols-2 sm:space-x-4 space-y-8 sm:space-y-0">
                 <div className="flex flex-col items-start col-span-1">
                   <h4 className="pb-5 text-lg text-[#124559]">Water Sources</h4>
                   <ul className="flex flex-col space-y-4">
@@ -341,34 +341,33 @@ export default function Home() {
                         <CircleIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> Trinity Run of River &rarr;
                       </Link>
                     </div>
-
                   </ul>
                 </div>
                 <div className="flex flex-col items-start col-span-1">
                   <h4 className="pb-5 text-lg text-[#124559]">Water Systems</h4>
                   <ul className="flex flex-col space-y-4">
                     <div>
-                      <Link href="./netexplorer/systems?node=AQUA+WSC" className="aPlus">
+                      <Link href="./netexplorer/systems?node=31500" className="aPlus">
                         <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> Agua WSC &rarr;
                       </Link>
                     </div>
                     <div>
-                      <Link href="./netexplorer/systems?node=CITY+OF+HOUSTON" className="aPlus">
+                      <Link href="./netexplorer/systems?node=396200" className="aPlus">
                         <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> City of Houston &rarr;
                       </Link>
                     </div>
                     <div>
-                      <Link href="./netexplorer/systems?node=EL+PASO+WATER+UTILITIES+PUBLIC+SERVICE+B" className="aPlus">
+                      <Link href="./netexplorer/systems?node=260300" className="aPlus">
                         <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> El Paso Water Utilities Public Service &rarr;
                       </Link>
                     </div>
                     <div>
-                      <Link href="./netexplorer/systems?node=NORTH+TEXAS+MUNICIPAL+WATER+DISTRICT" className="aPlus">
+                      <Link href="./netexplorer/systems?node=1101670" className="aPlus">
                         <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> North Texas Municipal Water District &rarr;
                       </Link>
                     </div>
                     <div>
-                      <Link href="./netexplorer/systems?node=SAN+ANTONIO+WATER+SYSTEM" className="aPlus">
+                      <Link href="./netexplorer/systems?node=764200" className="aPlus">
                         <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> San Antonio Water System &rarr;
                       </Link>
                     </div>
@@ -378,7 +377,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
         </div>
       </main >
     </>

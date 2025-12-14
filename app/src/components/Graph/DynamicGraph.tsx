@@ -10,7 +10,8 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
-import SearchOffIcon from '@mui/icons-material/SearchOff';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import cxtmenu from "cytoscape-cxtmenu";
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -221,18 +222,54 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         }
     });
 
-    const [allowZoom, setAllowZoom] = useState(false);
+
+    const handleZoomIn = () => {
+        const cy = cyRef.current;
+        if (cy) {
+            const currentZoom = cy.zoom();
+            const newZoom = Math.min(currentZoom * 1.1, 10); // Increase by 10%, max 5
+            cy.animate({
+                zoom: {
+                    level: newZoom,
+                    position: cy.pan()
+                },
+                center: { eles: cy.elements() },
+                duration: 50
+            });
+        }
+    };
+
+    const handleZoomOut = () => {
+        const cy = cyRef.current;
+        if (cy) {
+            const currentZoom = cy.zoom();
+            const newZoom = Math.max(currentZoom * 0.9, 1); // Decrease by 10%, min 1
+            cy.animate({
+                zoom: {
+                    level: newZoom,
+                    position: cy.pan()
+                },
+                center: { eles: cy.elements() },
+                duration: 50
+            });
+        }
+    };
+
+    // const [allowZoom, setAllowZoom] = useState(false);
     const handleAllowZoom = () => {
         const newZoomState = !allowZoom;
         setAllowZoom(newZoomState);
         if (cyRef.current) {
             cyRef.current.userZoomingEnabled(newZoomState);
 
+            cyRef.current.minZoom(0.5);
+            cyRef.current.maxZoom(5);
+
             // Set zoom limits when enabling zoom
-            if (newZoomState) {
-                cyRef.current.minZoom(0.5);
-                cyRef.current.maxZoom(5);
-            }
+            // if (newZoomState) {
+            //     cyRef.current.minZoom(0.5);
+            //     cyRef.current.maxZoom(5);
+            // }
         }
     };
 
@@ -241,7 +278,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
         if (cy) {
 
-            cy.userZoomingEnabled(allowZoom);
+            // cy.userZoomingEnabled(allowZoom);
+            cy.userZoomingEnabled(false);
             cy.style()
                 .selector("node")
                 .style({ label: showLabels ? "data(label)" : "" })
@@ -449,7 +487,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 cy.removeAllListeners();
             };
         }
-    }, [showLabels, nodeTooltip.show, edgeTooltip.show, allowZoom]);
+    // }, [showLabels, nodeTooltip.show, edgeTooltip.show, allowZoom]);
+    }, [showLabels, nodeTooltip.show, edgeTooltip.show]);
 
     const handleZoomToFit = () => {
         cyRef.current?.fit();
@@ -508,7 +547,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             </Paper>
 
             <Paper
-                className="hidden sm:block absolute top-[5em] left-3 z-10 shadow-lg"
+                className="hidden sm:block absolute top-[1em] left-[5em] z-10 shadow-lg"
                 sx={{
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(10px)',
@@ -611,13 +650,29 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             <Tooltip title="Fit to Screen" arrow placement="top">
                 <button
                     onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-3 z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                    className="absolute top-[1em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
                     id='fit-screen-btn'
                 >
                     <CenterFocusWeakIcon />
                 </button>
             </Tooltip>
-            <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
+            <Tooltip title="Zoom In" arrow placement="top">
+                <button
+                    onClick={handleZoomIn}
+                    className="absolute top-[4em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                >
+                    <ZoomInIcon />
+                </button>
+            </Tooltip>
+            <Tooltip title="Zoom Out" arrow placement="top">
+                <button
+                    onClick={handleZoomOut}
+                    className="absolute top-[7em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                >
+                    <ZoomOutIcon />
+                </button>
+            </Tooltip>
+            {/* <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
                 <button
                     onClick={handleAllowZoom}
                     className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
@@ -625,7 +680,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 >
                     {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
                 </button>
-            </Tooltip>
+            </Tooltip> */}
 
 
             {/* Custom node tooltip */}
