@@ -227,13 +227,12 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         const cy = cyRef.current;
         if (cy) {
             const currentZoom = cy.zoom();
-            const newZoom = Math.min(currentZoom * 1.1, 10); // Increase by 10%, max 5
+            const newZoom = Math.min(currentZoom * 1.05, 10); // Increase by 5%, max 10
             cy.animate({
                 zoom: {
                     level: newZoom,
                     position: cy.pan()
                 },
-                center: { eles: cy.elements() },
                 duration: 50
             });
         }
@@ -243,13 +242,12 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         const cy = cyRef.current;
         if (cy) {
             const currentZoom = cy.zoom();
-            const newZoom = Math.max(currentZoom * 0.9, 1); // Decrease by 10%, min 1
+            const newZoom = Math.max(currentZoom * 0.95, 1); // Decrease by 5%, min 1
             cy.animate({
                 zoom: {
                     level: newZoom,
                     position: cy.pan()
                 },
-                center: { eles: cy.elements() },
                 duration: 50
             });
         }
