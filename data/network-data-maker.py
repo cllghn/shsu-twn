@@ -25,7 +25,7 @@ def _():
     from datetime import datetime
     import networkx as nx
     import geopandas as gpd
-    return List, Optional, datetime, gpd, json, mo, np, nx, os, pd
+    return List, Optional, datetime, json, mo, np, nx, os, pd
 
 
 @app.cell(hide_code=True)
@@ -779,7 +779,8 @@ def _(Optional, get_retail_nodes, get_survey_nodes, nodes, pd):
 
 
 @app.cell
-def _():
+def _(nl):
+    nl
     return
 
 
@@ -1009,9 +1010,9 @@ def _(pd):
                            intake_table_path: str, 
                            year: str = None, how: str = 'left'
                           ) -> pd.DataFrame:
-    
+
         assert how in ['outer', 'left', 'right'], f"`how` argument must be outer, left, or right. Nothing else, nothing more."
-    
+
         master_table = pd.read_csv(
             master_table_path,
             usecols=['TWDB Survey Number', 'TCEQ PWS Code', 'PWS Name'],
@@ -1023,7 +1024,7 @@ def _(pd):
                 'PWS Name': 'name'
             }
         )
-    
+
         intake_table = pd.read_csv(
             intake_table_path,
             usecols=['TWDB Survey No', 'PWS Name', 'County Used', 'Year'],
@@ -1045,8 +1046,8 @@ def _(pd):
             on='id',
             how=how)
 
-    
-    
+
+
         return out.drop(columns='Year')
 
     geo_nodes = get_node_geography(
@@ -1082,16 +1083,15 @@ def _(geo_nodes, pd):
             c = v.get('county')
             if  pd.isna(c):
                 c = "NOT AVAILABLE"
-            
+
             if c not in out:
                 out[c] = []
 
             out[c].append(v)
-        
+
         return out
 
     reo_geo_nodes = reorient_by_geo(geo_nodes)
-
     return (reo_geo_nodes,)
 
 
@@ -1102,28 +1102,41 @@ def _(reo_geo_nodes):
 
 
 @app.cell
-def _(gpd):
-    counties = gpd.read_file('https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip')
-    texas_counties = counties[counties['STATEFP'] == '48'].copy()
-    texas_counties.plot()
-    return (texas_counties,)
+def _(json, reo_geo_nodes):
+    import math
+
+    def sanitize(obj):
+        if isinstance(obj, float) and math.isnan(obj):
+            return None
+        if isinstance(obj, dict):
+            return {k: sanitize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [sanitize(v) for v in obj]
+        return obj
+
+    with open('../app/src/data/geo-nodes.json', 'w') as f:
+        json.dump(sanitize(reo_geo_nodes), f, indent=4,
+            allow_nan=False)
 
 
-@app.cell
-def _(texas_counties):
-    texas_counties['NAMES_CAP'] = texas_counties['NAME'].str.upper()
-
-
-    texas_counties.to_geo_dict()
     return
 
 
 @app.cell
-def _(json, reo_geo_nodes, texas_counties):
-    with open('../app/src/data/geo-nodes.json', 'w') as f:
-        json.dump(reo_geo_nodes, f, indent=4)
+def _():
+    # counties = gpd.read_file('https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip')
+    # texas_counties = counties[counties['STATEFP'] == '48'].copy()
+    # texas_counties.plot()
+    return
 
-    texas_counties.to_file('../app/src/data/geo-shapes.json', driver='GeoJSON')
+
+@app.cell
+def _():
+    # texas_counties['NAMES_CAP'] = texas_counties['NAME'].str.upper()
+
+
+    # texas_counties.to_geo_dict()
+    # texas_counties.to_file('../app/src/data/geo-shapes.json')
     return
 
 

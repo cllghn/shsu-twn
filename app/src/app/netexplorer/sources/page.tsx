@@ -227,10 +227,12 @@ const SourcesPageContent: React.FC = () => {
                 
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <div ref={graphContainerRef} className="scroll-mt-24">
-<Tabs
+                                    <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? toTitleCase(filteredNode) : ''} Water Source Data Visualization</Typography>
+                                    <Tabs
                                         value={activeTab}
                                         onChange={handleTabChange}
                                         aria-label="data visualization tabs"
+                                        centered
                                     >
                                         <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
                                         <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />

@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect, Suspense, useRef } from "react";
 import React from 'react';
 import graphData from '@/data/network-data.json';
 import metadata from '@/data/network-meta-data.json';
+import geoNodes from '@/data/geo-nodes.json';
 import { Menu, MenuItem, Button, Paper, Typography, Tabs, Tab, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 import DynamicGraph from "@/components/Graph/DynamicGraph";
@@ -49,13 +50,19 @@ const SystemsPageContent: React.FC = () => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedItem, setSelectedItem] = useState("select a system");
+    const [countyAnchorEl, setCountyAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedCounty, setSelectedCounty] = useState("select a county");
+    const [systemAnchorEl, setSystemAnchorEl] = useState<null | HTMLElement>(null);
     const [filteredNode, setFilteredNode] = useState(null);
     const [filteredData, setFilteredData] = useState(null);
     const [triggerUpdate, setTriggerUpdate] = useState(false);
-    const [searchMode, setSearchMode] = useState<'name' | 'tbd'>('name');
+    const [searchMode, setSearchMode] = useState<'name' | 'geo'>('name');
     const open = Boolean(anchorEl);
+    const countyMenuOpen = Boolean(countyAnchorEl);
+    const systemMenuOpen = Boolean(systemAnchorEl);
 
     function toTitleCase(str: string): string {
+        if (!str) return '';
         return str
             .toLowerCase()
             .replace(/(^|[\/\-\s])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
@@ -126,18 +133,37 @@ const SystemsPageContent: React.FC = () => {
         if (data) {
             const params = new URLSearchParams(searchParams.toString());
             params.set('node', selectedItem);
-            router.push(`?${params.toString()}`);
+            // router.push(`?${params.toString()}`);
+            router.replace(`?${params.toString()}`, { scroll: false });
 
             setFilteredData(data);
             setFilteredNode(selectedItem);
             setTriggerUpdate(!triggerUpdate);
             scrollToRef(graphContainerRef);
-            
+
         }
     };
 
+    const countyMenuItems = Object.keys(geoNodes).sort((a, b) => a.localeCompare(b));
+
+    const handleCountySelect = (county: string) => {
+        setSelectedCounty(county);
+        setCountyAnchorEl(null);
+        // Reset selected system when county changes
+        setSelectedItem("select a system");
+    };
+
+    const handleSystemSelect = (systemId: string) => {
+        setSelectedItem(systemId);
+        setSystemAnchorEl(null);
+    };
+
     const handleSearchModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchMode(event.target.value as 'name' | 'tbd');
+        setSearchMode(event.target.value as 'name' | 'geo');
+
+        // Reset selections when switching modes, this should minimize glitches
+        setSelectedItem("select a system"); 
+        setSelectedCounty("select a county");
     };
 
     function TabPanel(props) {
@@ -180,7 +206,7 @@ const SystemsPageContent: React.FC = () => {
                                     onChange={handleSearchModeChange}
                                 >
                                     <FormControlLabel value="name" control={<Radio />} label="By Name" />
-                                    <FormControlLabel value="tbd" control={<Radio />} label="By Geography" />
+                                    <FormControlLabel value="geo" control={<Radio />} label="By Geography" />
                                 </RadioGroup>
                             </FormControl>
 
@@ -190,8 +216,10 @@ const SystemsPageContent: React.FC = () => {
                                 {searchMode === 'name' && (
 
                                     <div className="flex flex-col">
-                                        <Typography variant="body1" className="mb-4">Begin by selecting a system by name. If you don't know which water system to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus mt-3">list of resources.</Link></Typography>
-                                        <div className="flex flex-row space-x-2 items-center">
+                                        <Typography variant="body1" className="mb-4">
+                                            Begin by selecting a system by name. If you don't know which water system to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus">list of resources.</Link>
+                                        </Typography>
+                                        <div className="flex flex-row space-x-2 items-center pt-5">
                                             <Button
                                                 variant="text"
                                                 onClick={handleClick}
@@ -204,32 +232,89 @@ const SystemsPageContent: React.FC = () => {
                                                 } <ChevronDown size={18} className="ml-1" />
                                             </Button>
 
-                                            <div className="flex justify-start pt-4">
-                                                <Button
-                                                    variant="outlined"
-                                                    onClick={handleGo}
-                                                    disabled={selectedItem === "select a system"}
-                                                    sx={{
-                                                        color: '#ffffff',
-                                                        backgroundColor: '#124559',
-                                                        borderColor: '#ffffff',
-                                                        borderRadius: '5px',
-                                                        '&:hover': {
-                                                            backgroundColor: '#ffffff',
-                                                            borderColor: '#124559',
-                                                            color: '#124559',
-                                                        },
-                                                        '&:disabled': {
-                                                            backgroundColor: 'transparent',
-                                                            borderColor: '#949494',
-                                                            color: '#949494',
-                                                            cursor: 'not-allowed',
-                                                        },
-                                                    }}
-                                                >
-                                                    Go &rarr;
-                                                </Button>
-                                            </div>
+                                            <Button
+                                                variant="outlined"
+                                                onClick={handleGo}
+                                                disabled={selectedItem === "select a system"}
+                                                sx={{
+                                                    color: '#ffffff',
+                                                    backgroundColor: '#124559',
+                                                    borderColor: '#ffffff',
+                                                    borderRadius: '5px',
+                                                    '&:hover': {
+                                                        backgroundColor: '#ffffff',
+                                                        borderColor: '#124559',
+                                                        color: '#124559',
+                                                    },
+                                                    '&:disabled': {
+                                                        backgroundColor: 'transparent',
+                                                        borderColor: '#949494',
+                                                        color: '#949494',
+                                                        cursor: 'not-allowed',
+                                                    },
+                                                }}
+                                            >
+                                                Go &rarr;
+                                            </Button>
+
+                                        </div>
+                                    </div>
+                                )}
+                                {searchMode === 'geo' && (
+                                    <div className="flex flex-col">
+                                        <Typography variant="body1" className="mb-4">
+                                            Select a county to view water systems within that geography.
+                                        </Typography>
+                                        <div className="flex flex-row space-x-2 items-center pt-5">
+                                            {/* County Selection */}
+                                            <Button
+                                                variant="text"
+                                                onClick={(e) => setCountyAnchorEl(e.currentTarget)}
+                                                className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
+                                            >
+                                                {selectedCounty} <ChevronDown size={18} className="ml-1" />
+                                            </Button>
+
+                                            {/* System Selection - only show after county selected */}
+                                            {selectedCounty !== "select a county" && (
+                                                <>
+                                                    <Button
+                                                        variant="text"
+                                                        onClick={(e) => setSystemAnchorEl(e.currentTarget)}
+                                                        className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
+                                                    >
+                                                        {selectedItem === "select a system"
+                                                            ? selectedItem
+                                                            : metadata.systems.kvs[selectedItem]
+                                                        } <ChevronDown size={18} className="ml-1" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="outlined"
+                                                        onClick={handleGo}
+                                                        disabled={selectedItem === "select a system"}
+                                                        sx={{
+                                                            color: '#ffffff',
+                                                            backgroundColor: '#124559',
+                                                            borderColor: '#ffffff',
+                                                            borderRadius: '5px',
+                                                            '&:hover': {
+                                                                backgroundColor: '#ffffff',
+                                                                borderColor: '#124559',
+                                                                color: '#124559',
+                                                            },
+                                                            '&:disabled': {
+                                                                backgroundColor: 'transparent',
+                                                                borderColor: '#949494',
+                                                                color: '#949494',
+                                                                cursor: 'not-allowed',
+                                                            },
+                                                        }}
+                                                    >
+                                                        Go &rarr;
+                                                    </Button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -247,6 +332,35 @@ const SystemsPageContent: React.FC = () => {
                                 </MenuItem>
                             ))}
                         </Menu>
+
+                        <Menu
+                            anchorEl={countyAnchorEl}
+                            open={countyMenuOpen}
+                            onClose={() => setCountyAnchorEl(null)}
+                        >
+                            {countyMenuItems.map((county) => (
+                                <MenuItem key={county} onClick={() => handleCountySelect(county)}>
+                                    {county}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+
+                        <Menu
+                            anchorEl={systemAnchorEl}
+                            open={systemMenuOpen}
+                            onClose={() => setSystemAnchorEl(null)}
+                        >
+                            {selectedCounty !== "select a county" &&
+                                (geoNodes as Record<string, any[]>)[selectedCounty]?.map((systemsInCounty: object) => (
+                                    console.log("Rendering system menu item for ID:", systemsInCounty.id),
+                                    <MenuItem key={systemsInCounty.id} onClick={() => handleSystemSelect(systemsInCounty.id)}>
+                                        {   
+                                            (metadata.systems.kvs as Record<string, string>)[systemsInCounty.id] || systemsInCounty.id
+                                        }
+                                    </MenuItem>
+                                ))
+                            }
+                        </Menu>
                     </Paper>
                 </div>
 
@@ -254,25 +368,27 @@ const SystemsPageContent: React.FC = () => {
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
-                                
-                                    <div className="py-4 px-6 font-medium text-sm justify-center flex items-center bg-[#124559] text-white">
-                                        <InfoIcon />
-                                        <div className="px-2">
-                                            The graph below shows how water flows into and out of the selected water system. It only includes the connections directly linked to that system.
-                                        </div>
-                                        <InfoIcon />
+
+                                <div className="py-4 px-6 font-medium text-sm justify-center flex items-center bg-[#124559] text-white">
+                                    <InfoIcon />
+                                    <div className="px-2">
+                                        The graph below shows how water flows into and out of the selected water system. It only includes the connections directly linked to that system.
                                     </div>
-                                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                        <div ref={graphContainerRef} className="scroll-mt-24">
-                                    <Tabs
-                                        value={activeTab}
-                                        onChange={handleTabChange}
-                                        aria-label="data visualization tabs"
-                                    >
-                                        <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
-                                        <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
-                                        <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
-                                    </Tabs>
+                                    <InfoIcon />
+                                </div>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                    <div ref={graphContainerRef} className="scroll-mt-24">
+                                        <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? toTitleCase(metadata.systems.kvs[filteredNode]) : ''} Water System Data Visualization</Typography>
+                                        <Tabs
+                                            value={activeTab}
+                                            onChange={handleTabChange}
+                                            aria-label="data visualization tabs"
+                                            centered
+                                        >
+                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
+                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
+                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
+                                        </Tabs>
                                     </div>
                                 </Box>
 
@@ -287,7 +403,7 @@ const SystemsPageContent: React.FC = () => {
                                     <div className="flex justify-between items-center">
                                         <Typography variant="h6">
                                             <div className="text-semibold">
-                                                {toTitleCase(metadata.systems.kvs[filteredNode])} Water Flow Insights
+                                                {filteredNode ? toTitleCase(metadata.systems.kvs[filteredNode]) : ''} Water Flow Insights
                                             </div>
                                         </Typography>
                                     </div>

@@ -5,8 +5,6 @@ import fcose from 'cytoscape-fcose';
 import cola from 'cytoscape-cola';
 import Tooltip from '@mui/material/Tooltip';
 import CenterFocusWeakIcon from "@mui/icons-material/CenterFocusWeak";
-import TextFieldsIcon from '@mui/icons-material/TextFields';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
@@ -115,6 +113,63 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
         return volumeData;
     }, [nodes, edges]);
+
+    const parseVolume = (volumeString: string): number => {
+        if (!volumeString || volumeString.trim() === '-') {
+            return null;
+        }
+        const parsed = parseFloat(volumeString.replace(/,/g, ''));
+        return isNaN(parsed) ? null : parsed;
+    };
+
+    const edgeWidthConfig = useMemo(() => {
+        const volumes = edges
+            .map(edge => parseVolume(edge.data.yearly_volume))
+            .filter(v => v !== null) as number[];
+        if (volumes.length === 0) {
+           return { min: 1, max: 1, hasData: false };
+        }
+
+        const minVolume = Math.min(...volumes);
+        const maxVolume = Math.max(...volumes);
+
+        // Define the min and max widths for edges
+        const minWidth = 1;
+        const maxWidth = 5;
+
+        return {
+            minVolume,
+            maxVolume,
+            minWidth,
+            maxWidth,
+            hasData: true
+        };
+
+    }, [edges]);
+
+    const getEdgeWidth = (volumeString: string): number => {
+        const volume = parseVolume(volumeString);
+        
+        // Handle missing data - use thin dashed line
+        if (volume === null) {
+            return 0.5;
+        }
+        
+        if (!edgeWidthConfig.hasData) {
+            return 1;
+        }
+        
+        // Linear scaling
+        const { minVolume, maxVolume, minWidth, maxWidth } = edgeWidthConfig;
+        
+        if (minVolume === maxVolume) {
+            return (minWidth + maxWidth) / 2;
+        }
+        
+        // Normalize between min and max width
+        const normalized = (volume - minVolume) / (maxVolume - minVolume);
+        return minWidth + normalized * (maxWidth - minWidth);
+    };
 
     // Search term and selected node state -------------------------------------
     const [searchTerm, setSearchTerm] = useState('');
@@ -290,7 +345,9 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             };
 
             // Add event listeners for tooltips
-            const calculateNodeTooltipPosition = (renderedX, renderedY, tooltipWidth = 300, tooltipHeight = 200) => {
+            const calculateNodeTooltipPosition = (renderedX, renderedY,
+                tooltipWidth = 300, tooltipHeight = 200) => {
+                
                 const cy = cyRef.current;
                 if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
 
@@ -331,7 +388,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 cy.elements().difference(neighborhood).addClass('faded');
 
                 const position = event.renderedPosition || event.position;
-                const tooltipPos = calculateNodeTooltipPosition(position.x, position.y);
+                const tooltipPos = calculateNodeTooltipPosition(
+                    position.x, position.y);
 
                 // Hide edge tooltip if it's showing
                 setEdgeTooltip(prev => ({ ...prev, show: false }));
@@ -363,7 +421,9 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 // Remove highlight class from all nodes
             });
 
-            const calculateEdgeTooltipPosition = (renderedX, renderedY, tooltipWidth = 300, tooltipHeight = 200) => {
+            const calculateEdgeTooltipPosition = (renderedX, renderedY, 
+                tooltipWidth = 300, tooltipHeight = 200) => {
+                
                 const cy = cyRef.current;
                 if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
 
@@ -510,7 +570,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     return (
         <div className='min-h-screen relative'>
-            <Paper className="hidden sm:block absolute top-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
+            <Paper className="hidden sm:block absolute top-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-40">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
@@ -752,7 +812,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     {
                         selector: "edge",
                         style: {
-                            "width": 1,
+                            "width": (ele) => getEdgeWidth(ele.data("yearly_volume")),
                             "line-color": "#ccc",
                             "mid-target-arrow-shape": "vee",
                             "mid-target-arrow-color": "#ccc",
