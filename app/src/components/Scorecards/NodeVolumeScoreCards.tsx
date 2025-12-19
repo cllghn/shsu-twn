@@ -458,7 +458,11 @@ const NodeVolumeScoreCards = ({ data, selected, nodeType }: { data: any, selecte
                 <tbody className="divide-y divide-gray-200">
                   {edgesWhereSelectedIsTarget.map((row, index) => (
                     <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                      <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
+                      <td className="py-2 px-4 text-sm text-gray-900">
+                        <a href={`/netexplorer/${isNaN(Number(row.data.source)) ? 'sources' : 'systems'}?node=${encodeURIComponent(row.data.source)}`} className="aPlus">
+                          {row.data.sourceUnifiedName} &rarr;
+                        </a>
+                      </td>
                       <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
                       <td className="py-2 px-4 text-sm text-gray-900">{formatVolume(parseFloat(row.data.yearly_volume.replace(/,/g, '')) || 0, isAcreFeet)}</td>
                       <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
@@ -501,7 +505,11 @@ const NodeVolumeScoreCards = ({ data, selected, nodeType }: { data: any, selecte
                 {edgesWhereSelectedIsSource.map((row, index) => (
                   <tr key={row.data.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.sourceUnifiedName}</td>
-                    <td className="py-2 px-4 text-sm text-gray-900">{row.data.targetUnifiedName}</td>
+                    <td className="py-2 px-4 text-sm text-gray-900">
+                      <a href={`/netexplorer/systems?node=${encodeURIComponent(row.data.target)}`} className="aPlus">
+                        {row.data.targetUnifiedName} &rarr;
+                      </a>
+                    </td>
                     <td className="py-2 px-4 text-sm text-gray-900">{formatVolume(parseFloat(row.data.yearly_volume.replace(/,/g, '')) || 0, isAcreFeet)}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.water_type}</td>
                     <td className="py-2 px-4 text-sm text-gray-900">{row.data.purchased_self}</td>

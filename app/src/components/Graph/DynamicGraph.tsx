@@ -286,8 +286,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             cy.animate({
                 zoom: {
                     level: newZoom,
-                    position: cy.pan()
-                },
+                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }                },
                 duration: 50
             });
         }
@@ -301,7 +300,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             cy.animate({
                 zoom: {
                     level: newZoom,
-                    position: cy.pan()
+                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } 
                 },
                 duration: 50
             });
@@ -528,7 +527,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             const params = new URLSearchParams(searchParams.toString());
                             const nodeData = node.data();
                             const waterPath = nodeData.preliminary_type === "water source" ? "sources" : "systems";
-                            const nodeName = waterPath === "sources" ? nodeData.unified_name : nodeData.unified_name.toUpperCase();
+                            const nodeName = waterPath === "sources" ? nodeData.unified_name : nodeData.id;
                             params.set('node', nodeName);
                             router.push(`/netexplorer/${waterPath}?${params.toString()}`);
                         },
