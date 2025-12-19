@@ -1,7 +1,7 @@
 "use client";
 
 import type { Metadata } from "next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import { Analytics } from "@vercel/analytics/react"
 import { Geist, Geist_Mono } from "next/font/google";
@@ -28,7 +28,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const hasSeenDisclaimer = sessionStorage.getItem('hasSeenTWNetDisclaimer');
+    if (!hasSeenDisclaimer) {
+      setOpen(true);  
+    }
+  }, []);
+
+  const handleClose = () => {
+    setOpen(false);
+    sessionStorage.setItem('hasSeenTWNetDisclaimer', 'true');
+  };
 
   return (
     <html lang="en">
@@ -51,7 +62,7 @@ export default function RootLayout({
           <div className="flex justify-center mr-4 mb-4">
             <DialogActions>
               <Button  
-                onClick={() => setOpen(false)}
+                onClick={handleClose}
                 variant="contained"
                 sx={{
                   color: '#ffffff',

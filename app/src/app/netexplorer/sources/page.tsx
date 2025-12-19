@@ -61,11 +61,12 @@ const SourcesPageContent: React.FC = () => {
         if (!selected || selected === "select a source") return null;
 
         // Filter edges where the source matches the provided sourceId
-        const titleSelected = toTitleCase(selected);
-        const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === titleSelected);
-        const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), titleSelected]));
+        // const titleSelected = selected; //toTitleCase(selected); <- This was 
+        // removed because it failed to capitalize after the ( character
+        const sourceEdges = graphData.elements.edges.filter(edge => edge.data.source === selected);
+        const uniqueTargets = Array.from(new Set([...sourceEdges.map(edge => edge.data.target), selected]));
         const filteredEdges = graphData.elements.edges.filter(edge => uniqueTargets.includes(edge.data.source));
-        const uniqueNodes = Array.from(new Set([titleSelected, ...uniqueTargets,
+        const uniqueNodes = Array.from(new Set([selected, ...uniqueTargets,
             ...filteredEdges.map(edge => edge.data.target)])).filter(Boolean);
         const filteredNodes = graphData.elements.nodes.filter(node => uniqueNodes.includes(node.data.id));
 
@@ -227,7 +228,7 @@ const SourcesPageContent: React.FC = () => {
                 
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <div ref={graphContainerRef} className="scroll-mt-24">
-                                    <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? toTitleCase(filteredNode) : ''} Water Source Data Visualization</Typography>
+                                    <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? filteredNode : ''} Water Source Data Visualization</Typography>
                                     <Tabs
                                         value={activeTab}
                                         onChange={handleTabChange}
