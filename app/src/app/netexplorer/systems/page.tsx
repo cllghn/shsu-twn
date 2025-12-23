@@ -19,7 +19,7 @@ import Glossary from "@/components/Glossary/Glossary";
 import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
 import { scrollToRef } from "@/utils/scrollHelpers";
-import { systemTour } from "@/components/Guide/systemGuide";
+// import { systemTour } from "@/components/Guide/systemGuide";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 
@@ -44,6 +44,16 @@ const SystemsPageContent: React.FC = () => {
     const searchParams = useSearchParams();
 
     const graphContainerRef = useRef<HTMLDivElement>(null);
+
+    // Add state for the tour
+    const [systemTour, setSystemTour] = useState<any>(null);
+
+    // Dynamically import the tour on client side only
+    useEffect(() => {
+        import("@/components/Guide/systemGuide").then((module) => {
+            setSystemTour(module.systemTour);
+        });
+    }, []);
 
     // Use keys instead of values
     const nodeKeys = Object.keys(metadata.systems.kvs);
