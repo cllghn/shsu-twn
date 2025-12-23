@@ -879,6 +879,38 @@ def _(el_noparallel):
     return
 
 
+@app.cell
+def _(pd):
+    (pd.read_excel('inputs/20251003 2023 intake+sales+retail data for Reyna Loosmore (Sam Houston).xlsx', 
+                   sheet_name='Intake')[['surveyNo', 'SurveyForm']]
+        .drop_duplicates()
+        .rename(columns={"surveyNo": "id2023", "SurveyForm": "form2023"})
+        .astype({"id2023": "str"})
+    ).describe()
+    return
+
+
+@app.cell
+def _(nl_tidy, pd):
+    types2023 = (pd.read_excel('inputs/20251003 2023 intake+sales+retail data for Reyna Loosmore (Sam Houston).xlsx', 
+                   sheet_name='Intake')[['surveyNo', 'SurveyForm']]
+        .drop_duplicates()
+        .rename(columns={"surveyNo": "id2023", "SurveyForm": "form2023"})
+        .astype({"id2023": "str"})
+    )
+
+    test = nl_tidy.merge(types2023, left_on='id', right_on='id2023', how='left')
+    test
+
+    return (test,)
+
+
+@app.cell
+def _(pd, test):
+    test[(pd.isna(test['id2023'])) & (test['preliminary_type'] == "water system")]
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""

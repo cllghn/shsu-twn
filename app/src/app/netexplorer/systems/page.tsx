@@ -11,12 +11,17 @@ import InfoIcon from '@mui/icons-material/Info';
 import ShareIcon from '@mui/icons-material/Share';
 import InsightsIcon from '@mui/icons-material/Insights';
 import ArticleIcon from '@mui/icons-material/Article';
+import SignpostIcon from '@mui/icons-material/Signpost';
+import SearchIcon from '@mui/icons-material/Search';
 import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
 import Glossary from "@/components/Glossary/Glossary";
 import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
 import { scrollToRef } from "@/utils/scrollHelpers";
+import { systemTour } from "@/components/Guide/systemGuide";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
@@ -57,6 +62,14 @@ const SystemsPageContent: React.FC = () => {
     const [filteredData, setFilteredData] = useState(null);
     const [triggerUpdate, setTriggerUpdate] = useState(false);
     const [searchMode, setSearchMode] = useState<'name' | 'geo'>('name');
+    
+    // State for text search
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredSystems, setFilteredSystems] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isValidSelection, setIsValidSelection] = useState(false);
+    
     const open = Boolean(anchorEl);
     const countyMenuOpen = Boolean(countyAnchorEl);
     const systemMenuOpen = Boolean(systemAnchorEl);
@@ -107,6 +120,8 @@ const SystemsPageContent: React.FC = () => {
         const nodeParam = searchParams.get('node');
         if (nodeParam && menuItems.includes(nodeParam)) {
             setSelectedItem(nodeParam);
+            setSearchTerm(metadata.systems.kvs[nodeParam]);
+            setIsValidSelection(true);
             const data = filterDataBySource(nodeParam);
             if (data) {
                 setFilteredData(data);
@@ -125,6 +140,65 @@ const SystemsPageContent: React.FC = () => {
         setAnchorEl(null);
     };
 
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        setSelectedIndex(-1);
+        setIsValidSelection(false);
+        setSelectedItem("select a system");
+
+        if (value.trim() === "") {
+            setFilteredSystems([]);
+            setShowDropdown(false);
+        } else {
+            const filtered = menuItems.filter(key =>
+                metadata.systems.kvs[key].toLowerCase().includes(value.toLowerCase())
+            ).map(key => ({ key, name: metadata.systems.kvs[key] }));
+            setFilteredSystems(filtered);
+            setShowDropdown(true);
+        }
+    };
+
+    const handleSelectOption = (item) => {
+        setSearchTerm(item.name);
+        setSelectedItem(item.key);
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        setIsValidSelection(true);
+    };
+
+    const handleKeyDown = (e) => {
+        if (!showDropdown || filteredSystems.length === 0) {
+            if (e.key === 'Enter' && isValidSelection) {
+                handleGo();
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex(prev =>
+                    prev < filteredSystems.length - 1 ? prev + 1 : prev
+                );
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0) {
+                    handleSelectOption(filteredSystems[selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                setSelectedIndex(-1);
+                break;
+        }
+    };
+
     const handleGo = () => {
         if (selectedItem === "select a system") return;
 
@@ -133,14 +207,12 @@ const SystemsPageContent: React.FC = () => {
         if (data) {
             const params = new URLSearchParams(searchParams.toString());
             params.set('node', selectedItem);
-            // router.push(`?${params.toString()}`);
             router.replace(`?${params.toString()}`, { scroll: false });
 
             setFilteredData(data);
             setFilteredNode(selectedItem);
             setTriggerUpdate(!triggerUpdate);
             scrollToRef(graphContainerRef);
-
         }
     };
 
@@ -149,7 +221,6 @@ const SystemsPageContent: React.FC = () => {
     const handleCountySelect = (county: string) => {
         setSelectedCounty(county);
         setCountyAnchorEl(null);
-        // Reset selected system when county changes
         setSelectedItem("select a system");
     };
 
@@ -160,10 +231,14 @@ const SystemsPageContent: React.FC = () => {
 
     const handleSearchModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchMode(event.target.value as 'name' | 'geo');
-
-        // Reset selections when switching modes, this should minimize glitches
-        setSelectedItem("select a system"); 
+        
+        // Reset selections when switching modes
+        setSelectedItem("select a system");
         setSelectedCounty("select a county");
+        setSearchTerm("");
+        setFilteredSystems([]);
+        setShowDropdown(false);
+        setIsValidSelection(false);
     };
 
     function TabPanel(props) {
@@ -195,8 +270,35 @@ const SystemsPageContent: React.FC = () => {
             <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
                 <div>
                     <Paper elevation={2} className="p-6">
-                        <Typography variant="h4" className="pb-4">Explore How Data Flows through <Tooltip title="Water systems are the nodes involved in the sale and distribution in the network." arrow><span className="border-b-2 border-dotted border-[#124559]">Water Systems</span></Tooltip></Typography>
-                        <Box>
+                        <div className="flex justify-between">
+                            <Typography variant="h4" className="pb-4">Explore How Data Flows through <Tooltip title="Water systems are the nodes involved in the sale and distribution in the network." arrow><span className="border-b-2 border-dotted border-[#124559]">Water Systems</span></Tooltip></Typography>
+                            <Tooltip title="Start a guided tour of the water system visualizer" arrow>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#124559',
+                                        borderColor: '#ffffff',
+                                        borderRadius: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#ffffff',
+                                            borderColor: '#124559',
+                                            color: '#124559',
+                                        },
+                                        '&:disabled': {
+                                            backgroundColor: 'transparent',
+                                            borderColor: '#949494',
+                                            color: '#949494',
+                                            cursor: 'not-allowed',
+                                        },
+                                    }}
+                                    onClick={() => systemTour.start()}>
+                                    <SignpostIcon sx={{ mr: 1 }} />
+                                    Tour
+                                </Button>
+                            </Tooltip>
+                        </div>
+                        <Box id='search-mode-box'>
                             {/* Radio buttons for search mode */}
                             <FormControl component="fieldset" className="mb-4">
                                 <FormLabel component="legend">Search mode:</FormLabel>
@@ -211,52 +313,90 @@ const SystemsPageContent: React.FC = () => {
                             </FormControl>
 
                             <div className="flex flex-col flex-wrap">
-
-
                                 {searchMode === 'name' && (
-
                                     <div className="flex flex-col">
                                         <Typography variant="body1" className="mb-4">
                                             Begin by selecting a system by name. If you don't know which water system to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus">list of resources.</Link>
                                         </Typography>
                                         <div className="flex flex-row space-x-2 items-center pt-5">
-                                            <Button
-                                                variant="text"
-                                                onClick={handleClick}
-                                                className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
-                                                id="dropdown-button"
-                                            >
-                                                {selectedItem === "select a system"
-                                                    ? selectedItem
-                                                    : metadata.systems.kvs[selectedItem]
-                                                } <ChevronDown size={18} className="ml-1" />
-                                            </Button>
+                                            <div className="flex-grow relative" style={{ maxWidth: '500px' }}>
+                                                <TextField
+                                                    variant="outlined"
+                                                    placeholder="Search for water systems..."
+                                                    fullWidth
+                                                    size="small"
+                                                    value={searchTerm}
+                                                    onChange={handleSearchChange}
+                                                    onKeyDown={handleKeyDown}
+                                                    id="dropdown-button"
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                <SearchIcon />
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            backgroundColor: '#ffffff',
+                                                            '&:hover fieldset': {
+                                                                borderColor: '#124559',
+                                                            },
+                                                            '&.Mui-focused fieldset': {
+                                                                borderColor: '#124559',
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                                {/* Dropdown */}
+                                                {showDropdown && filteredSystems.length > 0 && (
+                                                    <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                                                        {filteredSystems.slice(0, 10).map((item, index) => (
+                                                            <div
+                                                                key={item.key}
+                                                                className={`px-4 py-2 cursor-pointer transition-colors ${index === selectedIndex
+                                                                    ? 'bg-[#124559] text-white'
+                                                                    : 'hover:bg-gray-100'
+                                                                    }`}
+                                                                onClick={() => handleSelectOption(item)}
+                                                                onMouseEnter={() => setSelectedIndex(index)}
+                                                            >
+                                                                <span className="font-medium">{item.name}</span>
+                                                            </div>
+                                                        ))}
+                                                        {filteredSystems.length > 10 && (
+                                                            <div className="px-4 py-2 text-gray-500 text-sm italic">
+                                                                ... and {filteredSystems.length - 10} more results
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
 
                                             <Button
                                                 variant="outlined"
                                                 onClick={handleGo}
-                                                disabled={selectedItem === "select a system"}
+                                                id="go-button"
+                                                disabled={!isValidSelection}
                                                 sx={{
                                                     color: '#ffffff',
                                                     backgroundColor: '#124559',
                                                     borderColor: '#ffffff',
                                                     borderRadius: '5px',
+                                                    minWidth: '80px',
                                                     '&:hover': {
                                                         backgroundColor: '#ffffff',
                                                         borderColor: '#124559',
                                                         color: '#124559',
                                                     },
                                                     '&:disabled': {
-                                                        backgroundColor: 'transparent',
-                                                        borderColor: '#949494',
-                                                        color: '#949494',
-                                                        cursor: 'not-allowed',
+                                                        backgroundColor: '#cccccc',
+                                                        color: '#666666',
                                                     },
                                                 }}
                                             >
                                                 Go &rarr;
                                             </Button>
-
                                         </div>
                                     </div>
                                 )}
@@ -354,7 +494,7 @@ const SystemsPageContent: React.FC = () => {
                                 (geoNodes as Record<string, any[]>)[selectedCounty]?.map((systemsInCounty: object) => (
                                     console.log("Rendering system menu item for ID:", systemsInCounty.id),
                                     <MenuItem key={systemsInCounty.id} onClick={() => handleSystemSelect(systemsInCounty.id)}>
-                                        {   
+                                        {
                                             (metadata.systems.kvs as Record<string, string>)[systemsInCounty.id] || systemsInCounty.id
                                         }
                                     </MenuItem>
@@ -364,7 +504,7 @@ const SystemsPageContent: React.FC = () => {
                     </Paper>
                 </div>
 
-                <div>
+                <div id='results-area'>
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
@@ -385,9 +525,9 @@ const SystemsPageContent: React.FC = () => {
                                             aria-label="data visualization tabs"
                                             centered
                                         >
-                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
-                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
-                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
+                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" id="graph-area" />
+                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" id="insights-area" />
+                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" id="glossary-area" />
                                         </Tabs>
                                     </div>
                                 </Box>

@@ -522,14 +522,27 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 selector: 'node',
                 commands: [
                     {
-                        content: 'See node network',
-                        select: (node) => {
+                        content: 'Go to Node',
+                        select: (node: cytoscape.NodeSingular) => {
                             const params = new URLSearchParams(searchParams.toString());
                             const nodeData = node.data();
                             const waterPath = nodeData.preliminary_type === "water source" ? "sources" : "systems";
                             const nodeName = waterPath === "sources" ? nodeData.unified_name : nodeData.id;
                             params.set('node', nodeName);
                             router.push(`/netexplorer/${waterPath}?${params.toString()}`);
+                        },
+                        openMenuEvents: 'cxttapstart taphold',
+                        outsideMenuCancel: true
+                    },
+                    {
+                        content: 'Center View',
+                        select: (node: cytoscape.NodeSingular) => {
+                            cy.animate({
+                                center: { eles: node },
+                                zoom: Math.max(cy.zoom(), 3)
+                            }, {
+                                duration: 500
+                            });
                         },
                         openMenuEvents: 'cxttapstart taphold',
                         outsideMenuCancel: true
@@ -704,40 +717,44 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     autoComplete
                 />
             </Paper>
-            <Tooltip title="Fit to Screen" arrow placement="top">
-                <button
-                    onClick={handleZoomToFit}
-                    className="absolute top-[1em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='fit-screen-btn'
-                >
-                    <CenterFocusWeakIcon />
-                </button>
-            </Tooltip>
-            <Tooltip title="Zoom In" arrow placement="top">
-                <button
-                    onClick={handleZoomIn}
-                    className="absolute top-[4em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                >
-                    <ZoomInIcon />
-                </button>
-            </Tooltip>
-            <Tooltip title="Zoom Out" arrow placement="top">
-                <button
-                    onClick={handleZoomOut}
-                    className="absolute top-[7em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                >
-                    <ZoomOutIcon />
-                </button>
-            </Tooltip>
-            {/* <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
-                <button
-                    onClick={handleAllowZoom}
-                    className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                    id='fit-screen-btn'
-                >
-                    {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
-                </button>
-            </Tooltip> */}
+            <Paper id='graph-button-cluster'>
+                <Tooltip title="Fit to Screen" arrow placement="top">
+                    <button
+                        onClick={handleZoomToFit}
+                        className="absolute top-[1em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                        id='fit-screen-btn'
+                    >
+                        <CenterFocusWeakIcon />
+                    </button>
+                </Tooltip>
+                <Tooltip title="Zoom In" arrow placement="top">
+                    <button
+                        onClick={handleZoomIn}
+                        className="absolute top-[4em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                        id='zoom-in-btn'
+                    >
+                        <ZoomInIcon />
+                    </button>
+                </Tooltip>
+                <Tooltip title="Zoom Out" arrow placement="top">
+                    <button
+                        onClick={handleZoomOut}
+                        className="absolute top-[7em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                        id='zoom-out-btn'
+                    >
+                        <ZoomOutIcon />
+                    </button>
+                </Tooltip>
+                {/* <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
+                    <button
+                        onClick={handleAllowZoom}
+                        className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                        id='fit-screen-btn'
+                    >
+                        {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
+                    </button>
+                </Tooltip> */}
+            </Paper>
 
 
             {/* Custom node tooltip */}

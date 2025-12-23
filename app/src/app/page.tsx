@@ -318,7 +318,7 @@ export default function Home() {
                   <ul className="flex flex-col space-y-4">
                     <div>
                       <Link href="./netexplorer/sources?node=Carrizo-Wilcox+Aquifer" className="aPlus">
-                        <CircleIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> Carrize-Wilcox Aquifer &rarr;
+                        <CircleIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> Carrizo-Wilcox Aquifer &rarr;
                       </Link>
                     </div>
                     <div>
