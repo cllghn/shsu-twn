@@ -257,7 +257,7 @@ const SourcesPageContent: React.FC = () => {
                             </Button>
 
                         </div>
-                        <div className="flex flex-col flex-wrap">
+                        <div className="flex flex-col flex-wrap" id="search-mode-box">
                             <Typography variant="body1" className="mb-4">Begin by selecting a source by name. If you don't know which water source to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus mt-3">list of resources.</Link></Typography>
                             <div className="flex flex-row space-x-2 items-center pt-5">
                                 <div className="flex-grow relative" style={{ maxWidth: '500px' }}>
@@ -356,7 +356,7 @@ const SourcesPageContent: React.FC = () => {
                     </Paper>
                 </div >
 
-                <div>
+                <div id='results-area'>
                     <Paper className="min-h-screen" elevation={2}>
                         {filteredData ? (
                             <Box sx={{ width: '100%' }}>
@@ -377,9 +377,12 @@ const SourcesPageContent: React.FC = () => {
                                             aria-label="data visualization tabs"
                                             centered
                                         >
-                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
-                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
-                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
+                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start"
+                                                id="graph-area" />
+                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start"
+                                                id="insights-area" />
+                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start"
+                                                id="glossary-area" />
                                         </Tabs>
                                     </div>
 
