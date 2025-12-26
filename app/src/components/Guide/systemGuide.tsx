@@ -16,7 +16,7 @@ export const systemTour = new Shepherd.Tour({
 
 systemTour.addStep({
   id: 'welcome',
-  title: 'Tour Welcome 🗺️',
+  title: '🗺️ Tour Welcome',
   text: 'Welcome to the Water System Visualizer guide! This tour will walk you through the main features of the system view.',
   buttons: [
     {
@@ -34,7 +34,7 @@ systemTour.addStep({
 
 systemTour.addStep({
   id: 'search-area',
-  title: 'How to Search 🔍',
+  title: '🔍 How to Search',
   text: 'This is the main search area where you can select different search modes to explore water systems. You can search by name or by location. Once you select a mode, enter your query and hit \'Go &rarr;\' to see the results.',
   attachTo: {
     element: '#search-mode-box',
@@ -55,7 +55,7 @@ systemTour.addStep({
 
 systemTour.addStep({
   id: 'results-area',
-  title: 'Viewing Results 📋',
+  title: '📋 Viewing Results',
   text: 'After performing a search, the results will be displayed here.',
   attachTo: {
     element: '#results-area',
@@ -90,7 +90,7 @@ systemTour.addStep({
 
 systemTour.addStep({
   id: 'graph-area',
-  title: 'Graph Visualization 📊',
+  title: '📊 Graph Visualization',
   text: 'This area displays the graph visualization of the water systems based on your search criteria.',
   attachTo: {
     element: '#graph-area',
@@ -118,11 +118,11 @@ systemTour.addStep({
 });
 
 systemTour.addStep({
-  id: 'graph-controls',
-  title: 'Graph Controls ⚙️',
-  text: 'Use these controls to manipulate the graph visualization, such as zooming in/out, resetting the view, or changing ....',
+  id: 'graph-controls1',
+  title: '⚙️ Graph Controls: Fit to Screen',
+  text: 'This button allows you to fit the entire graph within the visible area for better viewing.',
   attachTo: {
-    element: '#graph-button-cluster',
+    element: '#fit-screen-btn',
     on: 'top'
   },
   buttons: [
@@ -148,8 +148,99 @@ systemTour.addStep({
 });
 
 systemTour.addStep({
+  id: 'graph-controls2',
+  title: '⚙️ Graph Controls: Zoom In',
+  text: 'This button allows you to zoom in on the graph for a closer look at specific areas.',
+  attachTo: {
+    element: '#zoom-in-btn',
+    on: 'top'
+  },
+  buttons: [
+    {
+      text: 'Back',
+      action: systemTour.back,
+      secondary: true
+    },
+    {
+      text: 'Next',
+      action: systemTour.next
+    }
+  ],
+  when: {
+    show: function () {
+      const graphTab = document.querySelector("#graph-area") as HTMLElement;
+      if (graphTab) {
+        graphTab.click();
+      }
+    },
+
+  }
+});
+
+systemTour.addStep({
+  id: 'graph-controls3',
+  title: '⚙️ Graph Controls: Zoom Out',
+  text: 'This button allows you to zoom out on the graph to see a broader view of the network.',
+  attachTo: {
+    element: '#zoom-out-btn',
+    on: 'top'
+  },
+  buttons: [
+    {
+      text: 'Back',
+      action: systemTour.back,
+      secondary: true
+    },
+    {
+      text: 'Next',
+      action: systemTour.next
+    }
+  ],
+  when: {
+    show: function () {
+      const graphTab = document.querySelector("#graph-area") as HTMLElement;
+      if (graphTab) {
+        graphTab.click();
+      }
+    },
+
+  }
+});
+
+systemTour.addStep({
+  id: 'graph-controls4',
+  title: '⚙️ Graph Controls: Node Search',
+  text: 'This search bar allows you to quickly locate specific nodes within the graph by entering their name.',
+  attachTo: {
+    element: '#node-search',
+    on: 'top'
+  },
+  buttons: [
+    {
+      text: 'Back',
+      action: systemTour.back,
+      secondary: true
+    },
+    {
+      text: 'Next',
+      action: systemTour.next
+    }
+  ],
+  when: {
+    show: function () {
+      const graphTab = document.querySelector("#graph-area") as HTMLElement;
+      if (graphTab) {
+        graphTab.click();
+      }
+    },
+
+  }
+});
+
+
+systemTour.addStep({
   id: 'insights-area',
-  title: 'Insights 📊',
+  title: '📊 Insights',
   text: 'The insights tab provides detailed analytics about the selected water systems.',
   attachTo: {
     element: '#insights-area',
@@ -178,7 +269,7 @@ systemTour.addStep({
 
 systemTour.addStep({
   id: 'glossary-area',
-  title: 'Glossary 📚',
+  title: '📚 Glossary',
   text: 'The glossary tab provides definitions and explanations of key terms related to water systems.',
   attachTo: {
     element: '#glossary-area',

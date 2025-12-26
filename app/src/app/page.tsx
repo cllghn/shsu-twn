@@ -175,8 +175,8 @@ export default function Home() {
                           <div
                             key={index}
                             className={`px-4 py-2 cursor-pointer transition-colors ${index === selectedIndex
-                                ? 'bg-[#124559] text-white'
-                                : 'hover:bg-gray-100'
+                              ? 'bg-[#124559] text-white'
+                              : 'hover:bg-gray-100'
                               }`}
                             onClick={() => handleSelectOption(item)}
                             onMouseEnter={() => setSelectedIndex(index)}
@@ -214,7 +214,7 @@ export default function Home() {
                       },
                     }}
                   >
-                    Go
+                    Go &rarr;
                   </Button>
                 </div>
                 <div className="w-full flex py-5 items-center">
