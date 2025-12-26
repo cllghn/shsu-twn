@@ -19,7 +19,7 @@ import Glossary from "@/components/Glossary/Glossary";
 import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
 import { scrollToRef } from "@/utils/scrollHelpers";
-// import { systemTour } from "@/components/Guide/systemGuide";
+
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 
@@ -72,14 +72,14 @@ const SystemsPageContent: React.FC = () => {
     const [filteredData, setFilteredData] = useState(null);
     const [triggerUpdate, setTriggerUpdate] = useState(false);
     const [searchMode, setSearchMode] = useState<'name' | 'geo'>('name');
-    
+
     // State for text search
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredSystems, setFilteredSystems] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [isValidSelection, setIsValidSelection] = useState(false);
-    
+
     const open = Boolean(anchorEl);
     const countyMenuOpen = Boolean(countyAnchorEl);
     const systemMenuOpen = Boolean(systemAnchorEl);
@@ -241,7 +241,7 @@ const SystemsPageContent: React.FC = () => {
 
     const handleSearchModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchMode(event.target.value as 'name' | 'geo');
-        
+
         // Reset selections when switching modes
         setSelectedItem("select a system");
         setSelectedCounty("select a county");

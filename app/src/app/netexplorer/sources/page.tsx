@@ -14,9 +14,14 @@ import NodeVolumeScoreCards from "@/components/Scorecards/NodeVolumeScoreCards";
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from "next/link";
 import Tooltip from '@mui/material/Tooltip';
+import SignpostIcon from '@mui/icons-material/Signpost';
 
 import Glossary from "@/components/Glossary/Glossary";
 import { scrollToRef } from "@/utils/scrollHelpers";
+
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from '@mui/icons-material/Search';
 
 // Loading component for Suspense fallback
 const LoadingFallback = () => (
@@ -38,7 +43,21 @@ const SourcesPageContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    // State for text search
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredSources, setFilteredSources] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isValidSelection, setIsValidSelection] = useState(false);
+
     const graphContainerRef = useRef<HTMLDivElement>(null);
+
+    const [sourceTour, setSourceTour] = useState<any>(null);
+    useEffect(() => {
+        import("@/components/Guide/sourceGuide").then((module) => {
+            setSourceTour(module.sourceTour);
+        });
+    }, []);
 
     const nodeKeys = Object.keys(metadata.sources.kvs);
     const menuItems = nodeKeys.sort((a, b) => a.localeCompare(b));
@@ -85,6 +104,8 @@ const SourcesPageContent: React.FC = () => {
         const nodeParam = searchParams.get('node');
         if (nodeParam && menuItems.includes(nodeParam)) {
             setSelectedItem(nodeParam);
+            setSearchTerm(nodeParam);
+            setIsValidSelection(true);
             const data = filterDataBySource(nodeParam);
             if (data) {
                 setFilteredData(data);
@@ -94,13 +115,68 @@ const SourcesPageContent: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
     const handleClose = (item) => {
         if (item) setSelectedItem(item); // Update button text on selection
         setAnchorEl(null);
+    };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        setSelectedIndex(-1);
+        setIsValidSelection(false);
+        setSelectedItem("select a source");
+
+        if (value.trim() === "") {
+            setFilteredSources([]);
+            setShowDropdown(false);
+        } else {
+            const filtered = menuItems.filter(source =>
+                source.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredSources(filtered);
+            setShowDropdown(true);
+        }
+    };
+
+    const handleSelectOption = (source) => {
+        setSearchTerm(source);
+        setSelectedItem(source);
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        setIsValidSelection(true);
+    };
+
+    const handleKeyDown = (e) => {
+        if (!showDropdown || filteredSources.length === 0) {
+            if (e.key === 'Enter' && isValidSelection) {
+                handleGo();
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex(prev =>
+                    prev < filteredSources.length - 1 ? prev + 1 : prev
+                );
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0) {
+                    handleSelectOption(filteredSources[selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                setSelectedIndex(-1);
+                break;
+        }
     };
 
     // Handle the Go button click
@@ -113,7 +189,7 @@ const SourcesPageContent: React.FC = () => {
             // Update the URL with the selected node
             const params = new URLSearchParams(searchParams.toString());
             params.set('node', selectedItem);
-            router.push(`?${params.toString()}`);
+            router.replace(`?${params.toString()}`, { scroll: false });
 
             // Update state
             setFilteredData(data);
@@ -154,48 +230,114 @@ const SourcesPageContent: React.FC = () => {
             <main className='container flex flex-col w-full mt-16 m-28 mx-auto px-24 pt-14 space-y-4'>
                 <div>
                     <Paper elevation={2} className="p-6">
-                        <Typography variant="h4" className="pb-4">Explore How Data Flows from <Tooltip title="Water sources include surface water and ground water from which water flows into the system." arrow><span className="border-b-2 border-dotted border-[#124559]">Water Sources</span></Tooltip></Typography>
+                        <div className="flex justify-between">
+                            <Typography variant="h4" className="pb-4">Explore How Data Flows from <Tooltip title="Water sources include surface water and ground water from which water flows into the system." arrow><span className="border-b-2 border-dotted border-[#124559]">Water Sources</span></Tooltip></Typography>
+                            <Button
+                                variant="outlined"
+                                sx={{
+                                    color: '#ffffff',
+                                    backgroundColor: '#124559',
+                                    borderColor: '#ffffff',
+                                    borderRadius: '5px',
+                                    '&:hover': {
+                                        backgroundColor: '#ffffff',
+                                        borderColor: '#124559',
+                                        color: '#124559',
+                                    },
+                                    '&:disabled': {
+                                        backgroundColor: 'transparent',
+                                        borderColor: '#949494',
+                                        color: '#949494',
+                                        cursor: 'not-allowed',
+                                    },
+                                }}
+                                onClick={() => sourceTour.start()}>
+                                <SignpostIcon sx={{ mr: 1 }} />
+                                Tour
+                            </Button>
+
+                        </div>
                         <div className="flex flex-col flex-wrap">
                             <Typography variant="body1" className="mb-4">Begin by selecting a source by name. If you don't know which water source to begin with, take a look at this <Link href="/faq?expand=waterSource" className="aPlus mt-3">list of resources.</Link></Typography>
-                            <div className="flex flex-row">
-                                <Button
-                                    variant="text"
-                                    onClick={handleClick}
-                                    className="bg-gray-200 text-black normal-case shadow-none hover:bg-gray-300"
-                                    id="dropdown-button"
-                                >
-                                    {selectedItem} <ChevronDown size={18} className="ml-1" />
-                                </Button>
-
-                                {/* Go Button */}
-                                <div className="flex justify-center pt-4 ml-10">
-                                    <Button
+                            <div className="flex flex-row space-x-2 items-center pt-5">
+                                <div className="flex-grow relative" style={{ maxWidth: '500px' }}>
+                                    <TextField
                                         variant="outlined"
-                                        onClick={handleGo}
-                                        disabled={selectedItem === "select a source"}
+                                        placeholder="Search for water sources..."
+                                        fullWidth
+                                        size="small"
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        onKeyDown={handleKeyDown}
+                                        id="dropdown-button"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchIcon />
+                                                </InputAdornment>
+                                            ),
+                                        }}
                                         sx={{
-                                            color: '#ffffff',
-                                            backgroundColor: '#124559',
-                                            borderColor: '#ffffff',
-                                            borderRadius: '5px',
-                                            '&:hover': {
+                                            '& .MuiOutlinedInput-root': {
                                                 backgroundColor: '#ffffff',
-                                                borderColor: '#124559',
-                                                color: '#124559',
-                                            },
-                                            '&:disabled': {
-                                                backgroundColor: 'transparent',
-                                                borderColor: '#949494',
-                                                color: '#949494',
-                                                cursor: 'not-allowed',
+                                                '&:hover fieldset': {
+                                                    borderColor: '#124559',
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#124559',
+                                                },
                                             },
                                         }}
-                                    >
-                                        Go &rarr;
-                                    </Button>
+                                    />
+                                    {/* Dropdown */}
+                                    {showDropdown && filteredSources.length > 0 && (
+                                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                                            {filteredSources.slice(0, 10).map((source, index) => (
+                                                <div
+                                                    key={source}
+                                                    className={`px-4 py-2 cursor-pointer transition-colors ${index === selectedIndex
+                                                        ? 'bg-[#124559] text-white'
+                                                        : 'hover:bg-gray-100'
+                                                        }`}
+                                                    onClick={() => handleSelectOption(source)}
+                                                    onMouseEnter={() => setSelectedIndex(index)}
+                                                >
+                                                    <span className="font-medium">{source}</span>
+                                                </div>
+                                            ))}
+                                            {filteredSources.length > 10 && (
+                                                <div className="px-4 py-2 text-gray-500 text-sm italic">
+                                                    ... and {filteredSources.length - 10} more results
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
 
+                                <Button
+                                    variant="outlined"
+                                    onClick={handleGo}
+                                    disabled={!isValidSelection}
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#124559',
+                                        borderColor: '#ffffff',
+                                        borderRadius: '5px',
+                                        minWidth: '80px',
+                                        '&:hover': {
+                                            backgroundColor: '#ffffff',
+                                            borderColor: '#124559',
+                                            color: '#124559',
+                                        },
+                                        '&:disabled': {
+                                            backgroundColor: '#cccccc',
+                                            color: '#666666',
+                                        },
+                                    }}
+                                >
+                                    Go &rarr;
+                                </Button>
+                            </div>
                         </div>
 
 
@@ -212,7 +354,7 @@ const SourcesPageContent: React.FC = () => {
                             ))}
                         </Menu>
                     </Paper>
-                </div>
+                </div >
 
                 <div>
                     <Paper className="min-h-screen" elevation={2}>
@@ -225,30 +367,30 @@ const SourcesPageContent: React.FC = () => {
                                     </div>
                                     <InfoIcon />
                                 </div>
-                
+
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <div ref={graphContainerRef} className="scroll-mt-24">
-                                    <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? filteredNode : ''} Water Source Data Visualization</Typography>
-                                    <Tabs
-                                        value={activeTab}
-                                        onChange={handleTabChange}
-                                        aria-label="data visualization tabs"
-                                        centered
-                                    >
-                                        <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
-                                        <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
-                                        <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
-                                    </Tabs>
+                                        <Typography variant="h5" className="py-3 text-center text-[#124559]">{filteredNode ? filteredNode : ''} Water Source Data Visualization</Typography>
+                                        <Tabs
+                                            value={activeTab}
+                                            onChange={handleTabChange}
+                                            aria-label="data visualization tabs"
+                                            centered
+                                        >
+                                            <Tab label="Graph View" icon={<ShareIcon />} iconPosition="start" />
+                                            <Tab label="Insights" icon={<InsightsIcon />} iconPosition="start" />
+                                            <Tab label="Glossary" icon={<ArticleIcon />} iconPosition="start" />
+                                        </Tabs>
                                     </div>
-                                    
+
                                 </Box>
 
                                 <TabPanel value={activeTab} index={0}>
 
-                                        <DynamicGraph
-                                            data={filteredData}
-                                            selected={toTitleCase(filteredNode)}
-                                        />
+                                    <DynamicGraph
+                                        data={filteredData}
+                                        selected={toTitleCase(filteredNode)}
+                                    />
 
                                 </TabPanel>
 
@@ -284,7 +426,7 @@ const SourcesPageContent: React.FC = () => {
                     </Paper>
 
                 </div>
-            </main>
+            </main >
         </>
     );
 }
