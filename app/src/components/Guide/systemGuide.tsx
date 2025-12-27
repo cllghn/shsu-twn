@@ -1,14 +1,20 @@
 import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
+import '@/styles/shepherd-custom.css';
 
 let tourDropdownOpened: boolean = false;
 
 export const systemTour = new Shepherd.Tour({
   useModalOverlay: true,
   defaultStepOptions: {
-    classes: 'shadow-md bg-purple-dark',
+    classes: 'shepherd-theme-custom',
     scrollTo: { behavior: 'smooth', block: 'center' },
-    cancelIcon: { enabled: true }
+    cancelIcon: {
+      enabled: true,
+      label: 'Close Tour'
+    },
+    modalOverlayOpeningPadding: 8,
+    modalOverlayOpeningRadius: 10,
   },
   exitOnEsc: true,
   keyboardNavigation: true
