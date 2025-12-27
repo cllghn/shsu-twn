@@ -15,7 +15,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/base": "^5.0.0-beta.68",
     "@mui/icons-material": "^6.3.0",
-    "@mui/lab": "^6.0.0-beta.22",
+    "@mui/lab": "^7.0.1-beta.20",
     "@mui/material": "^6.4.2",
     "@mui/styles": "^6.4.2",
     "@vercel/analytics": "^1.5.0",
