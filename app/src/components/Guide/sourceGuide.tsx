@@ -214,6 +214,37 @@ sourceTour.addStep({
 
 sourceTour.addStep({
     id: 'graph-controls4',
+    title: '⚙️ Graph Controls: Color Toggle',
+    text: 'This button allows you toggle the node colors. By default, nodes are colored based on their type (e.g., water source or system). Clicking this button will switch to a color scheme based on whether the node represents a municipal or industrial survey.',
+    attachTo: {
+        element: '#color-toggle-btn',
+        on: 'top'
+    },
+    buttons: [
+        {
+            text: 'Back',
+            action: sourceTour.back,
+            secondary: true
+        },
+        {
+            text: 'Next',
+            action: sourceTour.next
+        }
+    ],
+    when: {
+        show: function () {
+            const graphTab = document.querySelector("#graph-area") as HTMLElement;
+            if (graphTab) {
+                graphTab.click();
+            }
+        },
+
+    }
+});
+
+
+sourceTour.addStep({
+    id: 'graph-controls5',
     title: '⚙️ Graph Controls: Node Search',
     text: 'This search bar allows you to quickly locate specific nodes within the graph by entering their name.',
     attachTo: {

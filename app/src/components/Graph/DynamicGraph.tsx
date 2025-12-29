@@ -826,7 +826,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <button
                         onClick={handleColorModeToggle}
                         className="absolute top-[10em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                        id='zoom-out-btn'
+                        id='color-toggle-btn'
                     >
                         <ColorLensIcon />
                     </button>
