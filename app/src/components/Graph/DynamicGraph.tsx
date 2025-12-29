@@ -10,6 +10,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import cxtmenu from "cytoscape-cxtmenu";
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -66,13 +67,28 @@ cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 
 
-// Function to determine color based on preliminary_type
-const getNodeColor = (type: string) => {
-    const colorMap: Record<string, string> = {
+// Update the getNodeColor function to handle both modes
+const getNodeColor = (type: string, surveyForm?: string, colorMode?: boolean) => {
+    // If colorMode is true (by survey form)
+    if (colorMode) {
+        // Handle null/undefined survey forms
+        if (!surveyForm || surveyForm === 'null' || surveyForm === 'N/A') {
+            return "#838383"; // Light gray for missing data
+        }
+
+        const formColorMap: Record<string, string> = {
+            "Municipal": "#fdb863", // Orange 
+            "Industrial": "#b2abd2" // Lavender
+        };
+        return formColorMap[surveyForm] || "#838383"; // Default gray for unknown forms
+    }
+
+    // Otherwise color by type (original behavior)
+    const typeColorMap: Record<string, string> = {
         "water source": "#01161E", // Dark Blue
         "water system": "#53899D", // Light Blue
     };
-    return colorMap[type] || "#808080"; // Default to gray if type is unknown
+    return typeColorMap[type] || "#808080";
 };
 
 
@@ -127,7 +143,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             .map(edge => parseVolume(edge.data.yearly_volume))
             .filter(v => v !== null) as number[];
         if (volumes.length === 0) {
-           return { min: 1, max: 1, hasData: false };
+            return { min: 1, max: 1, hasData: false };
         }
 
         const minVolume = Math.min(...volumes);
@@ -149,23 +165,23 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     const getEdgeWidth = (volumeString: string): number => {
         const volume = parseVolume(volumeString);
-        
+
         // Handle missing data - use thin dashed line
         if (volume === null) {
             return 0.5;
         }
-        
+
         if (!edgeWidthConfig.hasData) {
             return 1;
         }
-        
+
         // Linear scaling
         const { minVolume, maxVolume, minWidth, maxWidth } = edgeWidthConfig;
-        
+
         if (minVolume === maxVolume) {
             return (minWidth + maxWidth) / 2;
         }
-        
+
         // Normalize between min and max width
         const normalized = (volume - minVolume) / (maxVolume - minVolume);
         return minWidth + normalized * (maxWidth - minWidth);
@@ -250,6 +266,24 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         }
     };
 
+    const [colorMode, setColorMode] = useState(false); // false: by type, true: by survey form
+    const handleColorModeToggle = () => {
+        setColorMode((prev) => !prev);
+        if (cyRef.current) {
+            cyRef.current.style()
+                .selector("node")
+                .style({
+                    "background-color": (ele) => getNodeColor(
+                        ele.data("preliminary_type"),
+                        ele.data("form2023"),
+                        !colorMode
+                    )
+                })
+                .update();
+        }
+    };
+
+
     // Tooltip states using separate tooltip states for nodes and edges
     const [nodeTooltip, setNodeTooltip] = useState<NodeTooltipState>({
         show: false,
@@ -286,7 +320,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             cy.animate({
                 zoom: {
                     level: newZoom,
-                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }                },
+                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
+                },
                 duration: 50
             });
         }
@@ -300,7 +335,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             cy.animate({
                 zoom: {
                     level: newZoom,
-                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } 
+                    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
                 },
                 duration: 50
             });
@@ -346,7 +381,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             // Add event listeners for tooltips
             const calculateNodeTooltipPosition = (renderedX, renderedY,
                 tooltipWidth = 300, tooltipHeight = 200) => {
-                
+
                 const cy = cyRef.current;
                 if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
 
@@ -406,6 +441,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         id: node.data('id'),
                         name: node.data('unified_name'),
                         type: node.data('preliminary_type'),
+                        surveyForm: node.data('form2023'),
                         incomingVolume: incomingVolume,
                         outgoingVolume: outgoingVolume
                     }
@@ -420,9 +456,9 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 // Remove highlight class from all nodes
             });
 
-            const calculateEdgeTooltipPosition = (renderedX, renderedY, 
+            const calculateEdgeTooltipPosition = (renderedX, renderedY,
                 tooltipWidth = 300, tooltipHeight = 200) => {
-                
+
                 const cy = cyRef.current;
                 if (!cy) return { x: renderedX + 50, y: renderedY + 10 };
 
@@ -557,8 +593,8 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 cy.removeAllListeners();
             };
         }
-    // }, [showLabels, nodeTooltip.show, edgeTooltip.show, allowZoom]);
-    }, [showLabels, nodeTooltip.show, edgeTooltip.show]);
+        // }, [showLabels, nodeTooltip.show, edgeTooltip.show, allowZoom]);
+    }, [showLabels, nodeTooltip.show, edgeTooltip.show, colorMode]);
 
     const handleZoomToFit = () => {
         cyRef.current?.fit();
@@ -582,34 +618,75 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
 
     return (
         <div className='min-h-screen relative'>
+            {/* Desktop Legend */}
             <Paper className="hidden sm:block absolute top-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-40">
                 <span className="text-sm">
                     <ArrowBackIcon sx={{ fontSize: 'small' }} /> Water Flow
                 </span>
                 <br />
-                <span className="text-sm">
-                    <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /> Water Source
-                </span>
-                <br />
-                <span className="text-sm">
-                    <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /> Water System
-                </span>
+                {colorMode ? (
+                    // Survey Form Legend
+                    <>
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#e08214" }} /> Municipal
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#8073ac" }} /> Industrial
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#838383" }} /> No Data
+                        </span>
+                    </>
+                ) : (
+                    // Node Type Legend
+                    <>
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /> Water Source
+                        </span>
+                        <br />
+                        <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /> Water System
+                        </span>
+                    </>
+                )}
                 <br />
                 <span className="text-sm">
                     <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /> Selected Node
                 </span>
             </Paper>
+
+            {/* Mobile Legend */}
             <Paper className="block sm:hidden absolute bottom-[1em] right-3 rounded p-2 shadow-lg border-[1px] border-[#124559] z-50">
                 <div className="flex flex-row items-center gap-4 text-sm">
                     <span className="text-sm text-center">
                         <ArrowBackIcon sx={{ fontSize: 'small' }} /><br /> Water Flow
                     </span>
-                    <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br /> Water Source
-                    </span>
-                    <span className="text-sm text-center">
-                        <CircleIcon sx={{ fontSize: 'small', fill: "" }} /><br /> Water System
-                    </span>
+                    {colorMode ? (
+                        // Survey Form Legend
+                        <>
+                            <span className="text-sm text-center">
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#e08214" }} /><br /> Municipal
+                            </span>
+                            <span className="text-sm text-center">
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#8073ac" }} /><br /> Industrial
+                            </span>
+                            <span className="text-sm text-center">
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#838383" }} /><br /> No Data
+                            </span>
+                        </>
+                    ) : (
+                        // Node Type Legend
+                        <>
+                            <span className="text-sm text-center">
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br /> Water Source
+                            </span>
+                            <span className="text-sm text-center">
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#53899D" }} /><br /> Water System
+                            </span>
+                        </>
+                    )}
                     <span className="text-sm text-center">
                         <CircleIcon sx={{ fontSize: 'small', stroke: "#6F5A4C", strokeWidth: 3, fill: "transparent" }} /><br /> Selected Node
                     </span>
@@ -745,15 +822,15 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         <ZoomOutIcon />
                     </button>
                 </Tooltip>
-                {/* <Tooltip title={allowZoom ? "Disable Zoom" : "Enable Zoom"} arrow placement="top">
+                <Tooltip title={colorMode ? "Color by Node Type" : "Color by Survey Form"} arrow placement="top">
                     <button
-                        onClick={handleAllowZoom}
-                        className="absolute top-[1em] left-[5em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
-                        id='fit-screen-btn'
+                        onClick={handleColorModeToggle}
+                        className="absolute top-[10em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                        id='zoom-out-btn'
                     >
-                        {allowZoom ? <SearchOffIcon /> : <SearchIcon />}
+                        <ColorLensIcon />
                     </button>
-                </Tooltip> */}
+                </Tooltip>
             </Paper>
 
 
@@ -770,6 +847,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <h3 className="font-bold">Node: {nodeTooltip.content.name}</h3>
                     <p className="text-sm"><b>ID:</b> {nodeTooltip.content.id}</p>
                     <p className="text-sm"><b>Type:</b> {nodeTooltip.content.type?.toUpperCase()}</p>
+                    <p className="text-sm"><b>Survey Form:</b> {nodeTooltip.content.surveyForm || 'N/A'}</p>
                     <div className="border-t border-gray-200 mt-2 pt-2">
                         <p className='text-sm pb-1 font-bold'>Flow Visualized</p>
                         <p className="text-sm"><b>Incoming Volume:</b> {formatVolume(nodeTooltip.content.incomingVolume)}</p>
@@ -810,7 +888,11 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     {
                         selector: "node",
                         style: {
-                            "background-color": (ele) => getNodeColor(ele.data("preliminary_type")),
+                            "background-color": (ele) => getNodeColor(
+                                ele.data("preliminary_type"),
+                                ele.data("form2023"),
+                                colorMode
+                            ),
                             "border-color": "#6F5A4C",
                             "border-width": (ele: cytoscape.SingularElementArgument) => ele.data("id") === selected ? 1 : 0,
                             "label": "data(label)",
