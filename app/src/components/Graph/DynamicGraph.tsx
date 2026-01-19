@@ -78,7 +78,8 @@ const getNodeColor = (type: string, surveyForm?: string, colorMode?: boolean) =>
 
         const formColorMap: Record<string, string> = {
             "Municipal": "#fdb863", // Orange 
-            "Industrial": "#b2abd2" // Lavender
+            "Industrial": "#b2abd2", // Lavender
+            "Water Source": "#01161E", // Dark Blue
         };
         return formColorMap[surveyForm] || "#838383"; // Default gray for unknown forms
     }
@@ -672,6 +673,9 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                             <span className="text-sm text-center">
                                 <CircleIcon sx={{ fontSize: 'small', fill: "#8073ac" }} /><br /> Industrial
                             </span>
+                            <span>
+                                <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /><br /> Water Source
+                            </span>
                             <span className="text-sm text-center">
                                 <CircleIcon sx={{ fontSize: 'small', fill: "#838383" }} /><br /> No Data
                             </span>
@@ -847,7 +851,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     <h3 className="font-bold">Node: {nodeTooltip.content.name}</h3>
                     <p className="text-sm"><b>ID:</b> {nodeTooltip.content.id}</p>
                     <p className="text-sm"><b>Type:</b> {nodeTooltip.content.type?.toUpperCase()}</p>
-                    <p className="text-sm"><b>Survey Form:</b> {nodeTooltip.content.surveyForm || 'N/A'}</p>
+                    <p className="text-sm"><b>User Form:</b> {nodeTooltip.content.surveyForm || 'N/A'}</p>
                     <div className="border-t border-gray-200 mt-2 pt-2">
                         <p className='text-sm pb-1 font-bold'>Flow Visualized</p>
                         <p className="text-sm"><b>Incoming Volume:</b> {formatVolume(nodeTooltip.content.incomingVolume)}</p>

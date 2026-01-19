@@ -909,6 +909,12 @@ def _(nl_tidy, pd):
     )
 
     nl_tidy_enriched = nl_tidy.merge(types2023, left_on='id', right_on='id2023', how='left')
+    nl_tidy_enriched.loc[
+        nl_tidy_enriched['form2023'].isna() & (nl_tidy_enriched['preliminary_type'] == 'water source'),
+        'form2023'
+    ] = 'Water Source'
+
+    # nl_tidy_enriched['form2023'] = nl_tidy_enriched.
     nl_tidy_enriched
     return nl_tidy_enriched, types2023
 
