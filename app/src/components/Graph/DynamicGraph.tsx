@@ -637,6 +637,10 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         </span>
                         <br />
                         <span className="text-sm">
+                            <CircleIcon sx={{ fontSize: 'small', fill: "#01161E" }} /> Water Source
+                        </span>
+                        <br />
+                        <span className="text-sm">
                             <CircleIcon sx={{ fontSize: 'small', fill: "#838383" }} /> No Data
                         </span>
                     </>
