@@ -32,7 +32,7 @@ export default function RootLayout({
   useEffect(() => {
     const hasSeenDisclaimer = sessionStorage.getItem('hasSeenTWNetDisclaimer');
     if (!hasSeenDisclaimer) {
-      setOpen(true);  
+      setOpen(true);
     }
   }, []);
 
@@ -45,9 +45,9 @@ export default function RootLayout({
     <html lang="en">
       <Head>
         <title>Texas Water Network Visualizer</title>
-        <meta 
-          name="description" 
-          content="The Texas Water Network Explorer (TWNet) is a publicly accessible tool designed to enhance how policymakers, decision-makers, and the public analyze water data. It maps the interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. Using data from the Texas Water Development Board's (TWDB) Water Use Survey, TWNet leverages network analysis methods and visualization techniques to transform a complex web of thousands of water users into clear, intuitive graphs and insights. These insights help policymakers quickly understand water distribution patterns, identify key stakeholders, and make informed decisions to improve water management." 
+        <meta
+          name="description"
+          content="The Texas Water Network Explorer (TWNet) is a publicly accessible tool designed to enhance how policymakers, decision-makers, and the public analyze water data. It maps the interactions among water entities across Texas, illustrating how water is acquired, sold, and redistributed. Using data from the Texas Water Development Board's (TWDB) Water Use Survey, TWNet leverages network analysis methods and visualization techniques to transform a complex web of thousands of water users into clear, intuitive graphs and insights. These insights help policymakers quickly understand water distribution patterns, identify key stakeholders, and make informed decisions to improve water management."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -55,13 +55,13 @@ export default function RootLayout({
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogTitle>TWNet Data Disclaimer</DialogTitle>
           <DialogContent>
-            The TWNet makes use of data provided by the TWDB Water Use Survey on Public Water System (PWS) intakes, sales, and retail water information. The tool leverages relational data to depict interdependencies and flows, while pairing this with contextual data. The Water Use Survey relies on self-reported data, which may be subject to biases such as estimation errors, underreporting, or inconsistencies in reporting methodologies.
+            Sam Houston State University Institute for Homeland Security (SHSU IHS) and Texas Water Foundation (TWF) developed the Texas Water Network Explorer (TWNet) tool utilizing data available from the Texas Water Development Board (TWDB) Water Use Survey on Public Water System (PWS) intakes, sales, and retail water information. The tool interprets relational data to depict interdependencies and flows, while pairing this with contextual data. The Water Use Survey relies on self-reported data, which may be subject to biases such as estimation errors, underreporting, or inconsistencies in reporting methodologies and TWDB does not conduct an analysis such as the TWNet due to data limitations.
             <br /><br />
-            <b>Users should interpret the data with caution and consider supplementing it with additional sources or validation methods where precision is critical.</b> TWNet will be systematically revised and updated as data becomes available from the TWDB Water Use Survey. Therefore, the information presented is “as is” and “as available”. The TWDB, TWF, and SHSU IHS do not assume any legal liability or responsibility or makes any guarantees or warranties as to the accuracy, completeness of the information. 
+            <b>Users should interpret the data with caution and consider supplementing it with additional sources or validation methods where precision is critical.</b> TWNet will be systematically revised by SHSU IHS and TWF and updated as data becomes available from the TWDB Water Use Survey. Therefore, the information presented is “as is” and “as available”. The TWDB, TWF, and SHSU IHS do not assume any legal liability or responsibility or make any guarantees or warranties as to the accuracy, completeness of the information.
           </DialogContent>
           <div className="flex justify-center mr-4 mb-4">
             <DialogActions>
-              <Button  
+              <Button
                 onClick={handleClose}
                 variant="contained"
                 sx={{
@@ -74,8 +74,8 @@ export default function RootLayout({
                     border: '1px solid #0a0a0a',
                   },
                 }}>
-                    Got it
-                </Button>
+                Got it
+              </Button>
             </DialogActions>
           </div>
         </Dialog>

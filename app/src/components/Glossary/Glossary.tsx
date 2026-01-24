@@ -36,6 +36,12 @@ const Glossary: React.FC = () => {
                     <b>Flow Type: </b>For this graph depiction, we pull water from sales and intake records. As such, if an edge type is listed as "Sale" it denotes that this data point was taken from the water sales data provided by TWDB. If the edge type is listed as "Intake" it denotes that this data point was taken from the water intake data.
                 </p>
                 <p>
+                    <b>Local Supply: </b>Used when the water source can’t be identified or is not listed in the water use survey application. This includes sources like ponds, stormwater, rainwater harvesting, and similar- especially for mining or livestock.
+                </p>
+                {/* <p>
+                    <b>Run of River: </b> diversion is the water right permit that allows the permit holder to divert water directly out of stream or river
+                </p> */}
+                <p>
                     <b>Volume: </b>All water volumes are recorded in gallons. When a value was not included on the underlying records, it is reported back with a dash. When adding up volumes, the graph will only sum up the values that are available. For example, if a node has 3 edges with volumes of 100, 200, and 300 gallons, the total volume for that node will be 600 gallons. However, if one of those edges is missing a volume value (e.g., 100, -, and 300), the total volume for that node will be 400 gallons.
                 </p>
                 <p>

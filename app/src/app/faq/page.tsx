@@ -27,7 +27,7 @@ const FAQContent = () => {
             setExpandedData(true);
         }
     }, [expandData]);
-    
+
     return (
         <>
             <main className='container flex flex-col w-full m-28 mx-auto px-24 pt-14 '>
@@ -55,8 +55,8 @@ const FAQContent = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                                <p className="pb-4">    
-                                This tool distills thousands of data points into intuitive visual analytics, simplifying how policymakers conceptualize water usage across Texas. Rather than simply asking, "How much water is used?" the tool broadens the scope to: "Who uses it, and who do they rely on? What kinds of uses interlink water users? And how much water is exchanged?" By applying a network-based approach, users can visualize and interpret the intricate relationships between water entities—such as water intake from sources, sales to industries and municipalities, and retail distribution to other systems. This framing enables policymakers to quickly identify strengths, dependencies and weaknesses within the network and better understand how water moves through the system. In turn, this expanded insight supports more data-driven decision-making in key areas, including developing system resilience strategies, risk management, infrastructure planning, and the development of policies and regulations governing water use.
+                                <p className="pb-4">
+                                    This tool distills thousands of data points into intuitive visual analytics, simplifying how policymakers conceptualize water usage across Texas. Rather than simply asking, "How much water is used?" the tool broadens the scope to: "Who uses it, and who do they rely on? What kinds of uses interlink water users? And how much water is exchanged?" By applying a network-based approach, users can visualize and interpret the intricate relationships between water entities—such as water intake from sources, sales to industries and municipalities, and retail distribution to other systems. This framing enables policymakers to quickly identify strengths, dependencies and weaknesses within the network and better understand how water moves through the system. In turn, this expanded insight supports more data-driven decision-making in key areas, including developing system resilience strategies, risk management, infrastructure planning, and the development of policies and regulations governing water use.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -72,15 +72,15 @@ const FAQContent = () => {
                                 <ol className="pt-2 pl-2">
                                     <li><b>1. Water Sources to Systems:</b> These are derived from the records for water intake (self-supplied and purchased) for all Public Water Systems surveyed. This relation captures where water moves from a source (like an aquifer or surface water) to a water system. In turn, this shows where our water originates and which systems depend on each source.</li>
                                     <li><b>2. System-to-System Transfers:</b> These are derived from the records for water sales (wholesale to other PWS or industrial systems) reported by seller and buyer through the water use survey. This relationship captures where water moves between water systems in the network, revealing the interconnection between water systems across Texas.</li>
-                                </ol>                   
+                                </ol>
                                 <p className="pt-2">
-                                For both types of relationships we also capture, when possible, water volumes being transferred in Texas. This allows us to quantify the strength of relationships. Taken as a whole, these relationships and volumes enable us to show how water moves from natural sources through various systems and ultimately to end users.
+                                    For both types of relationships we also capture, when possible, water volumes being transferred in Texas. This allows us to quantify the strength of relationships. Taken as a whole, these relationships and volumes enable us to show how water moves from natural sources through various systems and ultimately to end users.
                                 </p>
                                 <p className="pt-2">
-                                In addition to characteristics of each relationship, like water volume and frequency, the TWDB data is also used to extract contextual characteristics about the water entities in the network, enriching our understanding of each entity in the network by adding important information beyond just relationships. For example, water sources and water systems are geographically referenced. Similarly, when applicable, data on retail water connections and populations served are included to provide users with relevant data about public water systems in the network.
+                                    In addition to characteristics of each relationship, like water volume and frequency, the TWDB data is also used to extract contextual characteristics about the water entities in the network, enriching our understanding of each entity in the network by adding important information beyond just relationships. For example, water sources and water systems are geographically referenced. Similarly, when applicable, data on retail water connections and populations served are included to provide users with relevant data about public water systems in the network.
                                 </p>
                                 <p className="pt-2 pb-4">
-                                In all, the tool leverages relational data to depict interdependencies and flows, while pairing this with contextual data. What emerges is a clear picture of Texas's water system, transforming thousands of data points into actionable insights to support water resource planning and policy-making.
+                                    In all, the tool leverages relational data to depict interdependencies and flows, while pairing this with contextual data. What emerges is a clear picture of Texas's water system, transforming thousands of data points into actionable insights to support water resource planning and policy-making.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -93,7 +93,7 @@ const FAQContent = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">
-                                   In this context, a network is a system of relationships between water entities in Texas. At a high level, those relationships represent the flow of water. Those can be further defined based on whether they connect a source-to-system (intake) or system-to-system (sales). 
+                                    In this context, a network is a system of relationships between water entities in Texas. At a high level, those relationships represent the flow of water. Those can be further defined based on whether they connect a source-to-system (intake) or system-to-system (sales).
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -105,11 +105,11 @@ const FAQContent = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                            Network visualizations are useful in exploratory data analysis. Have you ever heard the expression "a picture tells a thousand words?". Data visualization makes it easier to identify patterns, trends, and outliers in a dataset. For example: 
-                            <ol className="pb-4 pt-2 pl-2">
-                                <li>&bull; A network might center around a handful of nodes. A centralized network has advantages and disadvantages. For instance, a centralized network has clear hubs that can efficiently distribute resources. However, the downside is that if a central node fails, the entire system can become vulnerable to disruptions. On the other hand, a decentralized water network distributes control and flow across multiple nodes, increasing resilience to failures and making the system more adaptable to local needs. However, this can also introduce complexities in coordination and maintenance. Visualizing the data is the first step in identifying the advantages and disadvantages of a network.</li>
-                                <li>&bull; A network visualization might highlight disconnection between components in the networks. For example, isolated nodes or clusters might indicate areas with limited access to water resources, inefficiencies in distribution, or vulnerabilities in the system. For instance, if a community's water supply relies on a single pipeline that is not well-connected to alternative sources, a failure in that pipeline could leave residents without water.</li>
-                            </ol>
+                                Network visualizations are useful in exploratory data analysis. Have you ever heard the expression "a picture tells a thousand words?". Data visualization makes it easier to identify patterns, trends, and outliers in a dataset. For example:
+                                <ol className="pb-4 pt-2 pl-2">
+                                    <li>&bull; A network might center around a handful of nodes. A centralized network has advantages and disadvantages. For instance, a centralized network has clear hubs that can efficiently distribute resources. However, the downside is that if a central node fails, the entire system can become vulnerable to disruptions. On the other hand, a decentralized water network distributes control and flow across multiple nodes, increasing resilience to failures and making the system more adaptable to local needs. However, this can also introduce complexities in coordination and maintenance. Visualizing the data is the first step in identifying the advantages and disadvantages of a network.</li>
+                                    <li>&bull; A network visualization might highlight disconnection between components in the networks. For example, isolated nodes or clusters might indicate areas with limited access to water resources, inefficiencies in distribution, or vulnerabilities in the system. For instance, if a community's water supply relies on a single pipeline that is not well-connected to alternative sources, a failure in that pipeline could leave residents without water.</li>
+                                </ol>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>
@@ -121,15 +121,15 @@ const FAQContent = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">
-                                    The lines are connections that represent the flow of water from one water entity to another. Those relationships connect a source-to-system (intake) or system-to-system (sales). The dots represent water entities, those can be water sources (e.g., aquifers or surface water) or water systems. 
+                                    The lines are connections that represent the flow of water from one water entity to another. Those relationships connect a source-to-system (intake) or system-to-system (sales). The dots represent water entities, those can be water sources (e.g., aquifers or surface water) or water systems.
                                 </p>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>
 
                     <Accordion className="shadow-lg"
-                    expanded={expandedWater} 
-                    onChange={() => setExpandedWater(!expandedWater)}
+                        expanded={expandedWater}
+                        onChange={() => setExpandedWater(!expandedWater)}
                     >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography variant="overline">What if I don't know which water system or source I am interested in?
@@ -141,17 +141,17 @@ const FAQContent = () => {
                                     If you are unsure what water system or source you are interested in, then take a look at the list of resources below. These will allow you to enter an address or click on a map to find out where water comes from and/or who provides it.
                                 </p>
                                 <ol className="pt-2 pb-4 pl-2">
-                                    <li>&bull; <a href = "https://www3.twdb.texas.gov/apps/WaterServiceBoundaries" target="_blank" className='aPlus'>This site will tell you where the water providers are.</a></li>
-                                    <li>&bull; <a href = "https://www.waterdatafortexas.org/reservoirs/statewide" target="_blank" className='aPlus'>This page wil tell you where the reservoirs are located.</a></li>
-                                    <li>&bull; <a href = "https://www.twdb.texas.gov/groundwater/aquifer/major.asp" target="_blank" className='aPlus'>This map will tell you about the Major aquifers.</a></li>
+                                    <li>&bull; <a href="https://www3.twdb.texas.gov/apps/WaterServiceBoundaries" target="_blank" className='aPlus'>This site will tell you where the water providers are.</a></li>
+                                    <li>&bull; <a href="https://www.waterdatafortexas.org/reservoirs/statewide" target="_blank" className='aPlus'>This page wil tell you where the reservoirs are located.</a></li>
+                                    <li>&bull; <a href="https://www.twdb.texas.gov/groundwater/aquifer/major.asp" target="_blank" className='aPlus'>This map will tell you about the Major aquifers.</a></li>
                                 </ol>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>
 
                     <Accordion className="shadow-lg"
-                    expanded={expandedData} 
-                    onChange={() => setExpandedData(!expandedData)}
+                        expanded={expandedData}
+                        onChange={() => setExpandedData(!expandedData)}
                     >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography variant="overline">Where does the data come from? </Typography>
@@ -159,7 +159,7 @@ const FAQContent = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">
-                                    These data are provided by TWDB and collected through the annual Water Use Survey. 
+                                    These data are provided by TWDB and collected through the annual Water Use Survey.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -186,7 +186,7 @@ const FAQContent = () => {
                         <AccordionDetails>
                             <Typography>
                                 <p className="pb-4">
-                                    The Water Use Survey relies on self-reported data, which may be subject to biases such as estimation errors, underreporting, or inconsistencies in reporting methodologies. 
+                                    The Water Use Survey relies on self-reported data, which may be subject to biases such as estimation errors, underreporting, or inconsistencies in reporting methodologies.
                                 </p>
                             </Typography>
                         </AccordionDetails>
@@ -199,23 +199,25 @@ const FAQContent = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                                While TWDB staff conducts data cleaning and validation to enhance accuracy, these processes cannot eliminate potential inaccuracies. Users should interpret the data with caution and consider supplementing it with additional sources or validation methods where precision is critical. 
+                                While TWDB staff conducts data cleaning and validation to enhance accuracy, these processes cannot eliminate potential inaccuracies. Users should interpret the data with caution and consider supplementing it with additional sources or validation methods where precision is critical.
                                 <p className="pt-2">Data limitations can include but are not limited to the following:</p>
                                 <ol className="pt-2 pb-4 pl-2">
-                                    <li>&bull; Water loss volumes.</li>
-                                    <li>&bull; Lack of knowledge on how to report data correctly.</li>
-                                    <li>&bull; Water use estimates are created for small rural PWS that are not surveyed.</li>
+                                    <li>&bull; The survey does not include all water providers in Texas.</li>
+                                    <li>&bull; Many water systems are reporting their water source as unknown.</li>
+                                    <li>&bull; Not all buyers are reported, especially industrial buyers.</li>
+                                    <li>&bull; Reporting methods and definitions of water intake vary across systems.</li>
+                                    <li>&bull; Data is estimated for surveys that are not returned using the previous year’s data.</li>
                                     <li>&bull; Entities may not submit a survey every year.</li>
                                     <li>&bull; Volumes are self-reported and revised as additional or more accurate data becomes available.</li>
                                     <li>&bull; Volumes might not be consistent due to meter accuracy, water loss, or data errors.</li>
-                                    <li>&bull; Data are estimated for surveys that are not returned using the previous year's data.</li>
-                                    <li>&bull; Only data collected from community public water systems are included in this map along with   selected industrial facilities as their buyer.</li>
+                                    <li>&bull; Only data collected from community public water systems are included in the map along with selected industrial facilities as their buyer.</li>
+                                    <li>&bull; The tool is based on static data for the year 2022 and does not reflect the most updated changes.</li>
                                 </ol>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>
                 </div>
-            </main>
+            </main >
         </>
     );
 };
