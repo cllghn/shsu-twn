@@ -14,6 +14,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import SourceIcon from '@mui/icons-material/Source';
 import CircleIcon from '@mui/icons-material/Circle';
+import SchoolIcon from '@mui/icons-material/School';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 export default function Home() {
   const router = useRouter();
@@ -374,6 +376,43 @@ export default function Home() {
 
                   </ul>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 flex flex-col shadow-lg rounded-lg animate-fadeIn">
+            <div
+              className="w-full h-48 bg-cover bg-center bg-[url('/water-texas.jpg')] rounded-t-lg"></div>
+            <div className="bg-white bg-opacity-10 px-20 py-20 rounded-lg">
+              <h2 className="pb-5 text-[#124559] text-2xl">
+                Educational Resources <SchoolIcon />
+              </h2>
+              <h3 className="pb-5 text-xl text-[#124559]">Learn more about water resources in Texas.
+              </h3>
+              <div className="container mx-auto items-start grid">
+                <ul className="flex flex-col space-y-4">
+                  <div>
+                    <Link href="https://www.waterdatafortexas.org/reservoirs/statewide" className="aPlus">
+                      <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> Water Data for Texas &rarr;
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://www.twdb.texas.gov/waterplanning/swp/" className="aPlus">
+                      <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB State Water Plan  &rarr;
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/index.asp" className="aPlus">
+                      <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB Water Use Survey  &rarr;
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://www.twdb.texas.gov/waterplanning/resources/index.asp" className="aPlus">
+                      <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB Useful Links and Resources  &rarr;
+                    </Link>
+                  </div>
+
+                </ul>
               </div>
             </div>
           </div>
