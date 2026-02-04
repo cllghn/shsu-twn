@@ -18,7 +18,7 @@ const DataPage: React.FC = () => {
                 </div>
                 <div className="w-full py-5 mx-auto animate-fadeInSlow">
                     {/* Accordion 1 */}
-                    <Accordion className = "shadow-lg">
+                    <Accordion className="shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography className="font-semibold">TWDB Historical Water Use</Typography>
                         </AccordionSummary>
@@ -28,22 +28,22 @@ const DataPage: React.FC = () => {
                             </Typography>
                             <div className='flex justify-end py-5 px-5'>
                                 <Button
-                                variant="outlined"
-                                endIcon={<OutboundIcon />}
-                                href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/estimates/index.asp"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                sx={{
-                                    color: '#ffffff',
-                                    backgroundColor: '#124559',
-                                    borderColor: '#ffffff',
-                                    borderRadius: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#ffffff',
-                                        borderColor: '#124559',
-                                        color: '#124559',
-                                    },
-                                }}
+                                    variant="outlined"
+                                    endIcon={<OutboundIcon />}
+                                    href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/estimates/index.asp"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#124559',
+                                        borderColor: '#ffffff',
+                                        borderRadius: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#ffffff',
+                                            borderColor: '#124559',
+                                            color: '#124559',
+                                        },
+                                    }}
                                 >
                                     Go to Data Page
                                 </Button>
@@ -52,32 +52,32 @@ const DataPage: React.FC = () => {
                     </Accordion>
 
                     {/* Accordion 2 */}
-                    <Accordion className = "shadow-lg">
+                    <Accordion className="shadow-lg">
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography className="font-semibold">TWDB Historical Water Use Summary and Data Dashboard</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                            This interactive data dashboard displays historical water use survey and estimate data. The Texas Water Development Board Water Use Survey program conducts an annual survey of about 4,650 public water systems and 2,600 industrial facilities. The water use survey collects the volume of both ground and surface water used, the source of the water, water sales, and other pertinent data from the users. Periodically, the data reports are refreshed to include any new or corrected information. <b>Note:</b> periodically, the data reports are refreshed to include any new or corrected information.
+                                This interactive data dashboard displays historical water use survey and estimate data. The Texas Water Development Board Water Use Survey program conducts an annual survey of public water systems and industrial facilities. The water use survey collects the volume of both ground and surface water used, the source of the water, water sales, and other pertinent data from the users. Periodically, the data reports are refreshed to include any new or corrected information. <b>Note:</b> periodically, the data reports are refreshed to include any new or corrected information.
                             </Typography>
                             <div className='flex justify-end py-5 px-5'>
                                 <Button
-                                variant="outlined"
-                                endIcon={<OutboundIcon />}
-                                href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/dashboard/index.asp"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                sx={{
-                                    color: '#ffffff',
-                                    backgroundColor: '#124559',
-                                    borderColor: '#ffffff',
-                                    borderRadius: '5px',
-                                    '&:hover': {
-                                        backgroundColor: '#ffffff',
-                                        borderColor: '#124559',
-                                        color: '#124559',
-                                    },
-                                }}
+                                    variant="outlined"
+                                    endIcon={<OutboundIcon />}
+                                    href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/dashboard/index.asp"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#124559',
+                                        borderColor: '#ffffff',
+                                        borderRadius: '5px',
+                                        '&:hover': {
+                                            backgroundColor: '#ffffff',
+                                            borderColor: '#124559',
+                                            color: '#124559',
+                                        },
+                                    }}
                                 >
                                     Go to Dashboard Page
                                 </Button>

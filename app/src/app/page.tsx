@@ -350,7 +350,7 @@ export default function Home() {
                   <ul className="flex flex-col space-y-4">
                     <div>
                       <Link href="./netexplorer/systems?node=31500" className="aPlus">
-                        <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> Agua WSC &rarr;
+                        <CircleIcon className="inline-block align-top mr-2 text-[#53899D]" size={14} /> Aqua WSC &rarr;
                       </Link>
                     </div>
                     <div>
