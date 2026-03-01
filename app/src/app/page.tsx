@@ -392,23 +392,48 @@ export default function Home() {
               <div className="container mx-auto items-start grid">
                 <ul className="flex flex-col space-y-4">
                   <div>
-                    <Link href="https://www.waterdatafortexas.org/reservoirs/statewide" className="aPlus">
+                    <Link
+                      href="https://www.waterdatafortexas.org/reservoirs/statewide"
+                      className="aPlus"
+                      target="_blank"
+                    >
                       <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> Water Data for Texas &rarr;
                     </Link>
                   </div>
                   <div>
-                    <Link href="https://www.twdb.texas.gov/waterplanning/swp/" className="aPlus">
+                    <Link
+                      href="https://www.twdb.texas.gov/waterplanning/swp/"
+                      className="aPlus"
+                      target="_blank"
+                    >
                       <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB State Water Plan  &rarr;
                     </Link>
                   </div>
                   <div>
-                    <Link href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/index.asp" className="aPlus">
+                    <Link
+                      href="https://www.twdb.texas.gov/waterplanning/waterusesurvey/index.asp"
+                      className="aPlus"
+                      target="_blank"
+                    >
                       <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB Water Use Survey  &rarr;
                     </Link>
                   </div>
                   <div>
-                    <Link href="https://www.twdb.texas.gov/waterplanning/resources/index.asp" className="aPlus">
+                    <Link
+                      href="https://www.twdb.texas.gov/waterplanning/resources/index.asp"
+                      className="aPlus"
+                      target="_blank"
+                    >
                       <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB Useful Links and Resources  &rarr;
+                    </Link>
+                  </div>
+                  <div>
+                    <Link
+                      href="https://www.twdb.texas.gov/mapping/index.asp"
+                      className="aPlus"
+                      target="_blank"
+                    >
+                      <LibraryBooksIcon className="inline-block align-top mr-2 text-[#01161E]" size={14} /> TWDB Data Apps and Maps  &rarr;
                     </Link>
                   </div>
 

@@ -242,7 +242,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                 node.addClass('search-highlighted');
                 setTimeout(() => {
                     node.removeClass('search-highlighted');
-                }, 1000); // Remove after 1 second
+                }, 10000); // Remove after 1 second
 
                 // Center view on the node
                 cy.animate({

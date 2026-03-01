@@ -1,6 +1,7 @@
 import React from "react";
 import Typography from "@mui/material/Typography";
 import CircleIcon from '@mui/icons-material/Circle';
+import { Info } from 'lucide-react';
 
 const Glossary: React.FC = () => {
     return (
@@ -27,6 +28,12 @@ const Glossary: React.FC = () => {
                 <p>
                     <b>Edges: </b>These represent the connections or pathways between nodes in the network. An edge shows how water flows from one node to another — for example, from a water source to an intermediary, or from one system to another. Edges in this graph have direction, depicted by an arrow. In this dynamic visualization, properties about an edge (e.g., volume, year of transaction, type, etc.) can by accessed by hovering over it.
                 </p>
+                <div className='flex items-start space-x-2 py-2 px-4 space'>
+                    <Info className='w-[25px] h-[25px] shrink-0' />
+                    <div>
+                        <b>Edge Weight:</b> The width of each edge is proportional to the exchanged volume between the connected nodes; that is, thicker edges indicate a higher volume of flow or transactions, while thinner edges represent lower volumes.
+                    </div>
+                </div>
             </div>
             <div className="space-y-4">
                 <Typography variant="h6" className="text-semibold py-4">
