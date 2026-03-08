@@ -10,6 +10,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import SearchIcon from '@mui/icons-material/Search'
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import Backspace from '@mui/icons-material/Backspace';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import cxtmenu from "cytoscape-cxtmenu";
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -187,6 +188,9 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
         const normalized = (volume - minVolume) / (maxVolume - minVolume);
         return minWidth + normalized * (maxWidth - minWidth);
     };
+
+    // Highlight flow into nodes
+    const [flowHighlightActive, setFlowHighlightActive] = useState(false);
 
     // Search term and selected node state -------------------------------------
     const [searchTerm, setSearchTerm] = useState('');
@@ -554,6 +558,12 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                     resetStyles();
                 }
             });
+            cy.on('click', 'node', () => {
+                setNodeTooltip(prev => ({ ...prev, show: false }));
+            });
+            cy.on('cxttapstart', 'node', () => {
+                setNodeTooltip(prev => ({ ...prev, show: false }));
+            });
 
             cy.cxtmenu({
                 selector: 'node',
@@ -583,6 +593,38 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         },
                         openMenuEvents: 'cxttapstart taphold',
                         outsideMenuCancel: true
+                    },
+                    {
+                        content: 'Show In Flow',
+                        select: (node: cytoscape.NodeSingular) => {
+                            cy.elements().removeClass('flow-highlighted').removeClass('flow-highlighted-out').removeClass('faded');
+                            // predecessors() walks ALL upstream nodes + edges recursively
+                            const upstream = node.predecessors();
+                            const involved = upstream.add(node);
+
+                            cy.elements().difference(involved).addClass('faded');
+                            involved.addClass('flow-highlighted');
+                            setFlowHighlightActive(true);
+                        },
+                        openMenuEvents: 'cxttapstart taphold',
+                        outsideMenuCancel: true
+
+                    },
+                    {
+                        content: 'Show Out Flow',
+                        select: (node: cytoscape.NodeSingular) => {
+                            cy.elements().removeClass('flow-highlighted').removeClass('flow-highlighted-out').removeClass('faded');
+                            // predecessors() walks ALL upstream nodes + edges recursively
+                            const upstream = node.successors();
+                            const involved = upstream.add(node);
+
+                            cy.elements().difference(involved).addClass('faded');
+                            involved.addClass('flow-highlighted-out');
+                            setFlowHighlightActive(true);
+                        },
+                        openMenuEvents: 'cxttapstart taphold',
+                        outsideMenuCancel: true
+
                     }
                 ],
 
@@ -839,6 +881,21 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         <ColorLensIcon />
                     </button>
                 </Tooltip>
+                {flowHighlightActive && (
+                    <Tooltip title="Remove Path" arrow placement="top">
+                        <button
+                            className="absolute top-[13em] left-[1em] z-10 bg-[#124559] text-white p-2 rounded-full hover:bg-white hover:text-[#124559] hover:border-[#124559] hover:border-[1px] shadow-lg"
+                            id='color-toggle-btn'
+                            onClick={() => {
+                                cyRef.current?.elements().removeClass('flow-highlighted').removeClass('faded').removeClass('flow-highlighted-out');
+                                setFlowHighlightActive(false);
+                            }}
+                        >
+                            <Backspace />
+                        </button>
+                    </Tooltip>
+
+                )}
             </Paper>
 
 
@@ -938,6 +995,22 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
                         style: {
                             "opacity": 1,
                         },
+                    },
+                    {
+                        selector: "node.flow-highlighted",
+                        style: { "border-color": "#3E6445", "border-width": 2, "opacity": 1 }
+                    },
+                    {
+                        selector: "edge.flow-highlighted",
+                        style: { "line-color": "#3E6445", "mid-target-arrow-color": "#3E6445", "opacity": 1 }
+                    },
+                    {
+                        selector: "node.flow-highlighted-out",
+                        style: { "border-color": "#6F5A4C", "border-width": 2, "opacity": 1 }
+                    },
+                    {
+                        selector: "edge.flow-highlighted-out",
+                        style: { "line-color": "#6F5A4C", "mid-target-arrow-color": "#6F5A4C", "opacity": 1 }
                     },
                     {
                         selector: ".faded",
