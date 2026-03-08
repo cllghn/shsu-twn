@@ -561,6 +561,7 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ data, selected }) => {
             cy.on('click', 'node', () => {
                 setNodeTooltip(prev => ({ ...prev, show: false }));
             });
+            // Put this in to remove the tooltip when you click on the node and open the ctxmenu
             cy.on('cxttapstart', 'node', () => {
                 setNodeTooltip(prev => ({ ...prev, show: false }));
             });
