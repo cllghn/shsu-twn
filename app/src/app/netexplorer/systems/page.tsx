@@ -523,6 +523,9 @@ const SystemsPageContent: React.FC = () => {
                                     <InfoIcon />
                                     <div className="px-2">
                                         The graph below shows how water flows into and out of the selected water system. It only includes the connections directly linked to that system.
+                                        <i className="font-semibold text-white">
+                                            &nbsp;Results should be interpreted cautiously, as self-reported data may be incomplete or missing.
+                                        </i>
                                     </div>
                                     <InfoIcon />
                                 </div>

@@ -364,6 +364,9 @@ const SourcesPageContent: React.FC = () => {
                                     <InfoIcon />
                                     <div className="px-2" >
                                         The graph below shows how water flows out of the selected water source. It also includes the outputs from any systems directly connected to it, showing where water goes two steps away. Inputs into the water source are not shown because they are not available in the data.
+                                        <i className="font-semibold text-white">
+                                            &nbsp;Results should be interpreted cautiously, as self-reported data may be incomplete or missing.
+                                        </i>
                                     </div>
                                     <InfoIcon />
                                 </div>

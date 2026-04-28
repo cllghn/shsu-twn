@@ -1,6 +1,13 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "marimo>=0.22.4",
+# ]
+# ///
+
 import marimo
 
-__generated_with = "0.10.7"
+__generated_with = "0.11.8"
 app = marimo.App(width="medium")
 
 
@@ -940,6 +947,13 @@ def _(datetime, el_noparallel, nl_tidy_enriched):
     nl_tidy_enriched.to_csv(f'outputs/nodes_{current_date}.csv', index=False)
     el_noparallel.to_csv(f'outputs/edges_{current_date}.csv', index=False)
     return (current_date,)
+
+
+@app.cell
+def _(el_noparallel, nx):
+    test_G = nx.from_pandas_edgelist(el_noparallel, source='source', target='target', create_using=nx.DiGraph())
+    len(set(test_G.nodes()))
+    return (test_G,)
 
 
 @app.cell(hide_code=True)
