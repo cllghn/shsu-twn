@@ -8,7 +8,7 @@
 
 import marimo
 
-__generated_with = "0.23.1"
+__generated_with = "0.11.8"
 app = marimo.App(width="medium")
 
 
@@ -88,7 +88,7 @@ def _():
     intake_el = create_intake_el('inputs/PWS Intake_2022-2023.csv', el=True, year=2022)
     print(f"Intake edge list shape: {intake_el.shape}")
     intake_el.head()
-    return List, Optional, intake_el, os, pd
+    return List, Optional, create_intake_el, intake_el, os, pd
 
 
 @app.cell
@@ -122,7 +122,18 @@ def _(intake_el, pd):
         'is_target': [n in intake_targets for n in sorted(not_in_bridge)],
     })
     gaps_df
-    return bridge_ids, intake_sources, intake_targets
+    return (
+        all_intake_nodes,
+        bridge,
+        bridge_ids,
+        gaps_df,
+        in_bridge,
+        intake_sources,
+        intake_targets,
+        not_in_bridge,
+        sources_only,
+        targets_only,
+    )
 
 
 @app.cell
@@ -133,7 +144,7 @@ def _(bridge_ids, intake_sources):
     for s in unknown_sources[:10]:
         print(f"  - {s}")
     print(f"  - ...{len(unknown_sources) - 10} more")
-    return
+    return s, unknown_sources
 
 
 @app.cell
@@ -144,7 +155,7 @@ def _(bridge_ids, intake_sources):
     for stri in unknown_digit_sources[:10]:
         print(f"  - {stri}")
     print(f"  - ...{len(unknown_digit_sources) - 10} more")
-    return
+    return stri, unknown_digit_sources
 
 
 @app.cell
@@ -246,7 +257,13 @@ def _(bridge_ids, intake_sources, intake_targets):
         print(f"  - {udt}")
     if len(unknown_digit_targets_) > 10:
         print(f"  - ...{len(unknown_digit_targets_) - 10} more")
-    return (tranformation_list,)
+    return (
+        tranformation_list,
+        uds,
+        udt,
+        unknown_digit_sources_,
+        unknown_digit_targets_,
+    )
 
 
 @app.cell
@@ -299,14 +316,12 @@ def _(intake_el, pd):
     print(f"\nTotal rows: {len(comparison)}")
 
     comparison.sort_values('match_status')
-    return
+    return bridge_clean, bridges, classify, comparison, intake_targets_clean
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""
-    Can't compare the sources since these don't have a name.
-    """)
+    mo.md(r"""Can't compare the sources since these don't have a name.""")
     return
 
 
@@ -367,8 +382,7 @@ def _(List, Optional, os, pd):
 
     sales_el = create_sales_el('inputs/PWS Sales_2022-2023.csv', el=True, year=2022)
     sales_el.head(10)
-
-    return (sales_el,)
+    return create_sales_el, sales_el
 
 
 @app.cell
@@ -392,7 +406,14 @@ def _(bridge_ids, sales_el, tranformation_list):
         print(f"  - {sudt}")
     if len(sales_unknown_digit_targets_) > 10:
         print(f"  - ...{len(sales_unknown_digit_targets_) - 10} more")
-    return
+    return (
+        sales_sources,
+        sales_targets,
+        sales_unknown_digit_sources_,
+        sales_unknown_digit_targets_,
+        suds,
+        sudt,
+    )
 
 
 @app.cell
